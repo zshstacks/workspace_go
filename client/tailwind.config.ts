@@ -9,7 +9,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        header: "#232930",
+        main: "#232930",
       },
       backgroundImage: {
         bgMain:

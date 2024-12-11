@@ -7,23 +7,24 @@ const Header = () => {
   return (
     <header className="w-full p-2 flex justify-between items-center fixed ">
       {/* Left Section */}
-      <div className="flex items-center  ">
-        <div className="bg-header rounded-md px-2 py-1 flex justify-center items-center ">
-          <div className="flex hover:bg-gray-700 hover:rounded-md px-1  cursor-pointer">
-            <span className="text-white text-md mr-1">2</span>
-            <BsFire color="darkorange" size={19} />
-          </div>
+      <div className="bg-main rounded-md px-2 py-1 flex justify-center items-center ">
+        <div className="flex hover:bg-gray-700 hover:rounded-md px-1  cursor-pointer">
+          <span className="text-white text-md mr-1">2</span>
+          <BsFire color="darkorange" size={19} />
         </div>
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center bg-header rounded-md text-white p-1">
+      <div className="flex items-center bg-main  rounded-md text-white p-1">
+        {/* enter/exit fullscreen */}
         <div className="hover:bg-gray-700 p-1 hover:rounded-md cursor-pointer">
           <MdCloseFullscreen size={19} className="mr-[2px]" />
         </div>
 
+        {/* divider */}
         <div className="h-5 w-[1px] bg-gray-500 mx-2"></div>
 
+        {/* user dropdown menu */}
         <div className="flex items-center   p-1 hover:bg-gray-700 hover:rounded-md  cursor-pointer">
           <LuUserRound size={19} className="mr-[2px]" />
           <MdOutlineKeyboardArrowDown size={18} />
