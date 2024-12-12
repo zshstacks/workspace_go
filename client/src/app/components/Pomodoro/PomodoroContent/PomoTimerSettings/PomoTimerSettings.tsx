@@ -33,6 +33,7 @@ const PomoTimerSettings = () => {
               type="number"
               min={0}
               max={60}
+              defaultValue={60}
               className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black text-sm font-normal"
             />
           </div>
@@ -42,6 +43,7 @@ const PomoTimerSettings = () => {
               type="number"
               min={0}
               max={60}
+              defaultValue={15}
               className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black text-sm font-normal"
             />
           </div>
@@ -51,6 +53,7 @@ const PomoTimerSettings = () => {
               type="number"
               min={0}
               max={60}
+              defaultValue={30}
               className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black text-sm font-normal"
             />
           </div>
