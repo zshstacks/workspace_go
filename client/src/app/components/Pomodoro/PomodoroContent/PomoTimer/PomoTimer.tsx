@@ -1,8 +1,17 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
+import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
 
 const PomoTimer = () => {
+  const [openSettings, setOpenSettings] = useState(false);
+
+  const toggleOpenSettings = () => {
+    setOpenSettings(!openSettings);
+  };
+
   return (
     <div className="bg-main  text-white w-[360px] p-4 rounded-lg shadow-md">
       {/* Header Section */}
@@ -36,20 +45,22 @@ const PomoTimer = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="flex justify-around mt-6 text-sm">
+      <div className="flex justify-around mt-6 text-sm ">
         <button className="border-b-2 border-white pb-1 font-medium">
           Pomodoro
         </button>
-        <button className="hover:text-gray-300">Short Break</button>
-        <button className="hover:text-gray-300">Long Break</button>
+        <button>Short Break</button>
+        <button>Long Break</button>
 
         {/* Settings Icon */}
         <div className="flex">
-          <button className="hover:text-gray-300">
+          <button onClick={toggleOpenSettings}>
             <FiSettings size={20} />
           </button>
         </div>
       </div>
+
+      <>{openSettings && <PomoTimerSettings />}</>
     </div>
   );
 };
