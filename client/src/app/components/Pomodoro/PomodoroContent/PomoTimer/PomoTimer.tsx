@@ -11,7 +11,7 @@ const PomoTimer = ({ position }: { position: Position }) => {
   const [openSettings, setOpenSettings] = useState(false);
   const [localPosition, setLocalPosition] = useState(position);
 
-  // Atjaunot pozīciju, kad tās mainās
+  // update pos when it changes
   useEffect(() => {
     if (position !== localPosition) {
       setLocalPosition(position);
@@ -24,12 +24,12 @@ const PomoTimer = ({ position }: { position: Position }) => {
 
   useEffect(() => {
     if (transform) {
-      setLocalPosition((prevPosition) => ({
-        x: prevPosition.x + transform.x,
-        y: prevPosition.y + transform.y,
-      }));
+      setLocalPosition({
+        x: position.x + transform.x,
+        y: position.y + transform.y,
+      });
     }
-  }, [transform]);
+  }, [transform, position]);
 
   const toggleOpenSettings = () => {
     setOpenSettings(!openSettings);
@@ -37,24 +37,31 @@ const PomoTimer = ({ position }: { position: Position }) => {
 
   return (
     <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
       id="pomo-timer"
-      className={`bg-main text-white w-[360px] p-4 rounded-lg shadow-md transition-all`}
+      className={`bg-main   text-white w-[360px] p-4 rounded-lg shadow-md `}
       style={{
         transform: `translate3d(${localPosition.x}px, ${localPosition.y}px, 0)`,
         position: "fixed",
       }}
     >
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 z-20">
         <div className="flex gap-1">
           <div className="w-2 h-2 bg-gray-700 rounded-full"></div>
           <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
           <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
           <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
         </div>
+
+        {/* div for dnd  */}
+        <div
+          className="w-[270px] h-[40px] absolute"
+          ref={setNodeRef}
+          {...listeners}
+          {...attributes}
+          style={{ cursor: "grab" }}
+        ></div>
+
         <button className="text-gray-400  pb-2">
           <FaRegWindowMinimize size={14} />
         </button>
@@ -68,7 +75,7 @@ const PomoTimer = ({ position }: { position: Position }) => {
 
         {/* Buttons Section */}
         <div className="flex justify-center gap-4  ">
-          <button className="px-8 bg-transparent border border-white rounded-lg  ">
+          <button className="px-8 bg-transparent border border-white rounded-lg  relative z-20">
             <span className="font-bold text-sm">Start</span>
           </button>
           <button className="">
@@ -86,8 +93,8 @@ const PomoTimer = ({ position }: { position: Position }) => {
         <button>Long Break</button>
 
         {/* Settings Icon */}
-        <div className="flex">
-          <button onClick={toggleOpenSettings}>
+        <div className="flex ">
+          <button onClick={toggleOpenSettings} className="">
             <FiSettings size={20} />
           </button>
         </div>

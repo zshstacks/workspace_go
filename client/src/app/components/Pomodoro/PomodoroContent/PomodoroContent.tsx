@@ -13,7 +13,7 @@ const localStorageKey =
 const PomodoroContent = () => {
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
 
-  // Ielādēt saglabāto pozīciju no localStorage, ja tāda ir
+  // load saved pos from localstorage, if there is
   useEffect(() => {
     const savedPosition = localStorage.getItem(localStorageKey);
     if (savedPosition) {
@@ -21,10 +21,17 @@ const PomodoroContent = () => {
     }
   }, []);
 
-  // Saglabāt jauno pozīciju vietējā glabātuvē
+  // save new pos localstorage
   const savePosition = (newPosition: Position) => {
     setPosition(newPosition);
     localStorage.setItem(localStorageKey, JSON.stringify(newPosition));
+  };
+
+  //reset pos (dev)
+  const resetPos = () => {
+    const resetPosition = { x: 0, y: 0 };
+    setPosition(resetPosition);
+    localStorage.setItem(localStorageKey, JSON.stringify(resetPosition));
   };
 
   return (
@@ -32,6 +39,14 @@ const PomodoroContent = () => {
       {/* header */}
       <div className="h-[50px]">
         <Header />
+        <div
+          className="w-[15px] h-[10px]  absolute right-1/2 cursor-pointer"
+          onClick={resetPos}
+        >
+          <span color="red" className=" border-2 bg-red-300 ">
+            resetPos
+          </span>
+        </div>
       </div>
 
       {/* timer */}
