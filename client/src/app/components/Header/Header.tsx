@@ -4,10 +4,15 @@ import React, { useState } from "react";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import { BsFire } from "react-icons/bs";
 import { LuUserRound } from "react-icons/lu";
-import { MdCloseFullscreen, MdOutlineKeyboardArrowDown } from "react-icons/md";
+import {
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardArrowUp,
+} from "react-icons/md";
+import UserMenu from "./UserMenu/UserMenu";
 
 const Header = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [openUserMenu, setOpenUserMenu] = useState(false);
 
   const toggleFullscreenMode = () => {
     const element = document.documentElement;
@@ -17,6 +22,10 @@ const Header = () => {
     } else {
       document.exitFullscreen().then(() => setIsFullscreen(false));
     }
+  };
+
+  const toggleUserMenu = () => {
+    setOpenUserMenu(!openUserMenu);
   };
 
   return (
@@ -47,10 +56,18 @@ const Header = () => {
         <div className="h-5 w-[1px] bg-gray-500 mx-2"></div>
 
         {/* user dropdown menu */}
-        <div className="flex items-center   p-1 hover:bg-gray-700 hover:rounded-md  cursor-pointer">
+        <div
+          className="flex items-center  p-1 hover:bg-gray-700 hover:rounded-md  cursor-pointer transition-all"
+          onClick={toggleUserMenu}
+        >
           <LuUserRound size={19} className="mr-[2px]" />
-          <MdOutlineKeyboardArrowDown size={18} />
+          {openUserMenu ? (
+            <MdOutlineKeyboardArrowDown size={18} />
+          ) : (
+            <MdOutlineKeyboardArrowUp size={18} />
+          )}
         </div>
+        {openUserMenu && <UserMenu />}
       </div>
     </header>
   );

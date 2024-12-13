@@ -1,19 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
+import { useDraggable } from "@dnd-kit/core";
+import { Position } from "@/app/utility/types/types";
 
-const PomoTimer = () => {
+const PomoTimer = ({ position }: { position: Position }) => {
   const [openSettings, setOpenSettings] = useState(false);
+  const [localPosition, setLocalPosition] = useState(position);
+
+  // Atjaunot pozīciju, kad tās mainās
+  useEffect(() => {
+    if (position !== localPosition) {
+      setLocalPosition(position);
+    }
+  }, [position]);
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: "pomo-timer",
+  });
+
+  useEffect(() => {
+    if (transform) {
+      setLocalPosition((prevPosition) => ({
+        x: prevPosition.x + transform.x,
+        y: prevPosition.y + transform.y,
+      }));
+    }
+  }, [transform]);
 
   const toggleOpenSettings = () => {
     setOpenSettings(!openSettings);
   };
 
   return (
-    <div className="bg-main  text-white w-[360px] p-4 rounded-lg shadow-md">
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      id="pomo-timer"
+      className={`bg-main text-white w-[360px] p-4 rounded-lg shadow-md transition-all`}
+      style={{
+        transform: `translate3d(${localPosition.x}px, ${localPosition.y}px, 0)`,
+        position: "fixed",
+      }}
+    >
       {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex gap-1">
