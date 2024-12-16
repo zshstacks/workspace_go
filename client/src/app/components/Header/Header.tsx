@@ -9,8 +9,9 @@ import {
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
 import UserMenu from "./UserMenu/UserMenu";
+import { HeaderProps } from "@/app/utility/types/types";
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = ({ openAppearance }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [openUserMenu, setOpenUserMenu] = useState(false);
 
@@ -67,7 +68,7 @@ const Header = () => {
             <MdOutlineKeyboardArrowUp size={18} />
           )}
         </div>
-        {openUserMenu && <UserMenu />}
+        {openUserMenu && <UserMenu openAppearance={openAppearance} />}
       </div>
     </header>
   );

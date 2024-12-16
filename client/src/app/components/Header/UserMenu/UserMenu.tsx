@@ -3,7 +3,9 @@ import { FaUser } from "react-icons/fa";
 import { PiGithubLogo } from "react-icons/pi";
 import { VscSettings } from "react-icons/vsc";
 
-const UserMenu = () => {
+import { HeaderProps } from "@/app/utility/types/types";
+
+const UserMenu: React.FC<HeaderProps> = ({ openAppearance }) => {
   return (
     <div className="bg-main rounded-md w-[155px] h-[150px] absolute top-[45px] right-2">
       {/* account settings */}
@@ -15,7 +17,7 @@ const UserMenu = () => {
       <div className="h-[1px] w-full bg-white/25"></div>
 
       {/* appearance settings */}
-      <div className="flex gap-2 cursor-pointer p-2">
+      <div className="flex gap-2 cursor-pointer p-2" onClick={openAppearance}>
         <VscSettings className="my-auto" />
         <span className="">Appearance</span>
       </div>

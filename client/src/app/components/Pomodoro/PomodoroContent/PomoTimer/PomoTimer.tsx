@@ -37,15 +37,14 @@ const PomoTimer = ({ position }: { position: Position }) => {
 
   return (
     <div
-      id="pomo-timer"
-      className={`bg-main   text-white w-[360px] p-4 rounded-lg shadow-md `}
+      className={`bg-main  text-white w-[360px] p-4 rounded-lg shadow-md `}
       style={{
         transform: `translate3d(${localPosition.x}px, ${localPosition.y}px, 0)`,
         position: "fixed",
       }}
     >
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-4 z-20">
+      <div className="flex justify-between items-center mb-2 z-20">
         <div className="flex gap-1">
           <div className="w-2 h-2 bg-gray-700 rounded-full"></div>
           <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
@@ -67,8 +66,11 @@ const PomoTimer = ({ position }: { position: Position }) => {
         </button>
       </div>
 
+      {/* divider */}
+      <div className="w-[360px] h-[1px] bg-white/25 absolute right-0"></div>
+
       {/* Timer Section */}
-      <div className="flex justify-center ">
+      <div className="flex justify-center mt-6">
         <div className="w-full">
           <h1 className="text-5xl font-bold">60:00</h1>
         </div>

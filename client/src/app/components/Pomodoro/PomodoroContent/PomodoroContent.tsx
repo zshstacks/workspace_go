@@ -6,12 +6,18 @@ import PomoTimer from "./PomoTimer/PomoTimer";
 import { DndContext } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { Position } from "@/app/utility/types/types";
+import Appearance from "../../Header/UserMenu/Appearance/Appearance";
 
 const localStorageKey =
   process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY || "widgetPosition";
 
 const PomodoroContent = () => {
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+  const [openUISettings, setOpenUISettings] = useState(false);
+
+  const openAppearance = () => {
+    setOpenUISettings(true);
+  };
 
   // load saved pos from localstorage, if there is
   useEffect(() => {
@@ -35,18 +41,19 @@ const PomodoroContent = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    <>
       {/* header */}
-      <div className="h-[50px]">
-        <Header />
+      <div className="h-[50px] ">
+        <Header openAppearance={openAppearance} />
         <div
-          className="w-[15px] h-[10px]  absolute right-1/2 cursor-pointer"
+          className="w-[15px] h-[10px]  absolute right-1/2 cursor-pointer  "
           onClick={resetPos}
         >
           <span color="red" className=" border-2 bg-red-300 ">
             resetPos
           </span>
         </div>
+        {openUISettings && <Appearance />}
       </div>
 
       {/* timer */}
@@ -68,7 +75,7 @@ const PomodoroContent = () => {
           </div>
         </DndContext>
       </div>
-    </div>
+    </>
   );
 };
 
