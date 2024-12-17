@@ -16,7 +16,7 @@ const PomodoroContent = () => {
   const [openUISettings, setOpenUISettings] = useState(false);
 
   const openAppearance = () => {
-    setOpenUISettings(true);
+    setOpenUISettings(!openUISettings);
   };
 
   // load saved pos from localstorage, if there is
@@ -53,7 +53,12 @@ const PomodoroContent = () => {
             resetPos
           </span>
         </div>
-        {openUISettings && <Appearance />}
+        {openUISettings && (
+          <Appearance
+            openUISettings={openUISettings}
+            openAppearance={openAppearance}
+          />
+        )}
       </div>
 
       {/* timer */}
