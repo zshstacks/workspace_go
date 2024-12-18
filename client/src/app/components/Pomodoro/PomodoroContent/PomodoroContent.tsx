@@ -7,6 +7,7 @@ import { DndContext } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { Position } from "@/app/utility/types/types";
 import Appearance from "../../Header/UserMenu/Appearance/Appearance";
+import UserAccount from "../../Header/UserMenu/UserAccount/UserAccount";
 
 const localStorageKey =
   process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY || "widgetPosition";
@@ -14,9 +15,14 @@ const localStorageKey =
 const PomodoroContent = () => {
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const [openUISettings, setOpenUISettings] = useState(false);
+  const [openAccSettings, setOpenAccSettings] = useState(false);
 
   const openAppearance = () => {
     setOpenUISettings(!openUISettings);
+  };
+
+  const openAccountSettings = () => {
+    setOpenAccSettings(!openAccSettings);
   };
 
   // load saved pos from localstorage, if there is
@@ -44,7 +50,10 @@ const PomodoroContent = () => {
     <>
       {/* header */}
       <div className="h-[50px] ">
-        <Header openAppearance={openAppearance} />
+        <Header
+          openAppearance={openAppearance}
+          openAccountSettings={openAccountSettings}
+        />
         <div
           className="w-[15px] h-[10px]  absolute right-1/2 cursor-pointer  "
           onClick={resetPos}
@@ -57,6 +66,13 @@ const PomodoroContent = () => {
           <Appearance
             openUISettings={openUISettings}
             openAppearance={openAppearance}
+          />
+        )}
+
+        {openAccSettings && (
+          <UserAccount
+            openAccountSettings={openAccountSettings}
+            openAccSettings={openAccSettings}
           />
         )}
       </div>

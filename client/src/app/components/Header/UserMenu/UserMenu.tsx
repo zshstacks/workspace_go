@@ -5,11 +5,17 @@ import { VscSettings } from "react-icons/vsc";
 
 import { HeaderProps } from "@/app/utility/types/types";
 
-const UserMenu: React.FC<HeaderProps> = ({ openAppearance }) => {
+const UserMenu: React.FC<HeaderProps> = ({
+  openAppearance,
+  openAccountSettings,
+}) => {
   return (
-    <div className="bg-main rounded-md w-[155px] h-[150px] absolute top-[45px] right-2">
+    <div className="bg-main rounded-md w-[155px] h-[150px] absolute top-[45px] right-2 ">
       {/* account settings */}
-      <div className="flex gap-2 cursor-pointer p-2">
+      <div
+        className="flex gap-2 cursor-pointer p-2"
+        onClick={openAccountSettings}
+      >
         <FaUser size={12} className="my-auto" />
         <span className="">My account</span>
       </div>

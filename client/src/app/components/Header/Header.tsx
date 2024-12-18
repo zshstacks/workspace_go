@@ -11,7 +11,10 @@ import {
 import UserMenu from "./UserMenu/UserMenu";
 import { HeaderProps } from "@/app/utility/types/types";
 
-const Header: React.FC<HeaderProps> = ({ openAppearance }) => {
+const Header: React.FC<HeaderProps> = ({
+  openAppearance,
+  openAccountSettings,
+}) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [openUserMenu, setOpenUserMenu] = useState(false);
 
@@ -68,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ openAppearance }) => {
             <MdOutlineKeyboardArrowUp size={18} />
           )}
         </div>
-        {openUserMenu && <UserMenu openAppearance={openAppearance} />}
+        {openUserMenu && <UserMenu openAppearance={openAppearance} openAccountSettings={openAccountSettings} />}
       </div>
     </header>
   );
