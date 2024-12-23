@@ -1,11 +1,11 @@
 import React from "react";
 import "@/app/styles/globals.css";
-import StartPage from "./components/Start/StartPage";
+import Pomodoro from "../components/Pomodoro/Pomodoro";
 
 const page = () => {
   return (
     <div>
-      <StartPage />
+      <Pomodoro />
     </div>
   );
 };

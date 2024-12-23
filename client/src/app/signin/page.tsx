@@ -1,11 +1,11 @@
 import React from "react";
+import Signin from "../components/Auth/Signin/Signin";
 import "@/app/styles/globals.css";
-import StartPage from "./components/Start/StartPage";
 
 const page = () => {
   return (
     <div>
-      <StartPage />
+      <Signin />
     </div>
   );
 };
