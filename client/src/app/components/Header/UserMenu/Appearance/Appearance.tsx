@@ -10,7 +10,7 @@ const Appearance: React.FC<AppearanceProps> = ({
   return (
     <>
       {openUISettings && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999] ">
           <div className="w-96  bg-main rounded-lg shadow-lg">
             <div
               className=" flex justify-end relative cursor-pointer"

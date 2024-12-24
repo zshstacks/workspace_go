@@ -37,7 +37,7 @@ const PomoTimer = ({ position }: { position: Position }) => {
 
   return (
     <div
-      className={`bg-main  text-white w-[360px] p-4 rounded-lg shadow-md `}
+      className={`bg-main text-white w-[360px] p-4 rounded-lg shadow-md `}
       style={{
         transform: `translate3d(${localPosition.x}px, ${localPosition.y}px, 0)`,
         position: "fixed",

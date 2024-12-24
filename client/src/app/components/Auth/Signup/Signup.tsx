@@ -56,8 +56,10 @@ const Signup = () => {
         </p>
       </div>
 
-      <span className="text-blue-300 font-bold p-10 bg-white/20">
-        <Link href="/pomodoro"> Pomodoro</Link>
+      <span className="text-blue-300 font-bold  bg-white/20">
+        <Link href="/pomodoro" className="p-10 flex">
+          Pomodoro
+        </Link>
       </span>
     </div>
   );

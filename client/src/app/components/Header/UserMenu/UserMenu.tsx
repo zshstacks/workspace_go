@@ -10,7 +10,7 @@ const UserMenu: React.FC<HeaderProps> = ({
   openAccountSettings,
 }) => {
   return (
-    <div className="bg-main rounded-md w-[155px] h-[150px] absolute top-[45px] right-2 ">
+    <div className="bg-main rounded-md w-[155px] h-[150px] absolute top-[45px] right-2 shadow-xl shadow-gray-700">
       {/* account settings */}
       <div
         className="flex gap-2 cursor-pointer p-2"

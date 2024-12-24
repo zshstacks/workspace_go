@@ -8,6 +8,7 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { Position } from "@/app/utility/types/types";
 import Appearance from "../../Header/UserMenu/Appearance/Appearance";
 import UserAccount from "../../Header/UserMenu/UserAccount/UserAccount";
+import Link from "next/link";
 
 const localStorageKey =
   process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY || "widgetPosition";
@@ -62,6 +63,11 @@ const PomodoroContent = () => {
             resetPos
           </span>
         </div>
+        <div className="w-[15px] h-[10px]  absolute right-[55%] cursor-pointer ">
+          <span className="border-2 bg-red-300">
+            <Link href="/signin">Auth</Link>
+          </span>
+        </div>
         {openUISettings && (
           <Appearance
             openUISettings={openUISettings}
@@ -78,7 +84,6 @@ const PomodoroContent = () => {
       </div>
 
       {/* timer */}
-
       <div className="flex-grow flex justify-center items-center ">
         <DndContext
           modifiers={[restrictToWindowEdges]}
