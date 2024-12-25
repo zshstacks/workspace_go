@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="w-full p-2 flex justify-between items-center fixed ">
+    <header className="w-full p-2 flex justify-between items-center fixed  h-[50px] ">
       {/* Left Section */}
       <div className="bg-main rounded-md px-2 py-1 flex justify-center items-center ">
         <div className="flex hover:bg-gray-700 hover:rounded-md px-1  cursor-pointer">
@@ -71,7 +71,13 @@ const Header: React.FC<HeaderProps> = ({
             <MdOutlineKeyboardArrowUp size={18} />
           )}
         </div>
-        {openUserMenu && <UserMenu openAppearance={openAppearance} openAccountSettings={openAccountSettings} />}
+
+        {openUserMenu && (
+          <UserMenu
+            openAppearance={openAppearance}
+            openAccountSettings={openAccountSettings}
+          />
+        )}
       </div>
     </header>
   );
