@@ -20,9 +20,9 @@ const restrictToBoundingBox: Modifier = ({
 
   const boundingBox = {
     top: 60, // top y cord
-    bottom: 830, // bott y cord
+    bottom: window.innerHeight - 129, // bott y cord 830
     left: 16, // left x cord
-    right: 1846, // right x cord
+    right: window.innerWidth - 73, // right x cord 1846
   };
 
   let newX = transform.x;
