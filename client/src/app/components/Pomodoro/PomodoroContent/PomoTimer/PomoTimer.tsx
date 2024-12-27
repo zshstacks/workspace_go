@@ -5,11 +5,16 @@ import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
 import { useDraggable } from "@dnd-kit/core";
-import { Position } from "@/app/utility/types/types";
+import { PomoTimerProps } from "@/app/utility/types/types";
 
-const PomoTimer = ({ position }: { position: Position }) => {
-  const [openSettings, setOpenSettings] = useState(false);
+const PomoTimer: React.FC<PomoTimerProps> = ({
+  position,
+  toggleOpenSettings,
+  openSettings,
+}) => {
+  // const [openSettings, setOpenSettings] = useState(false);
   const [localPosition, setLocalPosition] = useState(position);
+  const [isDragging, setIsDragging] = useState(false);
 
   // update pos when it changes
   useEffect(() => {
@@ -18,7 +23,13 @@ const PomoTimer = ({ position }: { position: Position }) => {
     }
   }, [position]);
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging: dragging,
+  } = useDraggable({
     id: "pomo-timer",
   });
 
@@ -31,9 +42,9 @@ const PomoTimer = ({ position }: { position: Position }) => {
     }
   }, [transform, position]);
 
-  const toggleOpenSettings = () => {
-    setOpenSettings(!openSettings);
-  };
+  useEffect(() => {
+    setIsDragging(dragging);
+  }, [dragging]);
 
   return (
     <div
@@ -58,7 +69,7 @@ const PomoTimer = ({ position }: { position: Position }) => {
           ref={setNodeRef}
           {...listeners}
           {...attributes}
-          style={{ cursor: "grab" }}
+          style={{ cursor: isDragging ? "grabbing" : "grab" }}
         ></div>
 
         <button className="text-gray-400  pb-2">
@@ -76,9 +87,9 @@ const PomoTimer = ({ position }: { position: Position }) => {
         </div>
 
         {/* Buttons Section */}
-        <div className="flex justify-center gap-4  ">
-          <button className="px-8 bg-transparent border border-white rounded-lg  relative z-20">
-            <span className="font-bold text-sm">Start</span>
+        <div className="flex m-auto gap-4  ">
+          <button className="px-8 py-1 bg-transparent border border-white rounded-lg ">
+            <span className="font-semibold text-md">Start</span>
           </button>
           <button className="">
             <FiRefreshCw size={20} />
@@ -95,14 +106,14 @@ const PomoTimer = ({ position }: { position: Position }) => {
         <button>Long Break</button>
 
         {/* Settings Icon */}
-        <div className="flex ">
+        <div className="flex">
           <button onClick={toggleOpenSettings} className="">
             <FiSettings size={20} />
           </button>
         </div>
       </div>
 
-      <>{openSettings && <PomoTimerSettings />}</>
+      {openSettings && <PomoTimerSettings />}
     </div>
   );
 };

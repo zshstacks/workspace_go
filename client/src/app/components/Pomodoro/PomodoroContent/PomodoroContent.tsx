@@ -9,46 +9,47 @@ import Appearance from "../../Header/UserMenu/Appearance/Appearance";
 import UserAccount from "../../Header/UserMenu/UserAccount/UserAccount";
 import Link from "next/link";
 
-const restrictToBoundingBox: Modifier = ({
-  transform,
-  activeNodeRect,
-  containerNodeRect,
-}) => {
-  if (!activeNodeRect || !containerNodeRect) {
-    return transform;
-  }
+const restrictToBoundingBox =
+  (openSettings: boolean): Modifier =>
+  ({ transform, activeNodeRect, containerNodeRect }) => {
+    if (!activeNodeRect || !containerNodeRect) {
+      return transform;
+    }
 
-  const boundingBox = {
-    top: 60, // top y cord
-    bottom: window.innerHeight - 129, // bott y cord 830
-    left: 16, // left x cord
-    right: window.innerWidth - 73, // right x cord 1846
+    //when pomo settings is open
+    const settingsHeight = openSettings ? 348 : 0;
+
+    const boundingBox = {
+      top: 60, // top y cord
+      bottom: window.innerHeight - 129 - settingsHeight, // bott y cord
+      left: 16, // left x cord
+      right: window.innerWidth - 73, // right x cord
+    };
+
+    let newX = transform.x;
+    let newY = transform.y;
+
+    const adjustedX = activeNodeRect.left + transform.x;
+    const adjustedY = activeNodeRect.top + transform.y;
+
+    if (adjustedX < boundingBox.left) {
+      newX = boundingBox.left - activeNodeRect.left;
+    } else if (adjustedX + activeNodeRect.width > boundingBox.right) {
+      newX = boundingBox.right - (activeNodeRect.left + activeNodeRect.width);
+    }
+
+    if (adjustedY < boundingBox.top) {
+      newY = boundingBox.top - activeNodeRect.top;
+    } else if (adjustedY + activeNodeRect.height > boundingBox.bottom) {
+      newY = boundingBox.bottom - (activeNodeRect.top + activeNodeRect.height);
+    }
+
+    return {
+      ...transform, // saving scaleX & scaleY
+      x: newX,
+      y: newY,
+    };
   };
-
-  let newX = transform.x;
-  let newY = transform.y;
-
-  const adjustedX = activeNodeRect.left + transform.x;
-  const adjustedY = activeNodeRect.top + transform.y;
-
-  if (adjustedX < boundingBox.left) {
-    newX = boundingBox.left - activeNodeRect.left;
-  } else if (adjustedX + activeNodeRect.width > boundingBox.right) {
-    newX = boundingBox.right - (activeNodeRect.left + activeNodeRect.width);
-  }
-
-  if (adjustedY < boundingBox.top) {
-    newY = boundingBox.top - activeNodeRect.top;
-  } else if (adjustedY + activeNodeRect.height > boundingBox.bottom) {
-    newY = boundingBox.bottom - (activeNodeRect.top + activeNodeRect.height);
-  }
-
-  return {
-    ...transform, // saving scaleX & scaleY
-    x: newX,
-    y: newY,
-  };
-};
 
 const localStorageKey =
   process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY || "widgetPosition";
@@ -57,6 +58,7 @@ const PomodoroContent = () => {
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const [openUISettings, setOpenUISettings] = useState(false);
   const [openAccSettings, setOpenAccSettings] = useState(false);
+  const [openSettings, setOpenSettings] = useState(false);
 
   const openAppearance = () => {
     setOpenUISettings(!openUISettings);
@@ -64,6 +66,10 @@ const PomodoroContent = () => {
 
   const openAccountSettings = () => {
     setOpenAccSettings(!openAccSettings);
+  };
+
+  const toggleOpenSettings = () => {
+    setOpenSettings(!openSettings);
   };
 
   // load saved pos from localstorage, if there is
@@ -126,7 +132,7 @@ const PomodoroContent = () => {
 
       {/* timer */}
       <DndContext
-        modifiers={[restrictToBoundingBox]}
+        modifiers={[restrictToBoundingBox(openSettings)]}
         onDragEnd={(event) => {
           const { delta } = event;
           const newPosition = {
@@ -136,7 +142,11 @@ const PomodoroContent = () => {
           savePosition(newPosition);
         }}
       >
-        <PomoTimer position={position} />
+        <PomoTimer
+          position={position}
+          toggleOpenSettings={toggleOpenSettings}
+          openSettings={openSettings}
+        />
       </DndContext>
     </>
   );

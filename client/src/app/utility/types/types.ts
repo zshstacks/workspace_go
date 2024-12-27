@@ -1,4 +1,4 @@
-export type Position = { x: number; y: number };
+ type Position = { x: number; y: number };
 
 export interface HeaderProps {
   openAppearance: () => void;
@@ -13,4 +13,10 @@ export interface AppearanceProps {
 export interface UserAccountProps {
   openAccountSettings: () => void;
   openAccSettings: boolean;
+}
+
+export interface PomoTimerProps {
+  openSettings: boolean;
+  toggleOpenSettings: () => void;
+  position: Position;
 }

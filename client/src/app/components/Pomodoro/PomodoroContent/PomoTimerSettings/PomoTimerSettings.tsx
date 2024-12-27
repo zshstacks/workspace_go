@@ -3,7 +3,7 @@ import { PiSpeakerHigh } from "react-icons/pi";
 
 const PomoTimerSettings = () => {
   return (
-    <div className=" font-medium">
+    <div className=" font-medium " id="pomo-timer">
       {/* divider */}
       <div className="w-full h-[1px] bg-black/35 my-5"></div>
 
