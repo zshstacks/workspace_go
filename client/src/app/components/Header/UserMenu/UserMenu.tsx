@@ -3,18 +3,18 @@ import { FaUser } from "react-icons/fa";
 import { PiGithubLogo } from "react-icons/pi";
 import { VscSettings } from "react-icons/vsc";
 
-import { HeaderProps } from "@/app/utility/types/types";
+import { UserMenuProps } from "@/app/utility/types/types";
 
-const UserMenu: React.FC<HeaderProps> = ({
-  openAppearance,
-  openAccountSettings,
+const UserMenu: React.FC<UserMenuProps> = ({
+  setOpenUISettings,
+  setOpenAccSettings,
 }) => {
   return (
-    <div className="bg-main rounded-md w-[155px] h-[150px] absolute top-[45px] right-2 shadow-xl shadow-gray-700 ">
+    <div className="bg-main rounded-md w-[155px] h-[150px] absolute top-[45px] right-2 shadow-xl shadow-gray-700   z-[9999]">
       {/* account settings */}
       <div
-        className="flex gap-2 cursor-pointer p-2"
-        onClick={openAccountSettings}
+        className="flex gap-2 cursor-pointer p-2 z-[9999]"
+        onClick={setOpenAccSettings}
       >
         <FaUser size={12} className="my-auto" />
         <span className="">My account</span>
@@ -23,7 +23,10 @@ const UserMenu: React.FC<HeaderProps> = ({
       <div className="h-[1px] w-full bg-white/25"></div>
 
       {/* appearance settings */}
-      <div className="flex gap-2 cursor-pointer p-2" onClick={openAppearance}>
+      <div
+        className="flex gap-2 cursor-pointer p-2"
+        onClick={setOpenUISettings}
+      >
         <VscSettings className="my-auto" />
         <span className="">Appearance</span>
       </div>

@@ -10,6 +10,7 @@ export default {
     extend: {
       colors: {
         main: "#232930",
+        secondary: "#e89688",
       },
       backgroundImage: {
         bgMain:

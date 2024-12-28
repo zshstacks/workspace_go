@@ -5,25 +5,30 @@ import { RiMoonLine } from "react-icons/ri";
 
 const Appearance: React.FC<AppearanceProps> = ({
   openUISettings,
-  openAppearance,
+  setOpenUISettings,
 }) => {
   return (
     <>
       {openUISettings && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999] ">
           <div className="w-96  bg-main rounded-lg shadow-lg">
-            <div
-              className=" flex justify-end relative cursor-pointer"
-              onClick={openAppearance}
-            >
-              <IoIosClose color="white" size={22} />
+            {/* close btn */}
+            <div className=" flex justify-end relative ">
+              <button
+                className="m-1 cursor-pointer "
+                onClick={setOpenUISettings}
+              >
+                <IoIosClose color="white" size={22} />
+              </button>
             </div>
             <div className="py-1 px-7">
+              {/* title */}
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-100">
                   Appearance Settings
                 </h2>
               </div>
+              {/* theme */}
               <div className="flex flex-col gap-3 mb-10">
                 <h5 className="text-gray-500 text-[12px]">THEME</h5>
                 <div className="flex justify-between ">
@@ -35,6 +40,7 @@ const Appearance: React.FC<AppearanceProps> = ({
                   </button>
                 </div>
               </div>
+              {/* focus mode */}
               <div className="flex flex-col gap-3 mb-10">
                 <h5 className="text-gray-500 text-[12px]">FOCUS MODE</h5>
                 <div className="flex justify-between">

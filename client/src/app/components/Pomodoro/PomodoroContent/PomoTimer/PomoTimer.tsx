@@ -9,7 +9,7 @@ import { PomoTimerProps } from "@/app/utility/types/types";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   position,
-  toggleOpenSettings,
+  setOpenSettings,
   openSettings,
 }) => {
   // const [openSettings, setOpenSettings] = useState(false);
@@ -48,14 +48,14 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   return (
     <div
-      className={`bg-main text-white w-[360px] p-4 rounded-lg shadow-md `}
+      className={`bg-main text-white w-[360px] p-4 rounded-lg shadow-md  `}
       style={{
         transform: `translate3d(${localPosition.x}px, ${localPosition.y}px, 0)`,
         position: "fixed",
       }}
     >
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-2 z-20">
+      <div className="flex justify-between items-center mb-2 ">
         <div className="flex gap-1">
           <div className="w-2 h-2 bg-gray-700 rounded-full"></div>
           <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
@@ -107,7 +107,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
         {/* Settings Icon */}
         <div className="flex">
-          <button onClick={toggleOpenSettings} className="">
+          <button onClick={setOpenSettings}>
             <FiSettings size={20} />
           </button>
         </div>

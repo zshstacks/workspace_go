@@ -1,22 +1,29 @@
- type Position = { x: number; y: number };
+export type Position = { x: number; y: number };
 
 export interface HeaderProps {
-  openAppearance: () => void;
-  openAccountSettings: () => void;
+  setOpenUISettings: () => void;
+  setOpenAccSettings: () => void;
+  setIsTimerActive: () => void;
+  isTimerActive: boolean;
 }
 
 export interface AppearanceProps {
-  openAppearance: () => void;
+  setOpenUISettings: () => void;
   openUISettings: boolean;
 }
 
 export interface UserAccountProps {
-  openAccountSettings: () => void;
+  setOpenAccSettings: () => void;
   openAccSettings: boolean;
+}
+
+export interface UserMenuProps {
+  setOpenUISettings: () => void;
+  setOpenAccSettings: () => void;
 }
 
 export interface PomoTimerProps {
   openSettings: boolean;
-  toggleOpenSettings: () => void;
+  setOpenSettings: () => void;
   position: Position;
 }
