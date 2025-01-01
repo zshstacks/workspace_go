@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
+	"server/controllers"
 	"server/initializers"
 	"time"
 )
@@ -32,6 +33,8 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           24 * time.Hour,
 	}))
+
+	r.POST("/signup", controllers.SignUp)
 
 	log.Fatal(r.Run())
 
