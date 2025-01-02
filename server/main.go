@@ -35,6 +35,10 @@ func main() {
 	}))
 
 	r.POST("/signup", controllers.SignUp)
+	r.POST("/login", controllers.SignIn)
+
+	r.GET("/validate", controllers.Validate)
+	r.GET("/logout", controllers.Logout)
 
 	log.Fatal(r.Run())
 
