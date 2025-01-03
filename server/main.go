@@ -6,6 +6,7 @@ import (
 	"log"
 	"server/controllers"
 	"server/initializers"
+	"server/middleware"
 	"time"
 )
 
@@ -27,7 +28,7 @@ func main() {
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:8000", "http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
@@ -37,8 +38,8 @@ func main() {
 	r.POST("/signup", controllers.SignUp)
 	r.POST("/login", controllers.SignIn)
 
-	r.GET("/validate", controllers.Validate)
-	r.GET("/logout", controllers.Logout)
+	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
+	r.GET("/logout", middleware.RequireAuth, controllers.Logout)
 
 	log.Fatal(r.Run())
 
