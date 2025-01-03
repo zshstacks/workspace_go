@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
+
 import Header from "../../Header/Header";
 import PomoTimer from "./PomoTimer/PomoTimer";
-import { DndContext } from "@dnd-kit/core";
-import { Position } from "@/app/utility/types/types";
 import Appearance from "../../Header/UserMenu/Appearance/Appearance";
 import UserAccount from "../../Header/UserMenu/UserAccount/UserAccount";
-import Link from "next/link";
+
+import { DndContext } from "@dnd-kit/core";
+import { Position } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 
@@ -100,6 +102,7 @@ const PomodoroContent = () => {
             position={position}
             setOpenSettings={setOpenSettings}
             openSettings={openSettings}
+            setIsTimerActive={setIsTimerActive}
           />
         </DndContext>
       )}

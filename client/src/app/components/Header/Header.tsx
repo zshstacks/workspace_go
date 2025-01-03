@@ -1,6 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+
+import UserMenu from "./UserMenu/UserMenu";
+import { HeaderProps } from "@/app/utility/types/types";
+import { useToggleState } from "@/app/hooks/useToggleState";
+
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import { BsFire } from "react-icons/bs";
 import { LuUserRound } from "react-icons/lu";
@@ -9,9 +14,6 @@ import {
   MdOutlineKeyboardArrowUp,
   MdOutlineTimer,
 } from "react-icons/md";
-import UserMenu from "./UserMenu/UserMenu";
-import { HeaderProps } from "@/app/utility/types/types";
-import { useToggleState } from "@/app/hooks/useToggleState";
 
 const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,

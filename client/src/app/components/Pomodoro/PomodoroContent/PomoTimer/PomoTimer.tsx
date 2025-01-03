@@ -1,16 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaRegWindowMinimize } from "react-icons/fa";
-import { FiSettings, FiRefreshCw } from "react-icons/fi";
+
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
+
 import { useDraggable } from "@dnd-kit/core";
 import { PomoTimerProps } from "@/app/utility/types/types";
+
+import { FaRegWindowMinimize } from "react-icons/fa";
+import { FiSettings, FiRefreshCw } from "react-icons/fi";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   position,
   setOpenSettings,
   openSettings,
+  setIsTimerActive,
 }) => {
   // const [openSettings, setOpenSettings] = useState(false);
   const [localPosition, setLocalPosition] = useState(position);
@@ -48,7 +52,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   return (
     <div
-      className={`bg-main text-white w-[360px] p-4 rounded-lg shadow-md  `}
+      className={`bg-main text-white w-[360px] p-4 rounded-lg shadow-md `}
       style={{
         transform: `translate3d(${localPosition.x}px, ${localPosition.y}px, 0)`,
         position: "fixed",
@@ -72,7 +76,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
           style={{ cursor: isDragging ? "grabbing" : "grab" }}
         ></div>
 
-        <button className="text-gray-400  pb-2">
+        <button className="text-gray-400  pb-2" onClick={setIsTimerActive}>
           <FaRegWindowMinimize size={14} />
         </button>
       </div>

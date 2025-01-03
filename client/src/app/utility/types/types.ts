@@ -25,5 +25,13 @@ export interface UserMenuProps {
 export interface PomoTimerProps {
   openSettings: boolean;
   setOpenSettings: () => void;
+  setIsTimerActive: () => void;
   position: Position;
+}
+
+//redux auth slice
+export interface AuthState {
+  error: string | null;
+  user: any | null;
+  isLoading: boolean;
 }
