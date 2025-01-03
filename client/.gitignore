@@ -38,3 +38,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/certs
+frontend.key
+frontend.crt
+frontend.key~
+frontend.crt~
