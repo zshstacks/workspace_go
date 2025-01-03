@@ -13,6 +13,12 @@ dist-ssr
 *.local
 .env
 
+certs
+server.crt
+server.key
+server.crt~
+server.key~
+
 server.exe
 server.exe~
 
