@@ -1,10 +1,13 @@
 "use client";
 
 import { registerUser } from "@/app/redux/slices/authSlice/asyncActions";
-import { AppDispatch } from "@/app/redux/store";
+import { AppDispatch, RootState } from "@/app/redux/store";
+
 import Link from "next/link";
-import React, { useCallback, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +16,12 @@ const Signup = () => {
     username: "",
   });
 
+  const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
+
+  const { isLoading, error, success } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -24,14 +32,23 @@ const Signup = () => {
     }));
   };
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      console.log(formData);
-      dispatch(registerUser(formData));
-    },
-    [dispatch, formData]
-  );
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (error) {
+      toast.error(error, { theme: "dark", autoClose: 3000 });
+    }
+
+    const resultAction = await dispatch(registerUser(formData));
+
+    if (resultAction.meta.requestStatus === "fulfilled") {
+      toast.success(success, {
+        theme: "dark",
+        autoClose: 3000,
+      });
+      router.push("/signin");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat bg-bgAuth overflow-hidden">
@@ -39,11 +56,13 @@ const Signup = () => {
         <h2 className="text-3xl font-bold text-white text-center mb-6">
           Sign Up
         </h2>
+
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
               Username
             </label>
+
             <input
               id="username"
               type="text"
@@ -68,6 +87,7 @@ const Signup = () => {
             <label className="block text-sm font-medium text-gray-300 mb-1">
               Password
             </label>
+
             <input
               id="password"
               type="password"
@@ -79,7 +99,8 @@ const Signup = () => {
           <div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 focus:ring-2 focus:ring-blue-400 focus:outline-none disabled:bg-gray-500"
+              disabled={isLoading}
             >
               Register
             </button>

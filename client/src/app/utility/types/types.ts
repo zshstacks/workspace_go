@@ -32,6 +32,10 @@ export interface PomoTimerProps {
 //redux auth slice
 export interface AuthState {
   error: string | null;
-  user: any | null;
+  success: string | null;
   isLoading: boolean;
+}
+
+export interface ErrorPayload {
+  error: string;
 }
