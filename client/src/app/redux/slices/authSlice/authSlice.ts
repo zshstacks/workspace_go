@@ -1,10 +1,10 @@
-import { AuthState } from "@/app/utility/types/types";
+import { AuthState, ErrorPayload } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { registerUser } from "./asyncActions";
 
 const initialState: AuthState = {
   error: null,
-  user: null,
+  success: null,
   isLoading: false,
 };
 
@@ -16,20 +16,28 @@ const authSlice = createSlice({
     builder
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload;
+        state.success = action.payload.success;
       })
       .addMatcher(
         (action) => action.type.endsWith("/pending"),
         (state) => {
           state.isLoading = true;
           state.error = null;
+          state.success = null;
         }
       )
       .addMatcher(
         (action) => action.type.endsWith("/rejected"),
-        (state, action: PayloadAction<string>) => {
+        (state, action: PayloadAction<string | ErrorPayload>) => {
           state.isLoading = false;
-          state.error = action.payload as string;
+
+          if (typeof action.payload === "string") {
+            state.error = action.payload;
+          } else if (action.payload?.error) {
+            state.error = action.payload.error;
+          } else {
+            state.error = "Something went wrong!";
+          }
         }
       );
   },
