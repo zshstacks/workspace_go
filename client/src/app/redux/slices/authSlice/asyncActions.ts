@@ -21,3 +21,18 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+
+export const loginUser = createAsyncThunk(
+  "auth/loginUser",
+  async (
+    { email, password }: { email: string; password: string },
+    thunkAPI
+  ) => {
+    try {
+      const res = await api.post("/login", { email, password });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || "Login failed");
+    }
+  }
+);

@@ -1,6 +1,6 @@
 import { AuthState, ErrorPayload } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { registerUser } from "./asyncActions";
+import { loginUser, registerUser } from "./asyncActions";
 
 const initialState: AuthState = {
   emailError: null,
@@ -9,6 +9,7 @@ const initialState: AuthState = {
   error: null,
   success: null,
   isLoading: false,
+  user: null,
 };
 
 const authSlice = createSlice({
@@ -29,6 +30,11 @@ const authSlice = createSlice({
     builder
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.success = action.payload.success;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
         state.success = action.payload.success;
       })
       .addMatcher(
