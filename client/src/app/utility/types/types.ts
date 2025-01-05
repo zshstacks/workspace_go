@@ -37,6 +37,7 @@ export interface AuthState {
   error: string | null;
   success: string | null;
   isLoading: boolean;
+  user: any | null;
 }
 
 export interface ErrorPayload {
