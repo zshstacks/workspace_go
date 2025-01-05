@@ -1,12 +1,17 @@
 "use client";
 
 import { registerUser } from "@/app/redux/slices/authSlice/asyncActions";
-import { clearSuccess } from "@/app/redux/slices/authSlice/authSlice";
+import {
+  clearErrors,
+  clearSuccess,
+} from "@/app/redux/slices/authSlice/authSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { BsQuestion } from "react-icons/bs";
+
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -51,7 +56,11 @@ const Signup = () => {
   useEffect(() => {
     [emailError, passwordError, usernameError, error].forEach((err) => {
       if (err) {
-        toast.error(err, { theme: "dark", autoClose: 3000 });
+        toast.error(err, {
+          theme: "dark",
+          autoClose: 3000,
+          onClose: () => dispatch(clearErrors()),
+        });
       }
     });
 
@@ -73,15 +82,26 @@ const Signup = () => {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
+            <label className=" text-sm font-medium text-gray-300 mb-1 flex items-center gap-1">
               Username
+              <div className="relative group">
+                <BsQuestion
+                  className="text-gray-400 cursor-pointer "
+                  size={14}
+                />
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-500/20 backdrop-blur-md  text-neutral-200 text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Char.Min: 4;
+                </div>
+              </div>
             </label>
 
             <input
               id="username"
               type="text"
-              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                usernameError ? "border-red-500" : ""
+              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none  ${
+                usernameError
+                  ? "border-red-500 transition-all ease-in-out duration-300"
+                  : ""
               }`}
               placeholder="Enter your name"
               onChange={handleChange}
@@ -94,23 +114,35 @@ const Signup = () => {
             <input
               id="email"
               type="email"
-              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                emailError ? "border-red-500" : ""
+              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none   ${
+                emailError
+                  ? "border-red-500 transition-all ease-in-out duration-300"
+                  : ""
               }`}
               placeholder="Enter your email"
               onChange={handleChange}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
+            <label className=" text-sm font-medium text-gray-300 mb-1 flex items-center gap-1">
               Password
+              <div className="relative group">
+                <BsQuestion
+                  className="text-gray-400 cursor-pointer "
+                  size={14}
+                />
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-500/20 backdrop-blur-md  text-neutral-200 text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Char.Min: 10; Min.UpperCase:1; Min.Special.Char:1;
+                </div>
+              </div>
             </label>
-
             <input
               id="password"
               type="password"
               className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                passwordError ? "border-red-500" : ""
+                passwordError
+                  ? "border-red-500 transition-all ease-in-out duration-300"
+                  : ""
               }`}
               placeholder="Create a password"
               onChange={handleChange}
