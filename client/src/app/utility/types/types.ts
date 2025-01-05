@@ -31,11 +31,17 @@ export interface PomoTimerProps {
 
 //redux auth slice
 export interface AuthState {
+  emailError: string | null;
+  passwordError: string | null;
+  usernameError: string | null;
   error: string | null;
   success: string | null;
   isLoading: boolean;
 }
 
 export interface ErrorPayload {
-  error: string;
+  error?: string;
+  emailError?: string;
+  passwordError?: string;
+  usernameError?: string;
 }
