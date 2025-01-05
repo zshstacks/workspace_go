@@ -1,11 +1,12 @@
 "use client";
 
 import { registerUser } from "@/app/redux/slices/authSlice/asyncActions";
+import { clearSuccess } from "@/app/redux/slices/authSlice/authSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -19,9 +20,14 @@ const Signup = () => {
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
 
-  const { isLoading, error, success } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const {
+    isLoading,
+    error,
+    success,
+    emailError,
+    passwordError,
+    usernameError,
+  } = useSelector((state: RootState) => state.auth);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -35,20 +41,28 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (error) {
-      toast.error(error, { theme: "dark", autoClose: 3000 });
-    }
-
     const resultAction = await dispatch(registerUser(formData));
 
     if (resultAction.meta.requestStatus === "fulfilled") {
-      toast.success(success, {
-        theme: "dark",
-        autoClose: 3000,
-      });
       router.push("/signin");
     }
   };
+
+  useEffect(() => {
+    [emailError, passwordError, usernameError, error].forEach((err) => {
+      if (err) {
+        toast.error(err, { theme: "dark", autoClose: 3000 });
+      }
+    });
+
+    if (success) {
+      toast.success(success, {
+        theme: "dark",
+        autoClose: 3000,
+        onClose: () => dispatch(clearSuccess()),
+      });
+    }
+  }, [emailError, passwordError, usernameError, success, error, dispatch]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat bg-bgAuth overflow-hidden">
@@ -66,7 +80,9 @@ const Signup = () => {
             <input
               id="username"
               type="text"
-              className="w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                usernameError ? "border-red-500" : ""
+              }`}
               placeholder="Enter your name"
               onChange={handleChange}
             />
@@ -78,7 +94,9 @@ const Signup = () => {
             <input
               id="email"
               type="email"
-              className="w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                emailError ? "border-red-500" : ""
+              }`}
               placeholder="Enter your email"
               onChange={handleChange}
             />
@@ -91,7 +109,9 @@ const Signup = () => {
             <input
               id="password"
               type="password"
-              className="w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                passwordError ? "border-red-500" : ""
+              }`}
               placeholder="Create a password"
               onChange={handleChange}
             />
