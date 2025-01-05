@@ -36,36 +36,36 @@ func SignUp(c *gin.Context) {
 
 	//validate email
 	if body.Email == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"emailError": "Email is required"})
 		return
 	}
 	//validate email format
 	if !utils.IsValidEmail(body.Email) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email format"})
+		c.JSON(http.StatusBadRequest, gin.H{"emailError": "Invalid email format"})
 		return
 	}
 
 	//validate username
 	if body.Username == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"usernameError": "Username is required"})
 		return
 	}
 
 	//validate username length
 	if !utils.IsValidUsername(body.Username) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username must be at least 4 characters"})
+		c.JSON(http.StatusBadRequest, gin.H{"usernameError": "Username must be at least 4 characters"})
 		return
 	}
 
 	//validates password
 	if body.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Password is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"passwordError": "Password is required"})
 		return
 	}
 
 	//validates pass length, char, spec char
 	if !utils.IsValidPassword(body.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must be at least 10 characters long, with uppercase letter, and a special character"})
+		c.JSON(http.StatusBadRequest, gin.H{"passwordError": "Password must be at least 10 characters long, with uppercase letter, and a special character"})
 		return
 	}
 
@@ -87,7 +87,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	//respond
-	c.JSON(http.StatusOK, gin.H{"success": "Account created!"})
+	c.JSON(http.StatusCreated, gin.H{"success": "Account created!"})
 }
 
 func SignIn(c *gin.Context) {
