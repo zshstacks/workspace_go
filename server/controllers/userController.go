@@ -106,7 +106,7 @@ func SignIn(c *gin.Context) {
 	initializers.DB.First(&user, "email = ?", body.Email)
 
 	if user.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorLogin": "Invalid email or password"})
 		return
 	}
 
@@ -114,7 +114,7 @@ func SignIn(c *gin.Context) {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorLogin": "Invalid email or password"})
 		return
 	}
 
@@ -139,14 +139,30 @@ func SignIn(c *gin.Context) {
 		MaxAge:   int((time.Hour * 24 * 30).Seconds()),
 	})
 
-	c.JSON(http.StatusOK, gin.H{"success": "login successful"})
+	c.JSON(http.StatusOK, gin.H{"successLogin": "Login successful!"})
 
 }
 
 func Validate(c *gin.Context) {
-	user, _ := c.Get("user")
+	user, exists := c.Get("user")
 
-	c.JSON(http.StatusOK, gin.H{"message": user})
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"errorValidate": "Unauthorized"})
+		return
+	}
+
+	userModel, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"errorValidate": "Failed to retrieve user"})
+		return
+	}
+
+	//respond with user data
+	c.JSON(http.StatusOK, gin.H{
+		"id":       userModel.ID,
+		"email":    userModel.Email,
+		"username": userModel.Username,
+	})
 }
 
 func Logout(c *gin.Context) {
