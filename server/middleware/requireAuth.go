@@ -16,7 +16,7 @@ func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("token")
 
 	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or invalid token"})
 		return
 	}
 
@@ -28,23 +28,40 @@ func RequireAuth(c *gin.Context) {
 		return []byte(os.Getenv("SECRET")), nil
 	})
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		//check the exp
-		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.AbortWithStatus(http.StatusUnauthorized)
-		}
-		//find the user with token sub
-		var user models.User
-		initializers.DB.First(&user, claims["sub"])
-
-		if user.ID == 0 {
-			c.AbortWithStatus(http.StatusUnauthorized)
-		}
-		//attach to req
-		c.Set("user", user)
-		//continue
-		c.Next()
-	} else {
-		c.AbortWithStatus(http.StatusUnauthorized)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		return
 	}
+
+	//extract claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
+		return
+	}
+
+	//check the expiration time
+	exp, ok := claims["exp"].(float64)
+	if !ok || float64(time.Now().Unix()) > exp {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token expired"})
+		return
+	}
+
+	//find the user using the `sub` claim
+	sub, ok := claims["sub"].(float64)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token payload"})
+		return
+	}
+
+	var user models.User
+	if err := initializers.DB.First(&user, uint(sub)).Error; err != nil || user.ID == 0 {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	//attach the user to the context
+	c.Set("user", user)
+
+	c.Next()
 }
