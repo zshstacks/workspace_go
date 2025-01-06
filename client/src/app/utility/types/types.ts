@@ -36,6 +36,8 @@ export interface AuthState {
   usernameError: string | null;
   error: string | null;
   success: string | null;
+  successLogin: string | null;
+  errorLogin: string | null;
   isLoading: boolean;
   user: any | null;
 }
@@ -45,4 +47,5 @@ export interface ErrorPayload {
   emailError?: string;
   passwordError?: string;
   usernameError?: string;
+  errorLogin?: string;
 }

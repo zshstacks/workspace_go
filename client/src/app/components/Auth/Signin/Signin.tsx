@@ -1,10 +1,15 @@
 "use client";
 
 import { loginUser } from "@/app/redux/slices/authSlice/asyncActions";
+import {
+  clearLoginErrors,
+  clearSuccessLogin,
+} from "@/app/redux/slices/authSlice/authSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import Link from "next/link";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +17,9 @@ const Signin = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { success } = useSelector((state: RootState) => state.auth);
+  const { successLogin, errorLogin } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -26,13 +33,30 @@ const Signin = () => {
     [dispatch, email, password]
   );
 
+  useEffect(() => {
+    if (errorLogin) {
+      toast.error(errorLogin, {
+        theme: "dark",
+        autoClose: 2000,
+        onClose: () => dispatch(clearLoginErrors()),
+      });
+    }
+
+    if (successLogin) {
+      toast.success(successLogin, {
+        theme: "dark",
+        autoClose: 2000,
+        onClose: () => dispatch(clearSuccessLogin()),
+      });
+    }
+  }, [successLogin, errorLogin, dispatch]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat bg-bgAuth overflow-hidden">
       <div className="w-full max-w-md px-8 py-6 bg-white/10 backdrop-blur-md rounded-lg shadow-lg border border-gray-700">
         <h2 className="text-3xl font-bold text-white text-center mb-6">
           Sign In
         </h2>
-        {success && <p className="text-green-300">{success}</p>}
         <form className="space-y-4 " onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -43,7 +67,11 @@ const Signin = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                errorLogin
+                  ? "border-red-500 transition-all ease-in-out duration-300"
+                  : ""
+              }`}
               placeholder="Enter your email"
             />
           </div>
@@ -56,7 +84,11 @@ const Signin = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className={`w-full px-4 py-2 bg-main text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                errorLogin
+                  ? "border-red-500 transition-all ease-in-out duration-300"
+                  : ""
+              }`}
               placeholder="Create a password"
             />
           </div>
