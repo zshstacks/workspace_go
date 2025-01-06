@@ -58,7 +58,7 @@ const Signup = () => {
       if (err) {
         toast.error(err, {
           theme: "dark",
-          autoClose: 3000,
+          autoClose: 2000,
           onClose: () => dispatch(clearErrors()),
         });
       }
@@ -67,7 +67,7 @@ const Signup = () => {
     if (success) {
       toast.success(success, {
         theme: "dark",
-        autoClose: 3000,
+        autoClose: 2000,
         onClose: () => dispatch(clearSuccess()),
       });
     }

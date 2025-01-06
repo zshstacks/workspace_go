@@ -8,6 +8,8 @@ const initialState: AuthState = {
   usernameError: null,
   error: null,
   success: null,
+  errorLogin: null,
+  successLogin: null,
   isLoading: false,
   user: null,
 };
@@ -25,6 +27,12 @@ const authSlice = createSlice({
       state.emailError = null;
       state.usernameError = null;
     },
+    clearLoginErrors: (state) => {
+      state.errorLogin = null;
+    },
+    clearSuccessLogin: (state) => {
+      state.successLogin = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -35,7 +43,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
-        state.success = action.payload.success;
+        state.successLogin = action.payload.successLogin;
       })
       .addMatcher(
         (action) => action.type.endsWith("/pending"),
@@ -46,6 +54,8 @@ const authSlice = createSlice({
           state.emailError = null;
           state.usernameError = null;
           state.success = null;
+          state.errorLogin = null;
+          state.successLogin = null;
         }
       )
       .addMatcher(
@@ -62,18 +72,23 @@ const authSlice = createSlice({
           if (action.payload?.passwordError) {
             state.passwordError = action.payload.passwordError;
           }
-          if (
-            !action.payload?.emailError &&
-            !action.payload?.usernameError &&
-            !action.payload?.passwordError
-          ) {
-            state.error = "Something went wrong!";
+          if (action.payload?.errorLogin) {
+            state.errorLogin = action.payload.errorLogin;
+          }
+
+          if (action.payload?.error) {
+            state.error = action.payload.error;
           }
         }
       );
   },
 });
 
-export const { clearSuccess, clearErrors } = authSlice.actions;
+export const {
+  clearSuccess,
+  clearErrors,
+  clearLoginErrors,
+  clearSuccessLogin,
+} = authSlice.actions;
 
 export default authSlice.reducer;
