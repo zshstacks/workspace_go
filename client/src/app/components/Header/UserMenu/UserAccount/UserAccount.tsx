@@ -35,7 +35,6 @@ const UserAccount: React.FC<UserAccountProps> = ({
                 <input
                   type="email"
                   value="uns4d123@gmail.com"
-                  readOnly
                   className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500  focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
@@ -43,12 +42,11 @@ const UserAccount: React.FC<UserAccountProps> = ({
               {/* Name */}
               <div className="mb-4">
                 <label className="text-gray-400 text-sm font-medium mb-1 block">
-                  Name:
+                  Username:
                 </label>
                 <input
                   type="text"
-                  value="Edgars Grišins"
-                  readOnly
+                  value="wlr1_dev"
                   className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500 focus:outline-none"
                 />
               </div>
