@@ -1,6 +1,6 @@
 import { AuthState, ErrorPayload } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { loginUser, registerUser } from "./asyncActions";
+import { emailConfirmation, loginUser, registerUser } from "./asyncActions";
 
 const initialState: AuthState = {
   emailError: null,
@@ -10,8 +10,20 @@ const initialState: AuthState = {
   success: null,
   errorLogin: null,
   successLogin: null,
+  errorCodeEmail: null,
+  successCodeEmail: null,
   isLoading: false,
   user: null,
+};
+
+const resetStates = (state: AuthState) => {
+  state.emailError = null;
+  state.passwordError = null;
+  state.usernameError = null;
+  state.error = null;
+  state.errorLogin = null;
+  state.success = null;
+  state.successLogin = null;
 };
 
 const authSlice = createSlice({
@@ -33,52 +45,49 @@ const authSlice = createSlice({
     clearSuccessLogin: (state) => {
       state.successLogin = null;
     },
+    clearEmailConf: (state) => {
+      state.successCodeEmail = null;
+      state.errorCodeEmail = null;
+    },
   },
   extraReducers: (builder) => {
     builder
+      //register
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.success = action.payload.success;
       })
+      //login
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
         state.successLogin = action.payload.successLogin;
       })
+      //email confirm
+      .addCase(emailConfirmation.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.successCodeEmail = action.payload.successCodeEmail;
+      })
+
       .addMatcher(
         (action) => action.type.endsWith("/pending"),
         (state) => {
           state.isLoading = true;
-          state.error = null;
-          state.passwordError = null;
-          state.emailError = null;
-          state.usernameError = null;
-          state.success = null;
-          state.errorLogin = null;
-          state.successLogin = null;
+          resetStates(state);
         }
       )
+
       .addMatcher(
         (action) => action.type.endsWith("/rejected"),
         (state, action: PayloadAction<ErrorPayload>) => {
           state.isLoading = false;
 
-          if (action.payload?.emailError) {
-            state.emailError = action.payload.emailError;
-          }
-          if (action.payload?.usernameError) {
-            state.usernameError = action.payload.usernameError;
-          }
-          if (action.payload?.passwordError) {
-            state.passwordError = action.payload.passwordError;
-          }
-          if (action.payload?.errorLogin) {
-            state.errorLogin = action.payload.errorLogin;
-          }
-
-          if (action.payload?.error) {
-            state.error = action.payload.error;
-          }
+          state.emailError = action.payload?.emailError || null;
+          state.errorCodeEmail = action.payload?.errorCodeEmail || null;
+          state.usernameError = action.payload?.usernameError || null;
+          state.passwordError = action.payload?.passwordError || null;
+          state.errorLogin = action.payload?.errorLogin || null;
+          state.error = action.payload?.error || null;
         }
       );
   },
@@ -89,6 +98,7 @@ export const {
   clearErrors,
   clearLoginErrors,
   clearSuccessLogin,
+  clearEmailConf,
 } = authSlice.actions;
 
 export default authSlice.reducer;

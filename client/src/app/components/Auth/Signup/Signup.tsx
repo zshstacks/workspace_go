@@ -8,12 +8,13 @@ import {
 import { AppDispatch, RootState } from "@/app/redux/store";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 import { BsQuestion } from "react-icons/bs";
 
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import EmailConfirmModal from "../EmailConfirmModal/EmailConfirmModal";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -21,8 +22,8 @@ const Signup = () => {
     email: "",
     username: "",
   });
+  const [openModal, setOpenModal] = useState(false);
 
-  const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
 
   const {
@@ -49,7 +50,7 @@ const Signup = () => {
     const resultAction = await dispatch(registerUser(formData));
 
     if (resultAction.meta.requestStatus === "fulfilled") {
-      router.push("/signin");
+      setOpenModal(true);
     }
   };
 
@@ -171,6 +172,8 @@ const Signup = () => {
           Pomodoro
         </Link>
       </span>
+
+      {openModal && <EmailConfirmModal />}
     </div>
   );
 };

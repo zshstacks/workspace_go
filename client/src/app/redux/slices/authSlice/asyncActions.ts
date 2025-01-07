@@ -36,3 +36,17 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+
+export const emailConfirmation = createAsyncThunk(
+  "auth/emailConfirmation",
+  async (data: { code: string }, thunkAPI) => {
+    try {
+      const res = await api.post("/confirm-email", { code: data.code });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Confirmation failed"
+      );
+    }
+  }
+);
