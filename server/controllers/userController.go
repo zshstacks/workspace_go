@@ -1,15 +1,20 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"log"
+	"math/rand"
 	"net/http"
+	"net/smtp"
 	"os"
 	"server/initializers"
 	"server/models"
 	"server/utils"
+	"strconv"
 	"time"
 )
 
@@ -17,6 +22,68 @@ var db *gorm.DB
 
 func init() {
 	db = initializers.DB
+}
+
+func generateConfirmationCode() string {
+	return strconv.Itoa(rand.Intn(1000000))
+}
+
+func sendEmailConfirmation(toEmail, code string) error {
+	from := "uns4d123@gmail.com"
+	password := os.Getenv("EMAIL_PASS")
+	smtpHost := os.Getenv("SMTP_HOST")
+	smtpPort := os.Getenv("SMTP_PORT")
+
+	message := []byte("Subject: Email Confirmation\n\n" + "Your confirmation code is: " + code)
+
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+	return smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{toEmail}, message)
+}
+
+func ConfirmEmail(c *gin.Context) {
+
+	var body struct {
+		Email string `json:"email"`
+		Code  string `json:"code"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		return
+	}
+
+	if initializers.DB == nil {
+		log.Println("Database connection is nil in ConfirmEmail")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection not initialized"})
+		return
+	}
+
+	var user models.User
+
+	if err := initializers.DB.First(&user, "email = ?", body.Email).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(500, gin.H{"error": "Server error"})
+		}
+		return
+	}
+
+	if user.EmailConfirmationCode != body.Code {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid confirmation code"})
+		return
+	}
+
+	user.IsEmailConfirmed = true
+	user.EmailConfirmationCode = ""
+
+	if err := initializers.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user status"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Email confirmed!"})
 }
 
 func SignUp(c *gin.Context) {
@@ -77,8 +144,16 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
+	confirmationCode := generateConfirmationCode()
+
 	//create a user
-	user := models.User{Email: body.Email, Username: body.Username, Password: string(hash)}
+	user := models.User{
+		Email:                 body.Email,
+		Username:              body.Username,
+		Password:              string(hash),
+		IsEmailConfirmed:      false,
+		EmailConfirmationCode: confirmationCode,
+	}
 	result := initializers.DB.Create(&user)
 
 	if result.Error != nil {
@@ -86,8 +161,13 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
+	if err := sendEmailConfirmation(body.Email, confirmationCode); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"errorConfirmation": "Failed to send confirmation email "})
+		return
+	}
+
 	//respond
-	c.JSON(http.StatusCreated, gin.H{"success": "Account created!"})
+	c.JSON(http.StatusCreated, gin.H{"success": "Account created! Please confirm your email."})
 }
 
 func SignIn(c *gin.Context) {
@@ -115,6 +195,12 @@ func SignIn(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"errorLogin": "Invalid email or password"})
+		return
+	}
+
+	//check if email is confirmed
+	if !user.IsEmailConfirmed {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email not confirmed"})
 		return
 	}
 
