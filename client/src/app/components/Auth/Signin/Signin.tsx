@@ -118,11 +118,6 @@ const Signin = () => {
           </Link>
         </p>
       </div>
-      <span className="text-blue-300 font-bold  bg-white/20">
-        <Link href="/pomodoro" className="p-10 flex">
-          Pomodoro
-        </Link>
-      </span>
     </div>
   );
 };

@@ -170,16 +170,6 @@ const Signup = () => {
         </p>
       </div>
 
-      <span className="text-blue-300 font-bold  bg-white/20">
-        <Link href="/pomodoro" className="p-10 flex">
-          Pomodoro
-        </Link>
-      </span>
-
-      <span className="text-white absolute top-0">
-        UnSad; gg@gg.com; Ghty123iojKlll!
-      </span>
-
       {openModal && <EmailConfirmModal email={formData.email} />}
     </div>
   );
