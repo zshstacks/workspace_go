@@ -13,12 +13,15 @@ const initialState: AuthState = {
   passwordError: null,
   usernameError: null,
   error: null,
-  success: null,
   errorLogin: null,
-  successLogin: null,
   errorCodeEmail: null,
+
+  success: null,
+  successLogin: null,
   successCodeEmail: null,
   successResent: null,
+  successLogout: null,
+
   isLoading: false,
   user: null,
 };
