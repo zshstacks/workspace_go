@@ -2,36 +2,36 @@ import {
   emailConfirmation,
   resendConfirmation,
 } from "@/app/redux/slices/authSlice/asyncActions";
-import { AppDispatch, RootState } from "@/app/redux/store";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import {
   clearEmailConf,
   clearResentConf,
 } from "@/app/redux/slices/authSlice/authSlice";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+
+import React, { useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
+import { EmailModalProps } from "@/app/utility/types/types";
+
 import "animate.css";
 import { AiOutlineCheck } from "react-icons/ai";
-import { EmailModalProps } from "@/app/utility/types/types";
+import { toast } from "react-toastify";
 
 const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
   const [code, setCode] = useState<string[]>(Array(6).fill(""));
   const [emailConfirmed, setEmailConfirmed] = useState(false);
+  const [timer, setTimer] = useState<number | null>(null);
 
   const dispatch: AppDispatch = useDispatch();
 
-  const {
-    successCodeEmail,
-    isLoading,
-    errorCodeEmail,
-    error,
-    successResent,
-    user,
-  } = useSelector((state: RootState) => state.auth);
+  const { successCodeEmail, isLoading, errorCodeEmail, error, successResent } =
+    useSelector((state: RootState) => state.auth);
 
   const router = useRouter();
 
+  //input fields logic
   const handleInputChange = (value: string, index: number) => {
     if (value.length <= 1 && /^[0-9]*$/.test(value)) {
       const newCode = [...code];
@@ -40,6 +40,7 @@ const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
     }
   };
 
+  //ctrl+c ctrl+v logic
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const pasteData = e.clipboardData.getData("text");
     if (/^\d{6}$/.test(pasteData)) {
@@ -48,6 +49,7 @@ const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
     }
   };
 
+  //submit code
   const handleSubmit = async () => {
     const joinedCode = code.join("");
     const resultAction = await dispatch(
@@ -68,17 +70,37 @@ const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
     }
   };
 
+  //resend code with 60 sec timeout after resend is triggered
   const handleResendCode = async () => {
-    const resultAction = await dispatch(resendConfirmation({ email }));
-    if (resultAction.meta.requestStatus === "fulfilled") {
-      toast.success(successResent, {
-        theme: "dark",
-        autoClose: 2000,
-        onClose: () => dispatch(clearResentConf()),
-      });
+    if (timer === null) {
+      await dispatch(resendConfirmation({ email }));
+
+      setTimer(60);
     }
   };
 
+  //timer logic
+  useEffect(() => {
+    if (timer !== null) {
+      const interval = setInterval(() => {
+        setTimer((prev) => (prev !== null && prev > 0 ? prev - 1 : null));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
+
+  //display success messsage
+  useEffect(() => {
+    if (successResent) {
+      toast.success(successResent, {
+        theme: "dark",
+        autoClose: 2000,
+      });
+      dispatch(clearResentConf());
+    }
+  }, [successResent, dispatch]);
+
+  //display error messsage
   useEffect(() => {
     if (errorCodeEmail)
       toast.error(error, {
@@ -130,8 +152,9 @@ const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
             <button
               className="mt-4 w-full py-2 text-gray-400 hover:text-white font-medium rounded-md"
               onClick={handleResendCode}
+              disabled={timer !== null}
             >
-              Resend Code
+              {timer !== null ? `Resend in ${timer}s` : "Resend Code"}
             </button>
           </>
         )}

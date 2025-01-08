@@ -6,15 +6,15 @@ import {
   clearSuccess,
 } from "@/app/redux/slices/authSlice/authSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
+import { useDispatch, useSelector } from "react-redux";
 
 import Link from "next/link";
 
 import React, { useEffect, useState } from "react";
-import { BsQuestion } from "react-icons/bs";
-
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
 import EmailConfirmModal from "../EmailConfirmModal/EmailConfirmModal";
+
+import { toast } from "react-toastify";
+import { BsQuestion } from "react-icons/bs";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -35,6 +35,7 @@ const Signup = () => {
     usernameError,
   } = useSelector((state: RootState) => state.auth);
 
+  //input logic
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
 
@@ -44,6 +45,7 @@ const Signup = () => {
     }));
   };
 
+  //submit btn logic
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -54,6 +56,7 @@ const Signup = () => {
     }
   };
 
+  //display errors and success messages
   useEffect(() => {
     [emailError, passwordError, usernameError, error].forEach((err) => {
       if (err) {

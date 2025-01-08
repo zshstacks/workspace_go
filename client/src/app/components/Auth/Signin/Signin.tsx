@@ -6,9 +6,12 @@ import {
   clearSuccessLogin,
 } from "@/app/redux/slices/authSlice/authSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
-import Link from "next/link";
-import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+import Link from "next/link";
+
+import React, { useCallback, useEffect, useState } from "react";
+
 import { toast } from "react-toastify";
 
 const Signin = () => {
@@ -21,6 +24,7 @@ const Signin = () => {
     (state: RootState) => state.auth
   );
 
+  //submit btn logic
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -33,6 +37,7 @@ const Signin = () => {
     [dispatch, email, password]
   );
 
+  //display errors and success messages
   useEffect(() => {
     if (errorLogin) {
       toast.error(errorLogin, {
