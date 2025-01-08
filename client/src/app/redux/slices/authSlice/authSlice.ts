@@ -1,6 +1,11 @@
 import { AuthState, ErrorPayload } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { emailConfirmation, loginUser, registerUser } from "./asyncActions";
+import {
+  emailConfirmation,
+  loginUser,
+  registerUser,
+  resendConfirmation,
+} from "./asyncActions";
 
 const initialState: AuthState = {
   emailError: null,
@@ -12,6 +17,7 @@ const initialState: AuthState = {
   successLogin: null,
   errorCodeEmail: null,
   successCodeEmail: null,
+  successResent: null,
   isLoading: false,
   user: null,
 };
@@ -49,6 +55,9 @@ const authSlice = createSlice({
       state.successCodeEmail = null;
       state.errorCodeEmail = null;
     },
+    clearResentConf: (state) => {
+      state.successResent = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -67,6 +76,11 @@ const authSlice = createSlice({
       .addCase(emailConfirmation.fulfilled, (state, action) => {
         state.isLoading = false;
         state.successCodeEmail = action.payload.successCodeEmail;
+      })
+      //resend code
+      .addCase(resendConfirmation.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.successResent = action.payload.successResent;
       })
 
       .addMatcher(
@@ -99,6 +113,7 @@ export const {
   clearLoginErrors,
   clearSuccessLogin,
   clearEmailConf,
+  clearResentConf,
 } = authSlice.actions;
 
 export default authSlice.reducer;

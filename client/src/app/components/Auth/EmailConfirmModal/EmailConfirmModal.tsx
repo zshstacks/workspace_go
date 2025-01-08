@@ -1,22 +1,34 @@
-import { emailConfirmation } from "@/app/redux/slices/authSlice/asyncActions";
+import {
+  emailConfirmation,
+  resendConfirmation,
+} from "@/app/redux/slices/authSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { clearEmailConf } from "@/app/redux/slices/authSlice/authSlice";
+import {
+  clearEmailConf,
+  clearResentConf,
+} from "@/app/redux/slices/authSlice/authSlice";
 import "animate.css";
 import { AiOutlineCheck } from "react-icons/ai";
+import { EmailModalProps } from "@/app/utility/types/types";
 
-const EmailConfirmModal = () => {
+const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
   const [code, setCode] = useState<string[]>(Array(6).fill(""));
   const [emailConfirmed, setEmailConfirmed] = useState(false);
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { successCodeEmail, isLoading, errorCodeEmail, error } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const {
+    successCodeEmail,
+    isLoading,
+    errorCodeEmail,
+    error,
+    successResent,
+    user,
+  } = useSelector((state: RootState) => state.auth);
 
   const router = useRouter();
 
@@ -56,6 +68,17 @@ const EmailConfirmModal = () => {
     }
   };
 
+  const handleResendCode = async () => {
+    const resultAction = await dispatch(resendConfirmation({ email }));
+    if (resultAction.meta.requestStatus === "fulfilled") {
+      toast.success(successResent, {
+        theme: "dark",
+        autoClose: 2000,
+        onClose: () => dispatch(clearResentConf()),
+      });
+    }
+  };
+
   useEffect(() => {
     if (errorCodeEmail)
       toast.error(error, {
@@ -91,7 +114,7 @@ const EmailConfirmModal = () => {
                   onPaste={handlePaste}
                   className={`w-10 h-12 text-center text-white text-lg bg-white/20 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     error
-                      ? "border-red-500 transition-all ease-in-out duration-300"
+                      ? "border-red-500 transition-all ease-in-out duration-300 animate__animated animate__headShake"
                       : ""
                   }`}
                 />
@@ -104,7 +127,10 @@ const EmailConfirmModal = () => {
             >
               Confirm
             </button>
-            <button className="mt-4 w-full py-2 text-gray-400 hover:text-white font-medium rounded-md">
+            <button
+              className="mt-4 w-full py-2 text-gray-400 hover:text-white font-medium rounded-md"
+              onClick={handleResendCode}
+            >
               Resend Code
             </button>
           </>

@@ -133,7 +133,7 @@ const Signup = () => {
                   size={14}
                 />
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-500/20 backdrop-blur-md  text-neutral-200 text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Char.Min: 10; Min.UpperCase:1; Min.Special.Char:1;
+                  Char.Min: 10; Min.UpperCase: 1; Min.Special.Char: 1;
                 </div>
               </div>
             </label>
@@ -173,7 +173,11 @@ const Signup = () => {
         </Link>
       </span>
 
-      {openModal && <EmailConfirmModal />}
+      <span className="text-white absolute top-0">
+        UnSad; gg@gg.com; Ghty123iojKlll!
+      </span>
+
+      {openModal && <EmailConfirmModal email={formData.email} />}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
+import { RootState } from "../../store";
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
@@ -46,6 +47,20 @@ export const emailConfirmation = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
         error.response?.data || "Confirmation failed"
+      );
+    }
+  }
+);
+
+export const resendConfirmation = createAsyncThunk(
+  "auth/resendConfirmation",
+  async ({ email }: { email: string }, thunkAPI) => {
+    try {
+      const res = await api.post("/resend-confirmation-code", { email });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Failed to resend confirmation code"
       );
     }
   }
