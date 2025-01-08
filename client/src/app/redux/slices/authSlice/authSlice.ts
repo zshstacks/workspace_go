@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   emailConfirmation,
   loginUser,
+  logoutUser,
   registerUser,
   resendConfirmation,
 } from "./asyncActions";
@@ -58,6 +59,9 @@ const authSlice = createSlice({
     clearResentConf: (state) => {
       state.successResent = null;
     },
+    clearLogout: (state) => {
+      state.successLogout = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -82,6 +86,11 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.successResent = action.payload.successResent;
       })
+      //logout
+      .addCase(logoutUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.successLogout = action.payload.successLogout;
+      })
 
       .addMatcher(
         (action) => action.type.endsWith("/pending"),
@@ -101,6 +110,7 @@ const authSlice = createSlice({
           state.usernameError = action.payload?.usernameError || null;
           state.passwordError = action.payload?.passwordError || null;
           state.errorLogin = action.payload?.errorLogin || null;
+
           state.error = action.payload?.error || null;
         }
       );
@@ -114,6 +124,7 @@ export const {
   clearSuccessLogin,
   clearEmailConf,
   clearResentConf,
+  clearLogout,
 } = authSlice.actions;
 
 export default authSlice.reducer;

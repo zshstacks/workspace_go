@@ -13,6 +13,7 @@ import Link from "next/link";
 import React, { useCallback, useEffect, useState } from "react";
 
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +24,8 @@ const Signin = () => {
   const { successLogin, errorLogin } = useSelector(
     (state: RootState) => state.auth
   );
+
+  const router = useRouter();
 
   //submit btn logic
   const handleSubmit = useCallback(
@@ -53,8 +56,10 @@ const Signin = () => {
         autoClose: 2000,
         onClose: () => dispatch(clearSuccessLogin()),
       });
+
+      router.push("/pomodoro");
     }
-  }, [successLogin, errorLogin, dispatch]);
+  }, [successLogin, errorLogin, dispatch, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat bg-bgAuth overflow-hidden">

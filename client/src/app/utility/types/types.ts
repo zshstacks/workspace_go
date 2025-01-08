@@ -41,6 +41,7 @@ export interface AuthState {
   errorCodeEmail: string | null;
   successCodeEmail: string | null;
   successResent: string | null;
+  successLogout: string | null;
   isLoading: boolean;
   user: any | null;
 }
@@ -52,6 +53,7 @@ export interface ErrorPayload {
   usernameError?: string;
   errorLogin?: string;
   errorCodeEmail?: string;
+  successLogout?: string;
 }
 
 export interface EmailModalProps {
