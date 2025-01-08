@@ -43,8 +43,7 @@ func sendEmailConfirmation(toEmail, code string) error {
 func ConfirmEmail(c *gin.Context) {
 
 	var body struct {
-		Email string `json:"email"`
-		Code  string `json:"code"`
+		Code string `json:"code"`
 	}
 
 	if c.Bind(&body) != nil {
@@ -60,18 +59,13 @@ func ConfirmEmail(c *gin.Context) {
 
 	var user models.User
 
-	if err := initializers.DB.First(&user, "email = ?", body.Email).Error; err != nil {
+	if err := initializers.DB.First(&user, "email_confirmation_code = ?", body.Code).Error; err != nil {
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(404, gin.H{"error": "User not found"})
+			c.JSON(404, gin.H{"error": "Invalid confirmation code"})
 		} else {
 			c.JSON(500, gin.H{"error": "Server error"})
 		}
-		return
-	}
-
-	if user.EmailConfirmationCode != body.Code {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid confirmation code"})
 		return
 	}
 
@@ -83,7 +77,53 @@ func ConfirmEmail(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": "Email confirmed!"})
+	c.JSON(http.StatusOK, gin.H{"successCodeEmail": "Email confirmed!"})
+}
+
+func ResendConfirmationCode(c *gin.Context) {
+	var body struct {
+		Email string `json:"email"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		return
+	}
+
+	// find by email
+	var user models.User
+	if err := initializers.DB.First(&user, "email = ?", body.Email).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Email not registered"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error"})
+		}
+		return
+	}
+
+	// check if email is confirmed
+	if user.IsEmailConfirmed {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is already confirmed"})
+		return
+	}
+
+	// generate new code
+	confirmationCode := generateConfirmationCode()
+	user.EmailConfirmationCode = confirmationCode
+
+	// save to db
+	if err := initializers.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update confirmation code"})
+		return
+	}
+
+	// send new code
+	if err := sendEmailConfirmation(user.Email, confirmationCode); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send confirmation email"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Confirmation code resent successfully"})
 }
 
 func SignUp(c *gin.Context) {

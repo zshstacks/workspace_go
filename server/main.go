@@ -38,6 +38,7 @@ func main() {
 	r.POST("/signup", controllers.SignUp)
 	r.POST("/login", controllers.SignIn)
 	r.POST("/confirm-email", controllers.ConfirmEmail)
+	r.POST("/resend-confirmation-code", controllers.ResendConfirmationCode)
 
 	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
 	r.GET("/logout", middleware.RequireAuth, controllers.Logout)
