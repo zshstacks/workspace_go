@@ -1,11 +1,39 @@
+import { logoutUser } from "@/app/redux/slices/authSlice/asyncActions";
+import { clearLogout } from "@/app/redux/slices/authSlice/authSlice";
+import { AppDispatch, RootState } from "@/app/redux/store";
 import { UserAccountProps } from "@/app/utility/types/types";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const UserAccount: React.FC<UserAccountProps> = ({
   openAccSettings,
   setOpenAccSettings,
 }) => {
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
+
+  const dispatch: AppDispatch = useDispatch();
+
+  const { successLogout } = useSelector((state: RootState) => state.auth);
+
+  const router = useRouter();
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    setIsLoggedOut(true);
+  };
+
+  useEffect(() => {
+    if (successLogout && isLoggedOut) {
+      setTimeout(() => {
+        dispatch(clearLogout());
+        router.push("/signin");
+      }, 1000);
+    }
+  }, [successLogout, dispatch, router, isLoggedOut]);
+
   return (
     <>
       {openAccSettings && (
@@ -52,8 +80,17 @@ const UserAccount: React.FC<UserAccountProps> = ({
               </div>
 
               {/* Logout */}
-              <div className="mt-5 mb-4">
-                <button className="text-gray-500">Log out</button>
+              <div className="mt-5 mb-4 flex gap-2">
+                <button className="text-gray-500" onClick={handleLogout}>
+                  Log out
+                </button>
+                {isLoggedOut ? (
+                  <span className=" text-green-500 text-sm  m-auto">
+                    {successLogout}
+                  </span>
+                ) : (
+                  ""
+                )}
               </div>
 
               {/* Delete Account */}
