@@ -35,17 +35,20 @@ export interface AuthState {
   passwordError: string | null;
   usernameError: string | null;
   error: string | null;
-  success: string | null;
-  successLogin: string | null;
   errorLogin: string | null;
   errorCodeEmail: string | null;
+
   successCodeEmail: string | null;
   successResent: string | null;
   successLogout: string | null;
+  success: string | null;
+  successLogin: string | null;
+
   isLoading: boolean;
   user: any | null;
 }
 
+//redux auth .rejected
 export interface ErrorPayload {
   error?: string;
   emailError?: string;
@@ -53,9 +56,19 @@ export interface ErrorPayload {
   usernameError?: string;
   errorLogin?: string;
   errorCodeEmail?: string;
-  successLogout?: string;
 }
 
 export interface EmailModalProps {
   email: string;
+}
+
+//redux user slice
+export interface UserState {
+  user: any | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface UserErrorPayload {
+  error?: string;
 }

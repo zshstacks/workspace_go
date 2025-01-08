@@ -1,12 +1,12 @@
 import { logoutUser } from "@/app/redux/slices/authSlice/asyncActions";
 import { clearLogout } from "@/app/redux/slices/authSlice/authSlice";
+import { validateUser } from "@/app/redux/slices/userSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { UserAccountProps } from "@/app/utility/types/types";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
 
 const UserAccount: React.FC<UserAccountProps> = ({
   openAccSettings,
@@ -17,6 +17,7 @@ const UserAccount: React.FC<UserAccountProps> = ({
   const dispatch: AppDispatch = useDispatch();
 
   const { successLogout } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.user);
 
   const router = useRouter();
 
@@ -24,6 +25,10 @@ const UserAccount: React.FC<UserAccountProps> = ({
     dispatch(logoutUser());
     setIsLoggedOut(true);
   };
+
+  useEffect(() => {
+    dispatch(validateUser());
+  }, [dispatch]);
 
   useEffect(() => {
     if (successLogout && isLoggedOut) {
@@ -62,7 +67,7 @@ const UserAccount: React.FC<UserAccountProps> = ({
                 </label>
                 <input
                   type="email"
-                  value="uns4d123@gmail.com"
+                  value={user.email}
                   className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500  focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
@@ -74,7 +79,7 @@ const UserAccount: React.FC<UserAccountProps> = ({
                 </label>
                 <input
                   type="text"
-                  value="wlr1_dev"
+                  value={user.username}
                   className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500 focus:outline-none"
                 />
               </div>
