@@ -43,6 +43,8 @@ func main() {
 	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
 	r.GET("/logout", middleware.RequireAuth, controllers.Logout)
 
+	r.DELETE("/delete-user", middleware.RequireAuth, controllers.DeleteUser)
+
 	log.Fatal(r.Run())
 
 }
