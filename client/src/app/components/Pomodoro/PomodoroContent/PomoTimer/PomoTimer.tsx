@@ -9,6 +9,10 @@ import { PomoTimerProps } from "@/app/utility/types/types";
 
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { changeMode } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
+import { getPomodoroSettings } from "@/app/redux/slices/pomodoroSlice/asyncActions";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   position,
@@ -19,6 +23,29 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   // const [openSettings, setOpenSettings] = useState(false);
   const [localPosition, setLocalPosition] = useState(position);
   const [isDragging, setIsDragging] = useState(false);
+
+  const dispatch: AppDispatch = useDispatch();
+  const { settings, currentMode } = useSelector(
+    (state: RootState) => state.pomodoro
+  );
+
+  //change timer mode
+  const handleChangeMode = (mode: "pomodoro" | "shortBreak" | "longBreak") => {
+    dispatch(changeMode(mode));
+  };
+
+  useEffect(() => {
+    // Pieprasām iestatījumus no servera pēc komponentes ielādes
+    dispatch(getPomodoroSettings());
+  }, [dispatch]);
+
+  //fetch duration based on type
+  const getCurrentDuration = () => {
+    if (currentMode === "pomodoro") return settings.pomodoro;
+    if (currentMode === "shortBreak") return settings.shortBreak;
+    if (currentMode === "longBreak") return settings.longBreak;
+    return 0;
+  };
 
   // update pos when it changes
   useEffect(() => {
@@ -87,7 +114,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       {/* Timer Section */}
       <div className="flex justify-center mt-6">
         <div className="w-full">
-          <h1 className="text-5xl font-bold">60:00</h1>
+          <h1 className="text-5xl font-bold">{getCurrentDuration()}:00</h1>
         </div>
 
         {/* Buttons Section */}
@@ -103,11 +130,35 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
       {/* Tabs Section */}
       <div className="flex justify-around mt-6 text-sm ">
-        <button className="border-b-2 border-white pb-1 font-medium">
+        <button
+          className={
+            currentMode === "pomodoro" ? "border-b-2 border-gray-400  pb-1" : ""
+          }
+          onClick={() => handleChangeMode("pomodoro")}
+        >
           Pomodoro
         </button>
-        <button>Short Break</button>
-        <button>Long Break</button>
+        <button
+          className={
+            currentMode === "shortBreak"
+              ? "border-b-2 border-gray-400 pb-1 "
+              : ""
+          }
+          onClick={() => handleChangeMode("shortBreak")}
+        >
+          Short Break
+        </button>
+
+        <button
+          className={
+            currentMode === "longBreak"
+              ? "border-b-2 border-gray-400 pb-1 "
+              : ""
+          }
+          onClick={() => handleChangeMode("longBreak")}
+        >
+          Long Break
+        </button>
 
         {/* Settings Icon */}
         <div className="flex">

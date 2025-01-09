@@ -1,7 +1,24 @@
-import React from "react";
+import {
+  getPomodoroSettings,
+  updatePomodoroTime,
+} from "@/app/redux/slices/pomodoroSlice/asyncActions";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import React, { useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
+import { useDispatch, useSelector } from "react-redux";
 
 const PomoTimerSettings = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const settings = useSelector((state: RootState) => state.pomodoro.settings);
+
+  const [localSettings, setLocalSettings] = useState(settings);
+
+  const handleSave = () => {
+    dispatch(updatePomodoroTime(localSettings)).then(() => {
+      dispatch(getPomodoroSettings());
+    });
+  };
+
   return (
     <div className=" font-medium " id="pomo-timer">
       {/* divider */}
@@ -34,7 +51,14 @@ const PomoTimerSettings = () => {
               min={0}
               max={60}
               defaultValue={60}
+              value={localSettings.pomodoro}
               className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black text-sm font-normal"
+              onChange={(e) =>
+                setLocalSettings({
+                  ...localSettings,
+                  pomodoro: +e.target.value,
+                })
+              }
             />
           </div>
           <div>
@@ -44,6 +68,13 @@ const PomoTimerSettings = () => {
               min={0}
               max={60}
               defaultValue={15}
+              value={localSettings.shortBreak}
+              onChange={(e) =>
+                setLocalSettings({
+                  ...localSettings,
+                  shortBreak: +e.target.value,
+                })
+              }
               className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black text-sm font-normal"
             />
           </div>
@@ -54,6 +85,13 @@ const PomoTimerSettings = () => {
               min={0}
               max={60}
               defaultValue={30}
+              value={localSettings.longBreak}
+              onChange={(e) =>
+                setLocalSettings({
+                  ...localSettings,
+                  longBreak: +e.target.value,
+                })
+              }
               className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black text-sm font-normal"
             />
           </div>
@@ -95,7 +133,12 @@ const PomoTimerSettings = () => {
       </>
       {/* save settings */}
       <div className="flex justify-center mt-5 mb-3">
-        <button className="w-[303px] p-1 rounded-md bg-[#e89688]">Save</button>
+        <button
+          className="w-[303px] p-1 rounded-md bg-[#e89688]"
+          onClick={handleSave}
+        >
+          Save
+        </button>
       </div>
     </div>
   );
