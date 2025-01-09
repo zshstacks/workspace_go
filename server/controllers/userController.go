@@ -18,12 +18,6 @@ import (
 	"time"
 )
 
-var db *gorm.DB
-
-func init() {
-	db = initializers.DB
-}
-
 func generateConfirmationCode() string {
 	return strconv.Itoa(rand.Intn(1000000))
 }
