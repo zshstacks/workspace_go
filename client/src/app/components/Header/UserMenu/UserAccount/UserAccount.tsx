@@ -1,6 +1,9 @@
 import { logoutUser } from "@/app/redux/slices/authSlice/asyncActions";
 import { clearLogout } from "@/app/redux/slices/authSlice/authSlice";
-import { validateUser } from "@/app/redux/slices/userSlice/asyncActions";
+import {
+  deleteUser,
+  validateUser,
+} from "@/app/redux/slices/userSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { UserAccountProps } from "@/app/utility/types/types";
 import { useRouter } from "next/navigation";
@@ -17,7 +20,7 @@ const UserAccount: React.FC<UserAccountProps> = ({
   const dispatch: AppDispatch = useDispatch();
 
   const { successLogout } = useSelector((state: RootState) => state.auth);
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, successDelete } = useSelector((state: RootState) => state.user);
 
   const router = useRouter();
 
@@ -26,18 +29,22 @@ const UserAccount: React.FC<UserAccountProps> = ({
     setIsLoggedOut(true);
   };
 
+  const handleDelete = () => {
+    dispatch(deleteUser());
+  };
+
   useEffect(() => {
     dispatch(validateUser());
   }, [dispatch]);
 
   useEffect(() => {
-    if (successLogout && isLoggedOut) {
+    if ((successLogout && isLoggedOut) || successDelete) {
       setTimeout(() => {
         dispatch(clearLogout());
         router.push("/signin");
       }, 1000);
     }
-  }, [successLogout, dispatch, router, isLoggedOut]);
+  }, [successLogout, dispatch, router, isLoggedOut, successDelete]);
 
   return (
     <>
@@ -67,7 +74,7 @@ const UserAccount: React.FC<UserAccountProps> = ({
                 </label>
                 <input
                   type="email"
-                  value={user.email}
+                  value={user ? user.email : "Failed to fetch"}
                   className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500  focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
@@ -79,7 +86,7 @@ const UserAccount: React.FC<UserAccountProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={user.username}
+                  value={user ? user.username : "Failed to fetch"}
                   className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500 focus:outline-none"
                 />
               </div>
@@ -104,7 +111,10 @@ const UserAccount: React.FC<UserAccountProps> = ({
                   Permanently delete your pomodoro_go account and all of your
                   data.
                 </p>
-                <button className="text-red-500 text-sm hover:underline">
+                <button
+                  className="text-red-500 text-sm hover:underline"
+                  onClick={handleDelete}
+                >
                   Delete account
                 </button>
               </div>
