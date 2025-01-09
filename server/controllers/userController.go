@@ -51,6 +51,11 @@ func ConfirmEmail(c *gin.Context) {
 		return
 	}
 
+	if body.Code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Code cannot be empty"})
+		return
+	}
+
 	if initializers.DB == nil {
 		log.Println("Database connection is nil in ConfirmEmail")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection not initialized"})
@@ -60,7 +65,6 @@ func ConfirmEmail(c *gin.Context) {
 	var user models.User
 
 	if err := initializers.DB.First(&user, "email_confirmation_code = ?", body.Code).Error; err != nil {
-
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(404, gin.H{"error": "Invalid confirmation code"})
 		} else {
@@ -123,7 +127,7 @@ func ResendConfirmationCode(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": "Confirmation code resent successfully"})
+	c.JSON(http.StatusOK, gin.H{"successResent": "Confirmation code resent successfully"})
 }
 
 func SignUp(c *gin.Context) {
@@ -296,6 +300,24 @@ func Logout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Logged out successfully",
+		"successLogout": "Logged out successfully",
+	})
+}
+
+func DeleteUser(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	result := initializers.DB.Delete(&currentUser)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		return
+	}
+
+	c.SetCookie("token", "", -1, "/", "", false, true)
+
+	c.JSON(http.StatusOK, gin.H{
+		"successDelete": "User deleted successfully",
 	})
 }
