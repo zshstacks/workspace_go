@@ -1,11 +1,12 @@
 import { UserErrorPayload, UserState } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { validateUser } from "./asyncActions";
+import { deleteUser, validateUser } from "./asyncActions";
 
 const initialState: UserState = {
   user: null,
   isLoading: false,
   error: null,
+  successDelete: null,
 };
 
 const userSlice = createSlice({
@@ -18,6 +19,12 @@ const userSlice = createSlice({
       .addCase(validateUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload;
+      })
+
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = null;
+        state.successDelete = action.payload.successDelete;
       })
 
       .addMatcher(

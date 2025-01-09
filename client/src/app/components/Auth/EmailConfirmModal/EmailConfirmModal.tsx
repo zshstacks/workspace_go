@@ -69,7 +69,6 @@ const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
       }, 2000);
     }
   };
-
   //resend code with 60 sec timeout after resend is triggered
   const handleResendCode = async () => {
     if (timer === null) {

@@ -67,6 +67,7 @@ export interface UserState {
   user: any | null;
   isLoading: boolean;
   error: string | null;
+  successDelete: string | null;
 }
 
 export interface UserErrorPayload {
