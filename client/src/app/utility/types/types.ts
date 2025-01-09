@@ -70,6 +70,22 @@ export interface UserState {
   successDelete: string | null;
 }
 
+//user slice error payload
 export interface UserErrorPayload {
+  error?: string;
+}
+
+export interface PomodoroState {
+  settings: {
+    pomodoro: number;
+    shortBreak: number;
+    longBreak: number;
+  };
+  currentMode: string;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface PomodoroErrorPayload {
   error?: string;
 }
