@@ -199,6 +199,16 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
+	if result.Error == nil {
+		defaultSettings := models.PomodoroModel{
+			UserID:             user.ID,
+			PomodoroDuration:   25,
+			ShortBreakDuration: 5,
+			LongBreakDuration:  15,
+		}
+		initializers.DB.Create(&defaultSettings)
+	}
+
 	if err := sendEmailConfirmation(body.Email, confirmationCode); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"errorConfirmation": "Failed to send confirmation email "})
 		return
@@ -240,6 +250,22 @@ func SignIn(c *gin.Context) {
 	if !user.IsEmailConfirmed {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email not confirmed"})
 		return
+	}
+
+	var settings models.PomodoroModel
+	if err := initializers.DB.First(&settings, "user_id = ?", user.ID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			defaultSettings := models.PomodoroModel{
+				UserID:             user.ID,
+				PomodoroDuration:   25,
+				ShortBreakDuration: 5,
+				LongBreakDuration:  15,
+			}
+			initializers.DB.Create(&defaultSettings)
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check pomodoro settings"})
+			return
+		}
 	}
 
 	//generate jwt token
