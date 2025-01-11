@@ -199,6 +199,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
+	//create pomodoro table
 	if result.Error == nil {
 		defaultSettings := models.PomodoroModel{
 			UserID:             user.ID,
@@ -252,6 +253,7 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
+	//Ensure Pomodoro settings exist for the user
 	var settings models.PomodoroModel
 	if err := initializers.DB.First(&settings, "user_id = ?", user.ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

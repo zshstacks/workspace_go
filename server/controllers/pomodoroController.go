@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"server/initializers"
 	"server/models"
-	"time"
+	"server/utils"
 )
 
 func UpdatePomodoroSettings(c *gin.Context) {
@@ -60,13 +60,16 @@ func GetPomodoroSettings(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"pomodoro":   settings.PomodoroDuration,
-		"shortBreak": settings.ShortBreakDuration,
-		"longBreak":  settings.LongBreakDuration,
+		"pomodoro":      settings.PomodoroDuration,
+		"shortBreak":    settings.ShortBreakDuration,
+		"longBreak":     settings.LongBreakDuration,
+		"remainingTime": settings.RemainingTime,
+		"isRunning":     settings.IsRunning,
+		"currentPhase":  settings.CurrentPhase,
 	})
 }
 
-func StartPomodoro(c *gin.Context) {
+func FetchPomodoroStatus(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
@@ -76,23 +79,64 @@ func StartPomodoro(c *gin.Context) {
 		return
 	}
 
-	if settings.IsRunning {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Pomodoro already running"})
+	c.JSON(http.StatusOK, gin.H{
+
+		"remainingTime": settings.RemainingTime,
+		"isRunning":     settings.IsRunning,
+		"currentPhase":  settings.CurrentPhase,
+	})
+}
+
+func StartPomodoro(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	var body struct {
+		Phase string `json:"phase"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
 		return
 	}
 
-	startTime := time.Now()
-	settings.StartTime = &startTime
-	settings.IsRunning = true
-	settings.CurrentPhase = "pomodoro"
-	settings.RemainingTime = settings.PomodoroDuration * 60
+	var settings models.PomodoroModel
+	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		return
+	}
 
+	if settings.IsRunning {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Timer already running"})
+		return
+	}
+
+	if settings.CurrentPhase != body.Phase {
+		settings.CurrentPhase = body.Phase
+	}
+
+	switch settings.CurrentPhase {
+	case "pomodoro":
+		settings.RemainingTime = settings.PomodoroDuration * 60
+	case "shortBreak":
+		settings.RemainingTime = settings.ShortBreakDuration * 60
+	case "longBreak":
+		settings.RemainingTime = settings.LongBreakDuration * 60
+	}
+
+	settings.IsRunning = true
 	initializers.DB.Save(&settings)
 
-	c.JSON(http.StatusOK, gin.H{"success": "Pomodoro started"})
+	utils.StartPomodoroTimer(currentUser.ID)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":       "Timer started successfully",
+		"currentPhase":  settings.CurrentPhase,
+		"remainingTime": settings.RemainingTime,
+	})
 }
 
-func PausePomodoro(c *gin.Context) {
+func StopPomodoro(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
@@ -103,15 +147,17 @@ func PausePomodoro(c *gin.Context) {
 	}
 
 	if !settings.IsRunning {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Pomodoro is not running"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Timer is not running"})
 		return
 	}
 
-	elapsed := int(time.Since(*settings.StartTime).Seconds())
-	settings.RemainingTime -= elapsed
 	settings.IsRunning = false
-
 	initializers.DB.Save(&settings)
 
-	c.JSON(http.StatusOK, gin.H{"success": "Pomodoro paused"})
+	c.JSON(http.StatusOK, gin.H{
+		"success":       "Timer stopped successfully",
+		"remainingTime": settings.RemainingTime,
+		"currentPhase":  settings.CurrentPhase,
+	})
+
 }

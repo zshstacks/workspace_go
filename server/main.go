@@ -45,11 +45,14 @@ func main() {
 
 	r.DELETE("/delete-user", middleware.RequireAuth, controllers.DeleteUser)
 
+	//pomodoro routes
+
 	r.GET("/pomodoro-settings", middleware.RequireAuth, controllers.GetPomodoroSettings)
+	r.GET("/pomodoro-timer-status", middleware.RequireAuth, controllers.FetchPomodoroStatus)
 
 	r.POST("/pomodoro-update-settings", middleware.RequireAuth, controllers.UpdatePomodoroSettings)
 	r.POST("/pomodoro-start", middleware.RequireAuth, controllers.StartPomodoro)
-	r.POST("/pomodoro-pause", middleware.RequireAuth, controllers.PausePomodoro)
+	r.POST("/pomodoro-stop", middleware.RequireAuth, controllers.StopPomodoro)
 
 	log.Fatal(r.Run())
 
