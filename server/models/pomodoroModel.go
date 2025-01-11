@@ -2,7 +2,6 @@ package models
 
 import (
 	"gorm.io/gorm"
-	"time"
 )
 
 type PomodoroModel struct {
@@ -12,7 +11,7 @@ type PomodoroModel struct {
 	ShortBreakDuration int    `gorm:"default:5"`
 	LongBreakDuration  int    `gorm:"default:15"`
 	IsRunning          bool   `gorm:"default:false"`
+	IsStopping         bool   `gorm:"default:false"`
 	CurrentPhase       string `gorm:"default:'pomodoro'"`
-	StartTime          *time.Time
-	RemainingTime      int
+	RemainingTime      int    `gorm:"default:0"`
 }
