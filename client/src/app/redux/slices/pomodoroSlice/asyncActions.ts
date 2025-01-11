@@ -40,3 +40,45 @@ export const getPomodoroSettings = createAsyncThunk(
     }
   }
 );
+
+export const fetchTimerStatus = createAsyncThunk(
+  "pomodoro/fetchTimerStatus",
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.get("/pomodoro-timer-status");
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Failed to fetch timer status"
+      );
+    }
+  }
+);
+
+export const startPomodoro = createAsyncThunk(
+  "pomodoro/startPomodoro",
+  async (phase: "pomodoro" | "shortBreak" | "longBreak", thunkAPI) => {
+    try {
+      const res = await api.post("/pomodoro-start", { phase });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "failed to start pomodoro"
+      );
+    }
+  }
+);
+
+export const stopPomodoro = createAsyncThunk(
+  "pomodoro/stopPomodoro",
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.post("/pomodoro-stop");
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Failed to stop pomodoro"
+      );
+    }
+  }
+);

@@ -81,8 +81,10 @@ export interface PomodoroState {
     shortBreak: number;
     longBreak: number;
   };
-  currentMode: string;
+  currentMode: "pomodoro" | "shortBreak" | "longBreak";
+  remainingTime: number;
   isLoading: boolean;
+  isRunning: boolean;
   error: string | null;
 }
 

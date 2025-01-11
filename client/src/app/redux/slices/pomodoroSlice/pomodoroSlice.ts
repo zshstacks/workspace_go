@@ -1,5 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getPomodoroSettings, updatePomodoroTime } from "./asyncActions";
+import {
+  fetchTimerStatus,
+  getPomodoroSettings,
+  startPomodoro,
+  stopPomodoro,
+  updatePomodoroTime,
+} from "./asyncActions";
 import { PomodoroErrorPayload, PomodoroState } from "@/app/utility/types/types";
 
 const initialState: PomodoroState = {
@@ -8,8 +14,10 @@ const initialState: PomodoroState = {
     shortBreak: 5,
     longBreak: 15,
   },
+  remainingTime: 25 * 60,
   currentMode: "pomodoro",
   isLoading: false,
+  isRunning: false,
   error: null,
 };
 
@@ -23,6 +31,10 @@ const pomodoroSlice = createSlice({
     ) => {
       state.currentMode = action.payload;
     },
+
+    updateRemainingTime: (state, action: PayloadAction<number>) => {
+      state.remainingTime = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -35,6 +47,23 @@ const pomodoroSlice = createSlice({
       .addCase(getPomodoroSettings.fulfilled, (state, action) => {
         state.isLoading = false;
         state.settings = action.payload;
+      })
+
+      .addCase(fetchTimerStatus.fulfilled, (state, action) => {
+        state.remainingTime = action.payload.remainingTime;
+        state.currentMode = action.payload.currentMode;
+        state.isRunning = action.payload.isRunning;
+      })
+
+      .addCase(startPomodoro.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isRunning = true;
+        state.currentMode = action.payload.currentPhase;
+      })
+
+      .addCase(stopPomodoro.fulfilled, (state) => {
+        state.isRunning = false;
+        state.isLoading = false;
       })
 
       .addMatcher(
@@ -55,6 +84,6 @@ const pomodoroSlice = createSlice({
   },
 });
 
-export const { changeMode } = pomodoroSlice.actions;
+export const { changeMode, updateRemainingTime } = pomodoroSlice.actions;
 
 export default pomodoroSlice.reducer;

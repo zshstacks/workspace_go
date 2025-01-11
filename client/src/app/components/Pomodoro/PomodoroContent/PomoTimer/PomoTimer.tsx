@@ -7,12 +7,21 @@ import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
 import { useDraggable } from "@dnd-kit/core";
 import { PomoTimerProps } from "@/app/utility/types/types";
 
-import { FaRegWindowMinimize } from "react-icons/fa";
-import { FiSettings, FiRefreshCw } from "react-icons/fi";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
-import { changeMode } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
-import { getPomodoroSettings } from "@/app/redux/slices/pomodoroSlice/asyncActions";
+import {
+  changeMode,
+  updateRemainingTime,
+} from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
+import {
+  fetchTimerStatus,
+  getPomodoroSettings,
+  startPomodoro,
+  stopPomodoro,
+} from "@/app/redux/slices/pomodoroSlice/asyncActions";
+
+import { FaRegWindowMinimize } from "react-icons/fa";
+import { FiSettings, FiRefreshCw } from "react-icons/fi";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   position,
@@ -20,39 +29,55 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   openSettings,
   setIsTimerActive,
 }) => {
-  // const [openSettings, setOpenSettings] = useState(false);
   const [localPosition, setLocalPosition] = useState(position);
   const [isDragging, setIsDragging] = useState(false);
 
   const dispatch: AppDispatch = useDispatch();
-  const { settings, currentMode } = useSelector(
+  const { settings, currentMode, isRunning, remainingTime } = useSelector(
     (state: RootState) => state.pomodoro
   );
 
   //change timer mode
   const handleChangeMode = (mode: "pomodoro" | "shortBreak" | "longBreak") => {
     dispatch(changeMode(mode));
-  };
 
-  useEffect(() => {
-    // Pieprasām iestatījumus no servera pēc komponentes ielādes
-    dispatch(getPomodoroSettings());
-  }, [dispatch]);
-
-  //fetch duration based on type
-  const getCurrentDuration = () => {
-    if (currentMode === "pomodoro") return settings.pomodoro;
-    if (currentMode === "shortBreak") return settings.shortBreak;
-    if (currentMode === "longBreak") return settings.longBreak;
-    return 0;
-  };
-
-  // update pos when it changes
-  useEffect(() => {
-    if (position !== localPosition) {
-      setLocalPosition(position);
+    // Mainot režīmu, atjaunināt atlikušā laika vērtību
+    let newTime = 0;
+    if (mode === "pomodoro") {
+      newTime = settings.pomodoro * 60;
+    } else if (mode === "shortBreak") {
+      newTime = settings.shortBreak * 60;
+    } else if (mode === "longBreak") {
+      newTime = settings.longBreak * 60;
     }
-  }, [position]);
+
+    dispatch(updateRemainingTime(newTime));
+  };
+
+  const handleStart = () => {
+    let newTime = 0;
+    if (currentMode === "pomodoro") {
+      newTime = settings.pomodoro * 60;
+    } else if (currentMode === "shortBreak") {
+      newTime = settings.shortBreak * 60;
+    } else if (currentMode === "longBreak") {
+      newTime = settings.longBreak * 60;
+    }
+
+    dispatch(updateRemainingTime(newTime));
+    dispatch(startPomodoro(currentMode));
+  };
+
+  const handleStop = async () => {
+    await dispatch(stopPomodoro());
+    dispatch(fetchTimerStatus());
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" + secs : secs}`;
+  };
 
   const {
     attributes,
@@ -65,6 +90,51 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   });
 
   useEffect(() => {
+    const updateInitialTime = () => {
+      let initialTime = 0;
+      if (currentMode === "pomodoro") {
+        initialTime = settings.pomodoro * 60;
+      } else if (currentMode === "shortBreak") {
+        initialTime = settings.shortBreak * 60;
+      } else if (currentMode === "longBreak") {
+        initialTime = settings.longBreak * 60;
+      }
+      dispatch(updateRemainingTime(initialTime));
+    };
+
+    updateInitialTime(); // Call function to set the correct time
+  }, [
+    currentMode,
+    settings.pomodoro,
+    settings.shortBreak,
+    settings.longBreak,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (isRunning) {
+      const interval = setInterval(() => {
+        dispatch(fetchTimerStatus());
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [dispatch, isRunning]);
+
+  useEffect(() => {
+    if (remainingTime <= 0) {
+      // Automatically switch to next phase
+      dispatch(fetchTimerStatus());
+    }
+  }, [remainingTime, dispatch]);
+
+  useEffect(() => {
+    dispatch(getPomodoroSettings());
+  }, [dispatch]);
+
+  //=====================
+  //dnd
+  //=====================
+  useEffect(() => {
     if (transform) {
       setLocalPosition({
         x: position.x + transform.x,
@@ -76,6 +146,13 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   useEffect(() => {
     setIsDragging(dragging);
   }, [dragging]);
+
+  // update pos when it changes
+  useEffect(() => {
+    if (position !== localPosition) {
+      setLocalPosition(position);
+    }
+  }, [position]);
 
   return (
     <div
@@ -114,13 +191,18 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       {/* Timer Section */}
       <div className="flex justify-center mt-6">
         <div className="w-full">
-          <h1 className="text-5xl font-bold">{getCurrentDuration()}:00</h1>
+          <h1 className="text-5xl font-bold">{formatTime(remainingTime)}</h1>
         </div>
 
         {/* Buttons Section */}
         <div className="flex m-auto gap-4  ">
-          <button className="px-8 py-1 bg-transparent border border-white rounded-lg ">
-            <span className="font-semibold text-md">Start</span>
+          <button
+            className="px-8 py-1 bg-transparent border border-white rounded-lg "
+            onClick={isRunning ? handleStop : handleStart}
+          >
+            <span className="font-semibold text-md">
+              {isRunning ? "Stop" : "Start"}
+            </span>
           </button>
           <button className="">
             <FiRefreshCw size={20} />
