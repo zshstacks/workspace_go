@@ -53,12 +53,17 @@ const PomoTimerSettings = () => {
               defaultValue={60}
               value={localSettings.pomodoro}
               className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black text-sm font-normal"
-              onChange={(e) =>
+              onChange={(e) => {
+                const target = e.target as HTMLInputElement;
+                if (target.value.length > 2) {
+                  target.value = target.value.slice(0, 2);
+                }
+
                 setLocalSettings({
                   ...localSettings,
                   pomodoro: +e.target.value,
-                })
-              }
+                });
+              }}
             />
           </div>
           <div>
@@ -69,12 +74,17 @@ const PomoTimerSettings = () => {
               max={60}
               defaultValue={15}
               value={localSettings.shortBreak}
-              onChange={(e) =>
+              onChange={(e) => {
+                const target = e.target as HTMLInputElement;
+                if (target.value.length > 2) {
+                  target.value = target.value.slice(0, 2);
+                }
+
                 setLocalSettings({
                   ...localSettings,
                   shortBreak: +e.target.value,
-                })
-              }
+                });
+              }}
               className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black text-sm font-normal"
             />
           </div>
@@ -86,12 +96,17 @@ const PomoTimerSettings = () => {
               max={60}
               defaultValue={30}
               value={localSettings.longBreak}
-              onChange={(e) =>
+              onChange={(e) => {
+                const target = e.target as HTMLInputElement;
+                if (target.value.length > 2) {
+                  target.value = target.value.slice(0, 2);
+                }
+
                 setLocalSettings({
                   ...localSettings,
                   longBreak: +e.target.value,
-                })
-              }
+                });
+              }}
               className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black text-sm font-normal"
             />
           </div>
