@@ -15,7 +15,7 @@ const initialState: PomodoroState = {
     longBreak: 15,
   },
   remainingTime: 25 * 60,
-  currentMode: "pomodoro",
+  currentPhase: "pomodoro",
   isLoading: false,
   isRunning: false,
   error: null,
@@ -29,7 +29,7 @@ const pomodoroSlice = createSlice({
       state,
       action: PayloadAction<"pomodoro" | "shortBreak" | "longBreak">
     ) => {
-      state.currentMode = action.payload;
+      state.currentPhase = action.payload;
     },
 
     updateRemainingTime: (state, action: PayloadAction<number>) => {
@@ -51,14 +51,24 @@ const pomodoroSlice = createSlice({
 
       .addCase(fetchTimerStatus.fulfilled, (state, action) => {
         state.remainingTime = action.payload.remainingTime;
-        state.currentMode = action.payload.currentMode;
         state.isRunning = action.payload.isRunning;
       })
 
-      .addCase(startPomodoro.fulfilled, (state, action) => {
-        state.isLoading = false;
+      .addCase(startPomodoro.fulfilled, (state) => {
+        if (!state.remainingTime || state.remainingTime <= 0) {
+          switch (state.currentPhase) {
+            case "pomodoro":
+              state.remainingTime = state.settings.pomodoro * 60;
+              break;
+            case "shortBreak":
+              state.remainingTime = state.settings.shortBreak * 60;
+              break;
+            case "longBreak":
+              state.remainingTime = state.settings.longBreak * 60;
+              break;
+          }
+        }
         state.isRunning = true;
-        state.currentMode = action.payload.currentPhase;
       })
 
       .addCase(stopPomodoro.fulfilled, (state) => {
