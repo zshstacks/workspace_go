@@ -33,7 +33,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   const [isDragging, setIsDragging] = useState(false);
 
   const dispatch: AppDispatch = useDispatch();
-  const { settings, currentMode, isRunning, remainingTime } = useSelector(
+  const { settings, currentPhase, isRunning, remainingTime } = useSelector(
     (state: RootState) => state.pomodoro
   );
 
@@ -55,17 +55,9 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   };
 
   const handleStart = () => {
-    let newTime = 0;
-    if (currentMode === "pomodoro") {
-      newTime = settings.pomodoro * 60;
-    } else if (currentMode === "shortBreak") {
-      newTime = settings.shortBreak * 60;
-    } else if (currentMode === "longBreak") {
-      newTime = settings.longBreak * 60;
+    if (!isRunning) {
+      dispatch(startPomodoro(currentPhase));
     }
-
-    dispatch(updateRemainingTime(newTime));
-    dispatch(startPomodoro(currentMode));
   };
 
   const handleStop = async () => {
@@ -92,11 +84,11 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   useEffect(() => {
     const updateInitialTime = () => {
       let initialTime = 0;
-      if (currentMode === "pomodoro") {
+      if (currentPhase === "pomodoro") {
         initialTime = settings.pomodoro * 60;
-      } else if (currentMode === "shortBreak") {
+      } else if (currentPhase === "shortBreak") {
         initialTime = settings.shortBreak * 60;
-      } else if (currentMode === "longBreak") {
+      } else if (currentPhase === "longBreak") {
         initialTime = settings.longBreak * 60;
       }
       dispatch(updateRemainingTime(initialTime));
@@ -104,7 +96,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
     updateInitialTime(); // Call function to set the correct time
   }, [
-    currentMode,
+    currentPhase,
     settings.pomodoro,
     settings.shortBreak,
     settings.longBreak,
@@ -214,7 +206,9 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       <div className="flex justify-around mt-6 text-sm ">
         <button
           className={
-            currentMode === "pomodoro" ? "border-b-2 border-gray-400  pb-1" : ""
+            currentPhase === "pomodoro"
+              ? "border-b-2 border-gray-400  pb-1"
+              : ""
           }
           onClick={() => handleChangeMode("pomodoro")}
         >
@@ -222,7 +216,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         </button>
         <button
           className={
-            currentMode === "shortBreak"
+            currentPhase === "shortBreak"
               ? "border-b-2 border-gray-400 pb-1 "
               : ""
           }
@@ -233,7 +227,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
         <button
           className={
-            currentMode === "longBreak"
+            currentPhase === "longBreak"
               ? "border-b-2 border-gray-400 pb-1 "
               : ""
           }
