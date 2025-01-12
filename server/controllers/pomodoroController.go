@@ -113,15 +113,14 @@ func StartPomodoro(c *gin.Context) {
 
 	if settings.CurrentPhase != body.Phase {
 		settings.CurrentPhase = body.Phase
-	}
-
-	switch settings.CurrentPhase {
-	case "pomodoro":
-		settings.RemainingTime = settings.PomodoroDuration * 60
-	case "shortBreak":
-		settings.RemainingTime = settings.ShortBreakDuration * 60
-	case "longBreak":
-		settings.RemainingTime = settings.LongBreakDuration * 60
+		switch settings.CurrentPhase {
+		case "pomodoro":
+			settings.RemainingTime = settings.PomodoroDuration * 60
+		case "shortBreak":
+			settings.RemainingTime = settings.ShortBreakDuration * 60
+		case "longBreak":
+			settings.RemainingTime = settings.LongBreakDuration * 60
+		}
 	}
 
 	settings.IsRunning = true
