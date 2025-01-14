@@ -1,22 +1,42 @@
+"use client";
+
 import { AppearanceProps } from "@/app/utility/types/types";
-import React from "react";
-import { IoIosClose } from "react-icons/io";
+import React, { useEffect, useState } from "react";
+import { IoIosCheckmark, IoIosClose } from "react-icons/io";
 import { RiMoonLine } from "react-icons/ri";
 
 const Appearance: React.FC<AppearanceProps> = ({
   openUISettings,
   setOpenUISettings,
+  setHideElementsActive,
 }) => {
+  const [hideActive, setHideActive] = useState(() => {
+    const storedValue = localStorage.getItem("hideActive"); //after page reload hide in not working
+    return storedValue === "true";
+  });
+
+  useEffect(() => {
+    setHideElementsActive(hideActive);
+    localStorage.setItem("hideActive", hideActive.toString());
+  }, [hideActive, setHideElementsActive]);
+
+  const handleCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHideActive(e.target.checked);
+  };
+
+  const handleCloseUISettings = () => {
+    setOpenUISettings(false);
+  };
   return (
     <>
       {openUISettings && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999] ">
-          <div className="w-96  bg-main rounded-lg shadow-lg">
+          <div className="w-96 bg-main rounded-lg shadow-lg">
             {/* close btn */}
-            <div className=" flex justify-end relative ">
+            <div className="flex justify-end relative">
               <button
-                className="m-1 cursor-pointer "
-                onClick={setOpenUISettings}
+                className="m-1 cursor-pointer"
+                onClick={handleCloseUISettings}
               >
                 <IoIosClose color="white" size={22} />
               </button>
@@ -31,11 +51,11 @@ const Appearance: React.FC<AppearanceProps> = ({
               {/* theme */}
               <div className="flex flex-col gap-3 mb-10">
                 <h5 className="text-gray-500 text-[12px]">THEME</h5>
-                <div className="flex justify-between ">
+                <div className="flex justify-between">
                   <span className="text-gray-100 text-sm font-semibold my-auto">
                     Dark Mode
                   </span>
-                  <button className="w-12 h-8 border border-gray-500 rounded-md  flex justify-center ">
+                  <button className="w-12 h-8 border border-gray-500 rounded-md flex justify-center">
                     <RiMoonLine size={22} color="white" className="my-auto" />
                   </button>
                 </div>
@@ -47,12 +67,17 @@ const Appearance: React.FC<AppearanceProps> = ({
                   <span className="text-gray-100 text-sm font-semibold">
                     Hide Elements
                   </span>
-                  <input
-                    type="checkbox"
-                    name=""
-                    id=""
-                    className="w-5 h-5 appearance-none bg-main border border-gray-600 rounded-sm hover:bg-white/5 focus:outline-none cursor-pointer"
-                  />
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      onChange={handleCheckBox}
+                      checked={hideActive}
+                      className="absolute w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="w-5 h-5 bg-main border border-gray-600 rounded-sm flex items-center justify-center pointer-events-none">
+                      {hideActive && <IoIosCheckmark size={32} color="white" />}
+                    </div>
+                  </div>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-100 text-sm font-semibold my-auto">

@@ -55,20 +55,22 @@ const pomodoroSlice = createSlice({
       })
 
       .addCase(startPomodoro.fulfilled, (state) => {
-        if (!state.remainingTime || state.remainingTime <= 0) {
-          switch (state.currentPhase) {
-            case "pomodoro":
-              state.remainingTime = state.settings.pomodoro * 60;
-              break;
-            case "shortBreak":
-              state.remainingTime = state.settings.shortBreak * 60;
-              break;
-            case "longBreak":
-              state.remainingTime = state.settings.longBreak * 60;
-              break;
+        if (!state.isRunning) {
+          if (!state.remainingTime || state.remainingTime <= 0) {
+            switch (state.currentPhase) {
+              case "pomodoro":
+                state.remainingTime = state.settings.pomodoro * 60;
+                break;
+              case "shortBreak":
+                state.remainingTime = state.settings.shortBreak * 60;
+                break;
+              case "longBreak":
+                state.remainingTime = state.settings.longBreak * 60;
+                break;
+            }
           }
+          state.isRunning = true;
         }
-        state.isRunning = true;
       })
 
       .addCase(stopPomodoro.fulfilled, (state) => {
