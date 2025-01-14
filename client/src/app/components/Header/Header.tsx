@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import UserMenu from "./UserMenu/UserMenu";
 import { HeaderProps } from "@/app/utility/types/types";
@@ -15,14 +15,19 @@ import {
   MdOutlineTimer,
 } from "react-icons/md";
 
+import "animate.css";
+
 const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,
   setOpenAccSettings,
   setIsTimerActive,
   isTimerActive,
+  hideElementsActive,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [openUserMenu, setOpenUserMenu] = useToggleState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [animation, setAnimation] = useState("animate__slideInDown");
 
   const toggleFullscreenMode = () => {
     const element = document.documentElement;
@@ -34,8 +39,35 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const resetTimer = useCallback(() => {
+    setAnimation("animate__slideInDown");
+    setIsVisible(true);
+
+    if (hideElementsActive) {
+      clearTimeout((window as any).headerTimeout);
+      (window as any).headerTimeout = setTimeout(() => {
+        setAnimation("animate__slideOutUp");
+        setTimeout(() => setIsVisible(false), 500);
+      }, 3000);
+    }
+  }, [hideElementsActive]);
+
+  useEffect(() => {
+    document.addEventListener("mousemove", resetTimer);
+    document.addEventListener("keydown", resetTimer);
+
+    return () => {
+      document.removeEventListener("mousemove", resetTimer);
+      document.removeEventListener("keydown", resetTimer);
+    };
+  }, [resetTimer]);
+
+  if (!isVisible) return null;
+
   return (
-    <header className="w-full p-2 flex justify-between items-center fixed  h-[50px] ">
+    <header
+      className={`w-full p-2 flex justify-between items-center fixed  h-[50px] animate__animated ${animation} `}
+    >
       {/* Left Section */}
       <div className="bg-main rounded-md px-2 py-1 flex justify-center items-center ">
         <div className="flex hover:bg-neutral-600 hover:rounded-md px-1  cursor-pointer">

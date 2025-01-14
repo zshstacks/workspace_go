@@ -5,11 +5,13 @@ export interface HeaderProps {
   setOpenAccSettings: () => void;
   setIsTimerActive: () => void;
   isTimerActive: boolean;
+  hideElementsActive: boolean;
 }
 
 export interface AppearanceProps {
   setOpenUISettings: () => void;
   openUISettings: boolean;
+  setHideElementsActive: () => void;
 }
 
 export interface UserAccountProps {

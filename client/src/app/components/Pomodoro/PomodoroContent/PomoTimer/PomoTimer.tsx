@@ -40,18 +40,6 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   //change timer mode
   const handleChangeMode = (mode: "pomodoro" | "shortBreak" | "longBreak") => {
     dispatch(changeMode(mode));
-
-    // Mainot režīmu, atjaunināt atlikušā laika vērtību
-    let newTime = 0;
-    if (mode === "pomodoro") {
-      newTime = settings.pomodoro * 60;
-    } else if (mode === "shortBreak") {
-      newTime = settings.shortBreak * 60;
-    } else if (mode === "longBreak") {
-      newTime = settings.longBreak * 60;
-    }
-
-    dispatch(updateRemainingTime(newTime));
   };
 
   const handleStart = () => {
@@ -70,16 +58,6 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" + secs : secs}`;
   };
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging: dragging,
-  } = useDraggable({
-    id: "pomo-timer",
-  });
 
   useEffect(() => {
     const updateInitialTime = () => {
@@ -126,6 +104,17 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   //=====================
   //dnd
   //=====================
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging: dragging,
+  } = useDraggable({
+    id: "pomo-timer",
+  });
+
   useEffect(() => {
     if (transform) {
       setLocalPosition({

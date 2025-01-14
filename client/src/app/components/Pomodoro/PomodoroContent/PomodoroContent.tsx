@@ -21,6 +21,7 @@ const PomodoroContent = () => {
   const [openAccSettings, setOpenAccSettings] = useToggleState(false);
   const [openSettings, setOpenSettings] = useToggleState(false);
   const [isTimerActive, setIsTimerActive] = useToggleState(true);
+  const [hideElementsActive, setHideElementsActive] = useState(false);
 
   // load saved pos from localstorage, if there is
   useEffect(() => {
@@ -52,6 +53,7 @@ const PomodoroContent = () => {
           setOpenAccSettings={setOpenAccSettings}
           setIsTimerActive={setIsTimerActive}
           isTimerActive={isTimerActive}
+          hideElementsActive={hideElementsActive}
         />
       </div>
 
@@ -75,6 +77,7 @@ const PomodoroContent = () => {
         <Appearance
           openUISettings={openUISettings}
           setOpenUISettings={setOpenUISettings}
+          setHideElementsActive={setHideElementsActive}
         />
       )}
 
