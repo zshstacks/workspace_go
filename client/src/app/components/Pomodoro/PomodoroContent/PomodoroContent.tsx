@@ -22,6 +22,7 @@ const PomodoroContent = () => {
   const [openSettings, setOpenSettings] = useToggleState(false);
   const [isTimerActive, setIsTimerActive] = useToggleState(true);
   const [hideElementsActive, setHideElementsActive] = useState(false);
+  const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
 
   // load saved pos from localstorage, if there is
   useEffect(() => {
@@ -54,6 +55,7 @@ const PomodoroContent = () => {
           setIsTimerActive={setIsTimerActive}
           isTimerActive={isTimerActive}
           hideElementsActive={hideElementsActive}
+          hideAfterSeconds={hideAfterSeconds}
         />
       </div>
 
@@ -78,6 +80,8 @@ const PomodoroContent = () => {
           openUISettings={openUISettings}
           setOpenUISettings={setOpenUISettings}
           setHideElementsActive={setHideElementsActive}
+          setHideAfterSeconds={setHideAfterSeconds}
+          
         />
       )}
 

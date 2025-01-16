@@ -6,12 +6,14 @@ export interface HeaderProps {
   setIsTimerActive: () => void;
   isTimerActive: boolean;
   hideElementsActive: boolean;
+  hideAfterSeconds: number;
 }
 
 export interface AppearanceProps {
-  setOpenUISettings: () => void;
+  setOpenUISettings: (a: boolean) => void;
   openUISettings: boolean;
-  setHideElementsActive: () => void;
+  setHideElementsActive: (a: boolean) => void;
+  setHideAfterSeconds: (a: number) => void;
 }
 
 export interface UserAccountProps {
