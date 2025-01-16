@@ -9,24 +9,66 @@ const Appearance: React.FC<AppearanceProps> = ({
   openUISettings,
   setOpenUISettings,
   setHideElementsActive,
+  setHideAfterSeconds,
 }) => {
-  const [hideActive, setHideActive] = useState(() => {
-    const storedValue = localStorage.getItem("hideActive"); //after page reload hide in not working
-    return storedValue === "true";
-  });
-
-  useEffect(() => {
-    setHideElementsActive(hideActive);
-    localStorage.setItem("hideActive", hideActive.toString());
-  }, [hideActive, setHideElementsActive]);
+  const [hideActive, setHideActive] = useState<boolean | null>(null);
+  const [hideAfterSeconds, setHideAfterSecondsState] = useState<number>(30);
 
   const handleCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {
     setHideActive(e.target.checked);
   };
 
+  const handleHideAfterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = parseInt(e.target.value);
+    if (isNaN(value) || value < 1) value = 1;
+    if (value > 60) value = 60;
+    setHideAfterSecondsState(value);
+    localStorage.setItem("hideAfterSeconds", value.toString());
+    setHideAfterSeconds(value);
+  };
+
   const handleCloseUISettings = () => {
     setOpenUISettings(false);
   };
+
+  useEffect(() => {
+    const storedHideActive = localStorage.getItem("hideActive");
+    const storedHideAfterSeconds = localStorage.getItem("hideAfterSeconds");
+
+    if (storedHideActive !== null) {
+      const parsedHideActive = storedHideActive === "true";
+      setHideActive(parsedHideActive);
+      setHideElementsActive(parsedHideActive);
+    } else {
+      localStorage.setItem("hideActive", "false");
+      setHideActive(false);
+      setHideElementsActive(false);
+    }
+
+    if (storedHideAfterSeconds !== null) {
+      const parsedHideAfterSeconds = Math.min(
+        Math.max(parseInt(storedHideAfterSeconds), 1),
+        60
+      );
+      setHideAfterSecondsState(parsedHideAfterSeconds);
+      setHideAfterSeconds(parsedHideAfterSeconds);
+    } else {
+      localStorage.setItem("hideAfterSeconds", "30");
+      setHideAfterSeconds(30);
+    }
+  }, [setHideElementsActive, setHideAfterSeconds]);
+
+  useEffect(() => {
+    if (hideActive !== null) {
+      localStorage.setItem("hideActive", hideActive.toString());
+      setHideElementsActive(hideActive);
+    }
+  }, [hideActive, setHideElementsActive]);
+
+  if (hideActive === null) {
+    return null;
+  }
+
   return (
     <>
       {openUISettings && (
@@ -85,6 +127,8 @@ const Appearance: React.FC<AppearanceProps> = ({
                   </span>
                   <input
                     type="number"
+                    value={hideAfterSeconds}
+                    onChange={handleHideAfterChange}
                     className="w-16 h-8 bg-main text-gray-100 text-sm font-semibold border border-gray-600 rounded-md px-[10px] focus:outline-none focus:ring-1 focus:ring-gray-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     defaultValue={30}
                   />

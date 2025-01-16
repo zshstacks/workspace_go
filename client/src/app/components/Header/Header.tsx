@@ -23,6 +23,7 @@ const Header: React.FC<HeaderProps> = ({
   setIsTimerActive,
   isTimerActive,
   hideElementsActive,
+  hideAfterSeconds,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [openUserMenu, setOpenUserMenu] = useToggleState(false);
@@ -48,9 +49,9 @@ const Header: React.FC<HeaderProps> = ({
       (window as any).headerTimeout = setTimeout(() => {
         setAnimation("animate__slideOutUp");
         setTimeout(() => setIsVisible(false), 500);
-      }, 3000);
+      }, hideAfterSeconds * 1000);
     }
-  }, [hideElementsActive]);
+  }, [hideElementsActive, hideAfterSeconds]);
 
   useEffect(() => {
     document.addEventListener("mousemove", resetTimer);
