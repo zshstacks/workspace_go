@@ -343,3 +343,50 @@ func DeleteUser(c *gin.Context) {
 		"successDelete": "User deleted successfully",
 	})
 }
+
+func ChangeUsername(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	currentUser, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+		return
+	}
+
+	var body struct {
+		NewUsername string `json:"newUsername"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		return
+	}
+
+	if body.NewUsername == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "username is required"})
+		return
+	}
+
+	if !utils.IsValidUsername(body.NewUsername) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username format"})
+		return
+	}
+
+	var existingUser models.User
+	if err := initializers.DB.First(&existingUser, "username = ?", body.NewUsername).Error; err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Username already taken"})
+		return
+	}
+
+	currentUser.Username = body.NewUsername
+	if err := initializers.DB.Save(&currentUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update username"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Username updated successfully!"})
+}
