@@ -72,6 +72,7 @@ export interface UserState {
   isLoading: boolean;
   error: string | null;
   successDelete: string | null;
+  username: string | null, 
 }
 
 //user slice error payload

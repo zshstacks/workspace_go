@@ -1,12 +1,13 @@
 import { UserErrorPayload, UserState } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { deleteUser, validateUser } from "./asyncActions";
+import { changeUsername, deleteUser, validateUser } from "./asyncActions";
 
 const initialState: UserState = {
   user: null,
   isLoading: false,
   error: null,
   successDelete: null,
+  username: "",
 };
 
 const userSlice = createSlice({
@@ -25,6 +26,11 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.successDelete = action.payload.successDelete;
+      })
+
+      .addCase(changeUsername.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.username = action.payload.username;
       })
 
       .addMatcher(

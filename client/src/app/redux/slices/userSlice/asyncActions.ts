@@ -28,3 +28,17 @@ export const deleteUser = createAsyncThunk(
     }
   }
 );
+
+export const changeUsername = createAsyncThunk(
+  "user/changeUsername",
+  async (newUsername: string, thunkAPI) => {
+    try {
+      const res = await api.put("/update-username", { newUsername });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Failed to change username"
+      );
+    }
+  }
+);
