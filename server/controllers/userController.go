@@ -377,9 +377,12 @@ func ChangeUsername(c *gin.Context) {
 	}
 
 	var existingUser models.User
-	if err := initializers.DB.First(&existingUser, "username = ?", body.NewUsername).Error; err != nil {
+	result := initializers.DB.First(&existingUser, "username = ?", body.NewUsername)
+	if result.Error == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Username already taken"})
 		return
+	} else if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 	}
 
 	currentUser.Username = body.NewUsername
