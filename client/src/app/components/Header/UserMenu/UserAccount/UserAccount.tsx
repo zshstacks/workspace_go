@@ -1,6 +1,7 @@
 import { logoutUser } from "@/app/redux/slices/authSlice/asyncActions";
 import { clearLogout } from "@/app/redux/slices/authSlice/authSlice";
 import {
+  changeUsername,
   deleteUser,
   validateUser,
 } from "@/app/redux/slices/userSlice/asyncActions";
@@ -16,13 +17,24 @@ const UserAccount: React.FC<UserAccountProps> = ({
   setOpenAccSettings,
 }) => {
   const [isLoggedOut, setIsLoggedOut] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
 
   const dispatch: AppDispatch = useDispatch();
 
   const { successLogout } = useSelector((state: RootState) => state.auth);
-  const { user, successDelete } = useSelector((state: RootState) => state.user);
+  const { user, successDelete, username } = useSelector(
+    (state: RootState) => state.user
+  );
 
   const router = useRouter();
+
+  const handleChangeUsername = async () => {
+    if (newUsername.trim()) await dispatch(changeUsername(newUsername));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleChangeUsername();
+  };
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -45,6 +57,10 @@ const UserAccount: React.FC<UserAccountProps> = ({
       }, 1000);
     }
   }, [successLogout, dispatch, router, isLoggedOut, successDelete]);
+
+  useEffect(() => {
+    if (user) setNewUsername(user.username);
+  }, [user]);
 
   return (
     <>
@@ -74,8 +90,9 @@ const UserAccount: React.FC<UserAccountProps> = ({
                 </label>
                 <input
                   type="email"
+                  readOnly
                   value={user ? user.email : "Failed to fetch"}
-                  className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500  focus:outline-none focus:ring-2 focus:ring-gray-600"
+                  className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500 focus:outline-none "
                 />
               </div>
 
@@ -86,8 +103,10 @@ const UserAccount: React.FC<UserAccountProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={user ? user.username : "Failed to fetch"}
-                  className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500 focus:outline-none"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
 

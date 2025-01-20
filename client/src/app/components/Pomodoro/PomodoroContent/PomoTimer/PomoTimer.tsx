@@ -37,6 +37,12 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     (state: RootState) => state.pomodoro
   );
 
+  //==============================
+
+  //if i cant fix this fucking shit with useEffect, i can probably just change phases in handleChangeMode, so i need logic at backend to switch phase and just dispatch into handleChangeMode
+
+  //===============================
+
   //change timer mode
   const handleChangeMode = (mode: "pomodoro" | "shortBreak" | "longBreak") => {
     dispatch(changeMode(mode));
@@ -60,25 +66,29 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   };
 
   useEffect(() => {
-    const updateInitialTime = () => {
-      let initialTime = 0;
-      if (currentPhase === "pomodoro") {
-        initialTime = settings.pomodoro * 60;
-      } else if (currentPhase === "shortBreak") {
-        initialTime = settings.shortBreak * 60;
-      } else if (currentPhase === "longBreak") {
-        initialTime = settings.longBreak * 60;
-      }
-      dispatch(updateRemainingTime(initialTime));
-    };
+    // Atjaunināt laiku tikai, ja taimeris nav startēts
+    if (!isRunning) {
+      const updateInitialTime = () => {
+        let initialTime = 0;
+        if (currentPhase === "pomodoro") {
+          initialTime = settings.pomodoro * 60;
+        } else if (currentPhase === "shortBreak") {
+          initialTime = settings.shortBreak * 60;
+        } else if (currentPhase === "longBreak") {
+          initialTime = settings.longBreak * 60;
+        }
+        dispatch(updateRemainingTime(initialTime)); // Atjaunina tikai tad, kad taimeris nav startēts
+      };
 
-    updateInitialTime(); // Call function to set the correct time
+      updateInitialTime(); // Pārbaudām režīma maiņu
+    }
   }, [
     currentPhase,
     settings.pomodoro,
     settings.shortBreak,
     settings.longBreak,
     dispatch,
+    isRunning, // Pārliecināmies, ka tas tiek darīts tikai tad, kad taimeris nav startēts
   ]);
 
   useEffect(() => {
@@ -89,13 +99,6 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       return () => clearInterval(interval);
     }
   }, [dispatch, isRunning]);
-
-  useEffect(() => {
-    if (remainingTime <= 0) {
-      // Automatically switch to next phase
-      dispatch(fetchTimerStatus());
-    }
-  }, [remainingTime, dispatch]);
 
   useEffect(() => {
     dispatch(getPomodoroSettings());
