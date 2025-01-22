@@ -1,10 +1,18 @@
-import React from "react";
-import PomodoroContent from "./PomodoroContent/PomodoroContent";
+"use client";
 
+import React, { createContext, useState } from "react";
+import PomodoroContent from "./PomodoroContent/PomodoroContent";
+import { ContextProps } from "@/app/utility/types/types";
+
+export const MyContext = createContext<ContextProps | null>(null);
 const Pomodoro = () => {
+  const [theme, setTheme] = useState<"dark" | "light">("light");
+
   return (
     <div className="min-h-screen bg-cover bg-no-repeat bg-bgMain overflow-hidden ">
-      <PomodoroContent />
+      <MyContext.Provider value={{ theme, setTheme }}>
+        <PomodoroContent />
+      </MyContext.Provider>
     </div>
   );
 };

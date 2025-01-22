@@ -3,15 +3,26 @@ import {
   updatePomodoroTime,
 } from "@/app/redux/slices/pomodoroSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
+import { MyContext } from "../../Pomodoro";
 
 const PomoTimerSettings = () => {
   const dispatch: AppDispatch = useDispatch();
   const settings = useSelector((state: RootState) => state.pomodoro.settings);
 
   const [localSettings, setLocalSettings] = useState(settings);
+
+  const context = useContext(MyContext);
+
+  if (!context) {
+    throw new Error(
+      "The PomoTimerSettings component should be used within MyContext.Provider."
+    );
+  }
+
+  const { theme } = context;
 
   const handleSave = () => {
     dispatch(updatePomodoroTime(localSettings)).then(() => {
@@ -22,28 +33,32 @@ const PomoTimerSettings = () => {
   return (
     <div className=" font-medium " id="pomo-timer">
       {/* divider */}
-      <div className="w-full h-[1px] bg-black/35 my-5"></div>
+      <div className="w-full h-[1px] bg-black/35 dark:bg-lightBorder my-5"></div>
 
       {/* count and transition settings */}
       <div className="flex flex-col gap-2">
         <div className="gap-2 flex ">
           <input type="checkbox" id="trans_timer" className="w-4 " />
-          <label htmlFor="trans_timer">Auto-transition Timer</label>
+          <label htmlFor="trans_timer" className="dark:text-lightText">
+            Auto-transition Timer
+          </label>
         </div>
         <div className="gap-2 flex">
           <input type="checkbox" id="count_timer" className="w-4 " />
-          <label htmlFor="count_timer">Hide Pomodoro Count</label>
+          <label htmlFor="count_timer" className="dark:text-lightText">
+            Hide Pomodoro Count
+          </label>
         </div>
       </div>
       {/* divider */}
-      <div className="w-full h-[1px] bg-black/35 my-5"></div>
+      <div className="w-full h-[1px] bg-black/35 dark:bg-lightBorder my-5"></div>
 
       {/* pomodoro timer settings*/}
       <>
         {/* set time on pomo and breaks */}
         <div className="flex justify-center text-start gap-4">
           <div className="">
-            <label htmlFor="" className="">
+            <label htmlFor="" className="dark:text-lightText">
               Pomodoro
             </label>
             <input
@@ -52,7 +67,7 @@ const PomoTimerSettings = () => {
               max={60}
               defaultValue={60}
               value={localSettings.pomodoro}
-              className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black text-sm font-normal"
+              className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black dark:text-lightText text-sm font-normal"
               onChange={(e) => {
                 const target = e.target as HTMLInputElement;
                 if (target.value.length > 2) {
@@ -67,7 +82,9 @@ const PomoTimerSettings = () => {
             />
           </div>
           <div>
-            <label htmlFor="">Short Break</label>
+            <label htmlFor="" className="dark:text-lightText">
+              Short Break
+            </label>
             <input
               type="number"
               min={0}
@@ -85,11 +102,13 @@ const PomoTimerSettings = () => {
                   shortBreak: +e.target.value,
                 });
               }}
-              className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black text-sm font-normal"
+              className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black dark:text-lightText text-sm font-normal"
             />
           </div>
           <div>
-            <label htmlFor="">Long Break</label>
+            <label htmlFor="" className="dark:text-lightText">
+              Long Break
+            </label>
             <input
               type="number"
               min={0}
@@ -107,28 +126,40 @@ const PomoTimerSettings = () => {
                   longBreak: +e.target.value,
                 });
               }}
-              className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black text-sm font-normal"
+              className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black dark:text-text text-sm font-normal"
             />
           </div>
         </div>
         {/* choose sound */}
         <div className="flex ">
           <div className="flex gap-[22px] mt-5">
-            <label htmlFor="" className="m-auto ">
+            <label htmlFor="" className="m-auto dark:text-lightText ">
               Timer Sound
             </label>
 
             <select
               name=""
               id=""
-              className="w-[207px] bg-[#3d3e42] py-1 px-2 text-sm cursor-pointer focus:outline-none "
+              className="w-[207px] bg-[#3d3e42] dark:bg-[#d3d1d1] dark:text-lightText py-1 px-2 text-sm cursor-pointer focus:outline-none "
             >
-              <option value="twinkle">Twinkle</option>
-              <option value="playtime">Playtime</option>
-              <option value="sci-fi">Sci Fi</option>
-              <option value="slow-rise">Slow Rise</option>
-              <option value="rooster">Rooster</option>
-              <option value="bird">Bird</option>
+              <option value="twinkle" className="dark:text-lightText">
+                Twinkle
+              </option>
+              <option value="playtime" className="dark:text-lightText">
+                Playtime
+              </option>
+              <option value="sci-fi" className="dark:text-lightText">
+                Sci Fi
+              </option>
+              <option value="slow-rise" className="dark:text-lightText">
+                Slow Rise
+              </option>
+              <option value="rooster" className="dark:text-lightText">
+                Rooster
+              </option>
+              <option value="bird" className="dark:text-lightText">
+                Bird
+              </option>
             </select>
           </div>
         </div>
@@ -137,7 +168,10 @@ const PomoTimerSettings = () => {
 
         <div className="flex my-4 gap-4">
           <label htmlFor="">
-            <PiSpeakerHigh size={23} />
+            <PiSpeakerHigh
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+              size={23}
+            />
           </label>
           <input
             id="volume"

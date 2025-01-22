@@ -72,7 +72,7 @@ export interface UserState {
   isLoading: boolean;
   error: string | null;
   successDelete: string | null;
-  username: string | null, 
+  username: string | null;
 }
 
 //user slice error payload
@@ -95,4 +95,9 @@ export interface PomodoroState {
 
 export interface PomodoroErrorPayload {
   error?: string;
+}
+
+export interface ContextProps {
+  theme: "dark" | "light";
+  setTheme: React.Dispatch<React.SetStateAction<"dark" | "light">>;
 }
