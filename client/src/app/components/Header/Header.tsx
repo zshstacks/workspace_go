@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import UserMenu from "./UserMenu/UserMenu";
 import { HeaderProps } from "@/app/utility/types/types";
@@ -16,6 +16,7 @@ import {
 } from "react-icons/md";
 
 import "animate.css";
+import { MyContext } from "../Pomodoro/Pomodoro";
 
 const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,
@@ -29,6 +30,16 @@ const Header: React.FC<HeaderProps> = ({
   const [openUserMenu, setOpenUserMenu] = useToggleState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [animation, setAnimation] = useState("animate__slideInDown");
+
+  const context = useContext(MyContext);
+
+  if (!context) {
+    throw new Error(
+      "The Header component should be used within MyContext.Provider."
+    );
+  }
+
+  const { theme } = context;
 
   const toggleFullscreenMode = () => {
     const element = document.documentElement;
@@ -70,53 +81,76 @@ const Header: React.FC<HeaderProps> = ({
       className={`w-full p-2 flex justify-between items-center fixed  h-[50px] animate__animated ${animation} `}
     >
       {/* Left Section */}
-      <div className="bg-main rounded-md px-2 py-1 flex justify-center items-center ">
-        <div className="flex hover:bg-neutral-600 hover:rounded-md px-1  cursor-pointer">
-          <span className="text-white text-md mr-1">2</span>
+      <div className="bg-main dark:bg-lightMain rounded-md px-2 py-1 flex justify-center items-center ">
+        <div className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md px-1  cursor-pointer">
+          <span className="text-white dark:text-lightText text-md mr-1">2</span>
           <BsFire color="darkorange" size={19} />
         </div>
       </div>
 
       {/* center section */}
-      <div className="flex justify-center text-center align-middle bg-main rounded-md  w-9 h-[32px]">
+      <div className="flex justify-center text-center align-middle bg-main dark:bg-lightMain rounded-md w-9 h-[32px]">
         <div
-          className="flex m-auto hover:bg-neutral-600 hover:rounded-md hover:p-[3px] cursor-pointer"
+          className="flex m-auto hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md hover:p-[3px] cursor-pointer"
           onClick={setIsTimerActive}
         >
           <MdOutlineTimer
             size={19}
-            color={`${isTimerActive ? " #e89688" : "white"}`}
+            color={`${
+              isTimerActive
+                ? " #e89688"
+                : theme === "dark"
+                ? "#4e4e4e"
+                : "white"
+            }
+              `}
           />
         </div>
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center bg-main  rounded-md text-white p-1 ">
+      <div className="flex items-center bg-main dark:bg-lightMain rounded-md text-white p-1 ">
         {/* enter/exit fullscreen */}
         <div
-          className="hover:bg-neutral-600 p-1 hover:rounded-md cursor-pointer"
+          className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
           onClick={toggleFullscreenMode}
         >
           {isFullscreen ? (
-            <AiOutlineFullscreenExit size={19} />
+            <AiOutlineFullscreenExit
+              size={19}
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+            />
           ) : (
-            <AiOutlineFullscreen size={19} />
+            <AiOutlineFullscreen
+              size={19}
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+            />
           )}
         </div>
 
         {/* divider */}
-        <div className="h-5 w-[1px] bg-gray-500 mx-2"></div>
+        <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder mx-2"></div>
 
         {/* user dropdown menu */}
         <div
-          className="flex items-center  p-1 hover:bg-neutral-600 hover:rounded-md  cursor-pointer transition-all"
+          className="flex items-center  p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer transition-all"
           onClick={setOpenUserMenu}
         >
-          <LuUserRound size={19} className="mr-[2px]" />
+          <LuUserRound
+            size={19}
+            color={theme === "dark" ? "#4e4e4e" : "white"}
+            className="mr-[2px]"
+          />
           {openUserMenu ? (
-            <MdOutlineKeyboardArrowDown size={18} />
+            <MdOutlineKeyboardArrowDown
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+              size={18}
+            />
           ) : (
-            <MdOutlineKeyboardArrowUp size={18} />
+            <MdOutlineKeyboardArrowUp
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+              size={18}
+            />
           )}
         </div>
 

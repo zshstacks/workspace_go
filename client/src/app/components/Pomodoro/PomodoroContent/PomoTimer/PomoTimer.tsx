@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
 
@@ -22,6 +22,7 @@ import {
 
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
+import { MyContext } from "../../Pomodoro";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   position,
@@ -36,6 +37,16 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   const { settings, currentPhase, isRunning, remainingTime } = useSelector(
     (state: RootState) => state.pomodoro
   );
+
+  const context = useContext(MyContext);
+
+  if (!context) {
+    throw new Error(
+      "The PomoTimer component should be used within MyContext.Provider."
+    );
+  }
+
+  const { theme } = context;
 
   //==============================
 
@@ -140,7 +151,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   return (
     <div
-      className={`bg-main text-white w-[360px] p-4 rounded-lg shadow-md `}
+      className={`bg-main dark:bg-lightMain text-white  w-[360px] p-4 rounded-lg shadow-md `}
       style={{
         transform: `translate3d(${localPosition.x}px, ${localPosition.y}px, 0)`,
         position: "fixed",
@@ -149,10 +160,10 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       {/* Header Section */}
       <div className="flex justify-between items-center mb-2 ">
         <div className="flex gap-1">
-          <div className="w-2 h-2 bg-gray-700 rounded-full"></div>
-          <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
-          <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-700 dark:bg-neutral-700 rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-600 dark:bg-neutral-600 rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-500 dark:bg-neutral-500 rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-400 dark:bg-neutral-400 rounded-full"></div>
         </div>
 
         {/* div for dnd  */}
@@ -164,32 +175,43 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
           style={{ cursor: isDragging ? "grabbing" : "grab" }}
         ></div>
 
-        <button className="text-gray-400  pb-2" onClick={setIsTimerActive}>
-          <FaRegWindowMinimize size={14} />
+        <button
+          className="text-gray-400 dark:text-lightText  pb-2"
+          onClick={setIsTimerActive}
+        >
+          <FaRegWindowMinimize
+            size={14}
+            color={theme === "dark" ? "#4e4e4e" : "white"}
+          />
         </button>
       </div>
 
       {/* divider */}
-      <div className="w-[360px] h-[1px] bg-white/25 absolute right-0"></div>
+      <div className="w-[360px] h-[1px] bg-white/25 dark:bg-lightBorder absolute right-0"></div>
 
       {/* Timer Section */}
       <div className="flex justify-center mt-6">
         <div className="w-full">
-          <h1 className="text-5xl font-bold">{formatTime(remainingTime)}</h1>
+          <h1 className="text-5xl dark:text-lightText font-bold">
+            {formatTime(remainingTime)}
+          </h1>
         </div>
 
         {/* Buttons Section */}
         <div className="flex m-auto gap-4  ">
           <button
-            className="px-8 py-1 bg-transparent border border-white rounded-lg "
+            className="px-8 py-1 bg-transparent border border-white dark:border-lightBorder rounded-lg "
             onClick={isRunning ? handleStop : handleStart}
           >
-            <span className="font-semibold text-md">
+            <span className="font-semibold text-md dark:text-lightText">
               {isRunning ? "Stop" : "Start"}
             </span>
           </button>
           <button className="">
-            <FiRefreshCw size={20} />
+            <FiRefreshCw
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+              size={20}
+            />
           </button>
         </div>
       </div>
@@ -199,39 +221,42 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         <button
           className={
             currentPhase === "pomodoro"
-              ? "border-b-2 border-gray-400  pb-1"
+              ? "border-b-2 border-gray-400 dark:border-lightBorder  pb-1"
               : ""
           }
           onClick={() => handleChangeMode("pomodoro")}
         >
-          Pomodoro
+          <span className="dark:text-lightText">Pomodoro</span>
         </button>
         <button
           className={
             currentPhase === "shortBreak"
-              ? "border-b-2 border-gray-400 pb-1 "
+              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1 "
               : ""
           }
           onClick={() => handleChangeMode("shortBreak")}
         >
-          Short Break
+          <span className="dark:text-lightText">Short break</span>
         </button>
 
         <button
           className={
             currentPhase === "longBreak"
-              ? "border-b-2 border-gray-400 pb-1 "
+              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1 "
               : ""
           }
           onClick={() => handleChangeMode("longBreak")}
         >
-          Long Break
+          <span className="dark:text-lightText">Long break</span>
         </button>
 
         {/* Settings Icon */}
         <div className="flex">
           <button onClick={setOpenSettings}>
-            <FiSettings size={20} />
+            <FiSettings
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+              size={20}
+            />
           </button>
         </div>
       </div>

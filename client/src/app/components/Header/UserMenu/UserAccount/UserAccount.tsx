@@ -1,3 +1,4 @@
+import { MyContext } from "@/app/components/Pomodoro/Pomodoro";
 import { logoutUser } from "@/app/redux/slices/authSlice/asyncActions";
 import { clearLogout } from "@/app/redux/slices/authSlice/authSlice";
 import {
@@ -8,7 +9,7 @@ import {
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { UserAccountProps } from "@/app/utility/types/types";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -22,12 +23,20 @@ const UserAccount: React.FC<UserAccountProps> = ({
   const dispatch: AppDispatch = useDispatch();
 
   const { successLogout } = useSelector((state: RootState) => state.auth);
-  const { user, successDelete, username } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { user, successDelete } = useSelector((state: RootState) => state.user);
 
   const router = useRouter();
+  const context = useContext(MyContext);
 
+  if (!context) {
+    throw new Error(
+      "The UserAccount component should be used within MyContext.Provider."
+    );
+  }
+
+  const { theme } = context;
+
+  //TODO handling errors
   const handleChangeUsername = async () => {
     if (newUsername.trim()) await dispatch(changeUsername(newUsername));
   };
@@ -66,39 +75,42 @@ const UserAccount: React.FC<UserAccountProps> = ({
     <>
       {openAccSettings && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]">
-          <div className="w-[400px] bg-main rounded-lg shadow-lg ">
+          <div className="w-[400px] bg-main dark:bg-lightMain rounded-lg shadow-lg ">
             {/* Close Icon */}
             <div className="flex relative justify-end">
               <button
                 className="m-1 cursor-pointer"
                 onClick={setOpenAccSettings}
               >
-                <IoIosClose color="white" size={22} />
+                <IoIosClose
+                  color={theme === "dark" ? "#4e4e4e" : "white"}
+                  size={22}
+                />
               </button>
             </div>
 
             <div className="p-6">
               {/* Header */}
-              <h2 className="text-white text-xl font-semibold mb-6">
+              <h2 className="text-white dark:text-lightText text-xl font-semibold mb-6">
                 My account
               </h2>
 
               {/* Email */}
               <div className="mb-4">
-                <label className="text-gray-400 text-sm font-medium mb-1 block">
+                <label className="text-gray-400 dark:text-lightText text-sm font-medium mb-1 block">
                   Email:
                 </label>
                 <input
                   type="email"
                   readOnly
                   value={user ? user.email : "Failed to fetch"}
-                  className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500 focus:outline-none "
+                  className="w-full bg-main dark:bg-lightMain text-gray-300 dark:text-lightText text-sm rounded-md px-3 py-2 border border-gray-500 dark:border-lightBorder focus:outline-none "
                 />
               </div>
 
               {/* Name */}
               <div className="mb-4">
-                <label className="text-gray-400 text-sm font-medium mb-1 block">
+                <label className="text-gray-400 dark:text-lightText text-sm font-medium mb-1 block">
                   Username:
                 </label>
                 <input
@@ -106,13 +118,16 @@ const UserAccount: React.FC<UserAccountProps> = ({
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full bg-main text-gray-300 text-sm rounded-md px-3 py-2 border border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                  className="w-full bg-main dark:bg-lightMain text-gray-300 dark:text-lightText text-sm rounded-md px-3 py-2 border border-gray-500 dark:border-lightBorder focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-lightText"
                 />
               </div>
 
               {/* Logout */}
               <div className="mt-5 mb-4 flex gap-2">
-                <button className="text-gray-500" onClick={handleLogout}>
+                <button
+                  className="text-gray-500 dark:text-lightText"
+                  onClick={handleLogout}
+                >
                   Log out
                 </button>
                 {isLoggedOut ? (
@@ -125,7 +140,7 @@ const UserAccount: React.FC<UserAccountProps> = ({
               </div>
 
               {/* Delete Account */}
-              <div className="border-t border-gray-700 pt-4">
+              <div className="border-t border-gray-700 dark:border-lightBorder pt-4">
                 <p className="text-gray-400 text-xs mb-2">
                   Permanently delete your pomodoro_go account and all of your
                   data.
