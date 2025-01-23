@@ -160,3 +160,39 @@ func StopPomodoro(c *gin.Context) {
 	})
 
 }
+
+func ChangePhase(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	var body struct {
+		Phase string `json:"phase"`
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		return
+	}
+
+	var settings models.PomodoroModel
+	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Pomodoro settings not found"})
+		return
+	}
+
+	if settings.CurrentPhase != body.Phase {
+		settings.CurrentPhase = body.Phase
+		switch settings.CurrentPhase {
+		case "pomodoro":
+			settings.RemainingTime = settings.PomodoroDuration * 60
+		case "shortBreak":
+			settings.RemainingTime = settings.ShortBreakDuration * 60
+		case "longBreak":
+			settings.RemainingTime = settings.LongBreakDuration * 60
+		}
+	}
+
+	initializers.DB.Save(&settings)
+
+	c.JSON(http.StatusOK, gin.H{"success": "Phase changed", "currentPhase": settings.CurrentPhase})
+}
