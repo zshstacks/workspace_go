@@ -14,6 +14,7 @@ import {
   updateRemainingTime,
 } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
 import {
+  changePhase,
   fetchTimerStatus,
   getPomodoroSettings,
   startPomodoro,
@@ -38,6 +39,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     (state: RootState) => state.pomodoro
   );
 
+  //change color theme
   const context = useContext(MyContext);
 
   if (!context) {
@@ -48,15 +50,12 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   const { theme } = context;
 
-  //==============================
-
-  //if i cant fix this fucking shit with useEffect, i can probably just change phases in handleChangeMode, so i need logic at backend to switch phase and just dispatch into handleChangeMode
-
-  //===============================
-
   //change timer mode
-  const handleChangeMode = (mode: "pomodoro" | "shortBreak" | "longBreak") => {
-    dispatch(changeMode(mode));
+  const handleChangeMode = async (
+    mode: "pomodoro" | "shortBreak" | "longBreak"
+  ) => {
+    await dispatch(changePhase(mode)); //server
+    dispatch(changeMode(mode)); //client
   };
 
   const handleStart = () => {
