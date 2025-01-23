@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  changePhase,
   fetchTimerStatus,
   getPomodoroSettings,
   startPomodoro,
@@ -62,6 +63,10 @@ const pomodoroSlice = createSlice({
       .addCase(stopPomodoro.fulfilled, (state) => {
         state.isRunning = false;
         state.isLoading = false;
+      })
+
+      .addCase(changePhase.fulfilled, (state, action) => {
+        state.currentPhase = action.payload;
       })
 
       .addMatcher(

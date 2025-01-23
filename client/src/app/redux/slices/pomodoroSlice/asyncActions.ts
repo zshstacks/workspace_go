@@ -82,3 +82,17 @@ export const stopPomodoro = createAsyncThunk(
     }
   }
 );
+
+export const changePhase = createAsyncThunk(
+  "pomodoro/changePhase",
+  async (phase: "pomodoro" | "shortBreak" | "longBreak", thunkAPI) => {
+    try {
+      const res = await api.post("/pomodoro-phase", { phase });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Failed to change phase"
+      );
+    }
+  }
+);
