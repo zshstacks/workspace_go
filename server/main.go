@@ -54,6 +54,7 @@ func main() {
 	r.POST("/pomodoro-update-settings", middleware.RequireAuth, controllers.UpdatePomodoroSettings)
 	r.POST("/pomodoro-start", middleware.RequireAuth, controllers.StartPomodoro)
 	r.POST("/pomodoro-stop", middleware.RequireAuth, controllers.StopPomodoro)
+	r.POST("/pomodoro-phase", middleware.RequireAuth, controllers.ChangePhase)
 
 	log.Fatal(r.Run())
 
