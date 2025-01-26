@@ -13,4 +13,5 @@ type PomodoroModel struct {
 	IsRunning          bool   `gorm:"default:false"`
 	CurrentPhase       string `gorm:"default:'pomodoro'"`
 	RemainingTime      int    `gorm:"default:0"`
+	CompletedPomodoros int    `gorm:"default:0"`
 }

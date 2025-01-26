@@ -31,7 +31,7 @@ func StartPomodoroTimer(userID uint) {
 		return
 	}
 
-	// Situation 1: Reset RemainingTime to full duration when switching phases
+	// Reset RemainingTime to full duration when switching phases
 	if settings.RemainingTime == 0 || settings.IsRunning == false {
 		settings.RemainingTime = duration
 	}
@@ -51,14 +51,36 @@ func StartPomodoroTimer(userID uint) {
 			timerMutex.Lock()
 			initializers.DB.First(&settings, "user_id = ?", userID)
 
-			if !settings.IsRunning || settings.RemainingTime <= 0 {
+			if !settings.IsRunning {
+				timerMutex.Unlock()
+				return
+			}
+
+			if settings.RemainingTime <= 0 {
+				// Switch to the next phase
+				switch settings.CurrentPhase {
+				case "pomodoro":
+					settings.CompletedPomodoros++
+					if settings.CompletedPomodoros%4 == 0 {
+						settings.CurrentPhase = "longBreak"
+						settings.RemainingTime = settings.LongBreakDuration * 60
+					} else {
+						settings.CurrentPhase = "shortBreak"
+						settings.RemainingTime = settings.ShortBreakDuration * 60
+					}
+				case "shortBreak", "longBreak":
+					settings.CurrentPhase = "pomodoro"
+					settings.RemainingTime = settings.PomodoroDuration * 60
+				}
+
+				// Stop running and save changes
 				settings.IsRunning = false
 				initializers.DB.Save(&settings)
 				timerMutex.Unlock()
 				return
 			}
 
-			settings.RemainingTime -= 1
+			settings.RemainingTime--
 			initializers.DB.Save(&settings)
 			timerMutex.Unlock()
 		}
