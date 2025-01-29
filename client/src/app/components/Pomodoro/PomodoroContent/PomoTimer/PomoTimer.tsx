@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
+import { MyContext } from "../../Pomodoro";
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
 
 import { useDraggable } from "@dnd-kit/core";
@@ -11,6 +12,7 @@ import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   changeMode,
+  updateCompletedPomodoros,
   updateRemainingTime,
 } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
 import {
@@ -23,7 +25,6 @@ import {
 
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
-import { MyContext } from "../../Pomodoro";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   position,
@@ -35,9 +36,13 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   const [isDragging, setIsDragging] = useState(false);
 
   const dispatch: AppDispatch = useDispatch();
-  const { settings, currentPhase, isRunning, remainingTime } = useSelector(
-    (state: RootState) => state.pomodoro
-  );
+  const {
+    settings,
+    currentPhase,
+    isRunning,
+    remainingTime,
+    autoTransitionEnabled,
+  } = useSelector((state: RootState) => state.pomodoro);
 
   //change color theme
   const context = useContext(MyContext);
@@ -51,24 +56,46 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   const { theme } = context;
 
   //change timer mode
-  const handleChangeMode = async (
-    mode: "pomodoro" | "shortBreak" | "longBreak"
-  ) => {
-    await dispatch(changePhase(mode)); //server
-    dispatch(changeMode(mode)); //client
+  const handleChangeMode = useCallback(
+    async (mode: string) => {
+      if (
+        mode === "pomodoro" ||
+        mode === "shortBreak" ||
+        mode === "longBreak"
+      ) {
+        await dispatch(changePhase(mode));
+        dispatch(changeMode(mode));
+      }
+    },
+    [dispatch]
+  );
+
+  //stop start btn audio
+  const playAudio = () => {
+    new Audio(process.env.NEXT_PUBLIC_START_PAUSE_AUDIO).play();
   };
 
+  //alarm audio
+  const alarmAudio = () => {
+    new Audio(process.env.NEXT_PUBLIC_ALARM_AUDIO).play();
+  };
+
+  //start timer
   const handleStart = () => {
     if (!isRunning) {
       dispatch(startPomodoro(currentPhase));
+      playAudio();
     }
   };
 
+  //stop timer
   const handleStop = async () => {
     await dispatch(stopPomodoro());
     dispatch(fetchTimerStatus());
+    playAudio();
   };
 
+  //format time to 00:00
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -76,7 +103,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   };
 
   useEffect(() => {
-    // Atjaunināt laiku tikai, ja taimeris nav startēts
+    //  Refresh time, if timer is not started
     if (!isRunning) {
       const updateInitialTime = () => {
         let initialTime = 0;
@@ -87,10 +114,10 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         } else if (currentPhase === "longBreak") {
           initialTime = settings.longBreak * 60;
         }
-        dispatch(updateRemainingTime(initialTime)); // Atjaunina tikai tad, kad taimeris nav startēts
+        dispatch(updateRemainingTime(initialTime)); // Refreshed, if timer is not started
       };
 
-      updateInitialTime(); // Pārbaudām režīma maiņu
+      updateInitialTime(); // Check mode changes
     }
   }, [
     currentPhase,
@@ -98,9 +125,10 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     settings.shortBreak,
     settings.longBreak,
     dispatch,
-    isRunning, // Pārliecināmies, ka tas tiek darīts tikai tad, kad taimeris nav startēts
+    isRunning,
   ]);
 
+  //get current time
   useEffect(() => {
     if (isRunning) {
       const interval = setInterval(() => {
@@ -108,8 +136,46 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [dispatch, isRunning]);
+  }, [dispatch, isRunning, remainingTime]);
 
+  //should be for auto-transition timer, but broken asf
+  useEffect(() => {
+    if (remainingTime === 0 && isRunning) {
+      if (autoTransitionEnabled) {
+        const nextMode =
+          currentPhase === "pomodoro"
+            ? "shortBreak"
+            : currentPhase === "shortBreak"
+            ? "longBreak"
+            : "pomodoro";
+
+        if (currentPhase === "pomodoro" && nextMode !== "pomodoro") {
+          dispatch(updateCompletedPomodoros());
+        }
+
+        console.log(
+          `current phase : ${JSON.stringify(
+            currentPhase
+          )}, Switching phase to: ${JSON.stringify(nextMode)}`
+        );
+
+        if (nextMode !== currentPhase) {
+          handleChangeMode(nextMode);
+        }
+      } else {
+        alarmAudio();
+      }
+    }
+  }, [
+    remainingTime,
+    autoTransitionEnabled,
+    currentPhase,
+    isRunning,
+    handleChangeMode,
+    dispatch,
+  ]);
+
+  //fetch custom time from user
   useEffect(() => {
     dispatch(getPomodoroSettings());
   }, [dispatch]);

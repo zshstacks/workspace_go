@@ -17,8 +17,10 @@ const initialState: PomodoroState = {
   },
   remainingTime: 25 * 60,
   currentPhase: "pomodoro",
+  autoTransitionEnabled: false,
   isLoading: false,
   isRunning: false,
+  completedPomodoros: 0,
   error: null,
 };
 
@@ -33,8 +35,16 @@ const pomodoroSlice = createSlice({
       state.currentPhase = action.payload;
     },
 
+    setAutotransition: (state, action: PayloadAction<boolean>) => {
+      state.autoTransitionEnabled = action.payload;
+    },
+
     updateRemainingTime: (state, action: PayloadAction<number>) => {
       state.remainingTime = action.payload;
+    },
+
+    updateCompletedPomodoros: (state) => {
+      state.completedPomodoros += 1;
     },
   },
   extraReducers: (builder) => {
@@ -54,6 +64,7 @@ const pomodoroSlice = createSlice({
         state.remainingTime = action.payload.remainingTime;
         state.isRunning = action.payload.isRunning;
         state.currentPhase = action.payload.currentPhase;
+        state.completedPomodoros = action.payload.completedPomodoros;
       })
 
       .addCase(startPomodoro.fulfilled, (state) => {
@@ -87,6 +98,11 @@ const pomodoroSlice = createSlice({
   },
 });
 
-export const { changeMode, updateRemainingTime } = pomodoroSlice.actions;
+export const {
+  changeMode,
+  updateRemainingTime,
+  setAutotransition,
+  updateCompletedPomodoros,
+} = pomodoroSlice.actions;
 
 export default pomodoroSlice.reducer;

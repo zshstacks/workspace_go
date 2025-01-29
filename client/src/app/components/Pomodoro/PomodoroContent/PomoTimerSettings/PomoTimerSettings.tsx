@@ -7,10 +7,14 @@ import React, { useContext, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { MyContext } from "../../Pomodoro";
+import { setAutotransition } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
 
 const PomoTimerSettings = () => {
   const dispatch: AppDispatch = useDispatch();
   const settings = useSelector((state: RootState) => state.pomodoro.settings);
+  const autoTransitionEnabled = useSelector(
+    (state: RootState) => state.pomodoro.autoTransitionEnabled
+  );
 
   const [localSettings, setLocalSettings] = useState(settings);
 
@@ -23,6 +27,10 @@ const PomoTimerSettings = () => {
   }
 
   const { theme } = context;
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setAutotransition(e.target.checked));
+  };
 
   const handleSave = () => {
     dispatch(updatePomodoroTime(localSettings)).then(() => {
@@ -38,7 +46,13 @@ const PomoTimerSettings = () => {
       {/* count and transition settings */}
       <div className="flex flex-col gap-2">
         <div className="gap-2 flex ">
-          <input type="checkbox" id="trans_timer" className="w-4 " />
+          <input
+            type="checkbox"
+            id="trans_timer"
+            checked={autoTransitionEnabled}
+            onChange={handleCheckboxChange}
+            className="w-4 "
+          />
           <label htmlFor="trans_timer" className="dark:text-lightText">
             Auto-transition Timer
           </label>
