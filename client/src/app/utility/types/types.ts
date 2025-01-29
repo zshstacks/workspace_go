@@ -88,8 +88,10 @@ export interface PomodoroState {
   };
   currentPhase: "pomodoro" | "shortBreak" | "longBreak";
   remainingTime: number;
+  autoTransitionEnabled: boolean;
   isLoading: boolean;
   isRunning: boolean;
+  completedPomodoros: number;
   error: string | null;
 }
 
