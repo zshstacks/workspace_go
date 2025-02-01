@@ -21,7 +21,7 @@ func main() {
 	r := gin.Default()
 
 	r.ForwardedByClientIP = true
-	err := r.SetTrustedProxies([]string{"127.0.0.1"})
+	err := r.SetTrustedProxies(nil)
 	if err != nil {
 		return
 	}

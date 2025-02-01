@@ -68,16 +68,34 @@ func StartPomodoroTimer(userID uint) {
 						settings.CurrentPhase = "shortBreak"
 						settings.RemainingTime = settings.ShortBreakDuration * 60
 					}
-				case "shortBreak", "longBreak":
+				case "shortBreak":
 					settings.CurrentPhase = "pomodoro"
 					settings.RemainingTime = settings.PomodoroDuration * 60
+
+				case "longBreak":
+					settings.CurrentPhase = "pomodoro"
+					settings.RemainingTime = settings.PomodoroDuration * 60
+
 				}
 
-				// Stop running and save changes
-				settings.IsRunning = false
-				initializers.DB.Save(&settings)
+				if settings.AutoTransition {
+					settings.IsRunning = true // Continue to next phase
+				} else {
+					settings.IsRunning = false // Stop timer
+				}
+
+				if err := initializers.DB.Save(&settings).Error; err != nil {
+					timerMutex.Unlock()
+					return
+				}
+
+				if !settings.AutoTransition {
+					timerMutex.Unlock()
+					return
+				}
+
 				timerMutex.Unlock()
-				return
+				continue
 			}
 
 			settings.RemainingTime--
