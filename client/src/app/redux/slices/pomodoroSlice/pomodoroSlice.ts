@@ -5,6 +5,7 @@ import {
   getPomodoroSettings,
   startPomodoro,
   stopPomodoro,
+  updateAutoTransition,
   updatePomodoroTime,
 } from "./asyncActions";
 import { PomodoroErrorPayload, PomodoroState } from "@/app/utility/types/types";
@@ -14,10 +15,10 @@ const initialState: PomodoroState = {
     pomodoro: 25,
     shortBreak: 5,
     longBreak: 15,
+    autoTransitionEnabled: false,
   },
   remainingTime: 25 * 60,
   currentPhase: "pomodoro",
-  autoTransitionEnabled: false,
   isLoading: false,
   isRunning: false,
   completedPomodoros: 0,
@@ -33,10 +34,6 @@ const pomodoroSlice = createSlice({
       action: PayloadAction<"pomodoro" | "shortBreak" | "longBreak">
     ) => {
       state.currentPhase = action.payload;
-    },
-
-    setAutotransition: (state, action: PayloadAction<boolean>) => {
-      state.autoTransitionEnabled = action.payload;
     },
 
     updateRemainingTime: (state, action: PayloadAction<number>) => {
@@ -65,6 +62,7 @@ const pomodoroSlice = createSlice({
         state.isRunning = action.payload.isRunning;
         state.currentPhase = action.payload.currentPhase;
         state.completedPomodoros = action.payload.completedPomodoros;
+        state.settings.autoTransitionEnabled = action.payload.autoTransition;
       })
 
       .addCase(startPomodoro.fulfilled, (state) => {
@@ -78,6 +76,11 @@ const pomodoroSlice = createSlice({
 
       .addCase(changePhase.fulfilled, (state, action) => {
         state.currentPhase = action.payload;
+      })
+
+      .addCase(updateAutoTransition.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.settings.autoTransitionEnabled = action.payload.autoTransition;
       })
 
       .addMatcher(
@@ -98,11 +101,7 @@ const pomodoroSlice = createSlice({
   },
 });
 
-export const {
-  changeMode,
-  updateRemainingTime,
-  setAutotransition,
-  updateCompletedPomodoros,
-} = pomodoroSlice.actions;
+export const { changeMode, updateRemainingTime, updateCompletedPomodoros } =
+  pomodoroSlice.actions;
 
 export default pomodoroSlice.reducer;

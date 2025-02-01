@@ -12,7 +12,6 @@ import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   changeMode,
-  updateCompletedPomodoros,
   updateRemainingTime,
 } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
 import {
@@ -36,13 +35,9 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   const [isDragging, setIsDragging] = useState(false);
 
   const dispatch: AppDispatch = useDispatch();
-  const {
-    settings,
-    currentPhase,
-    isRunning,
-    remainingTime,
-    autoTransitionEnabled,
-  } = useSelector((state: RootState) => state.pomodoro);
+  const { settings, currentPhase, isRunning, remainingTime } = useSelector(
+    (state: RootState) => state.pomodoro
+  );
 
   //change color theme
   const context = useContext(MyContext);
@@ -81,12 +76,12 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   };
 
   //start timer
-  const handleStart = () => {
+  const handleStart = useCallback(() => {
     if (!isRunning) {
       dispatch(startPomodoro(currentPhase));
       playAudio();
     }
-  };
+  }, [dispatch, currentPhase, isRunning]);
 
   //stop timer
   const handleStop = async () => {
@@ -138,42 +133,12 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     }
   }, [dispatch, isRunning, remainingTime]);
 
-  //should be for auto-transition timer, but broken asf
+  //play alarm audio when timer is on the 2 sec
   useEffect(() => {
-    if (remainingTime === 0 && isRunning) {
-      if (autoTransitionEnabled) {
-        const nextMode =
-          currentPhase === "pomodoro"
-            ? "shortBreak"
-            : currentPhase === "shortBreak"
-            ? "longBreak"
-            : "pomodoro";
-
-        if (currentPhase === "pomodoro" && nextMode !== "pomodoro") {
-          dispatch(updateCompletedPomodoros());
-        }
-
-        console.log(
-          `current phase : ${JSON.stringify(
-            currentPhase
-          )}, Switching phase to: ${JSON.stringify(nextMode)}`
-        );
-
-        if (nextMode !== currentPhase) {
-          handleChangeMode(nextMode);
-        }
-      } else {
-        alarmAudio();
-      }
+    if (remainingTime === 2) {
+      alarmAudio();
     }
-  }, [
-    remainingTime,
-    autoTransitionEnabled,
-    currentPhase,
-    isRunning,
-    handleChangeMode,
-    dispatch,
-  ]);
+  }, [remainingTime]);
 
   //fetch custom time from user
   useEffect(() => {

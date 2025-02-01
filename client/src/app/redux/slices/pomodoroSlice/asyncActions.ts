@@ -96,3 +96,17 @@ export const changePhase = createAsyncThunk(
     }
   }
 );
+
+export const updateAutoTransition = createAsyncThunk(
+  "pomodoro/updateAutoTransition",
+  async (autoTransition: boolean, thunkAPI) => {
+    try {
+      const res = await api.post("/pomodoro-auto-mode", { autoTransition });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Failed to update auto-transition"
+      );
+    }
+  }
+);
