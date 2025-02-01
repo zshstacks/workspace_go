@@ -203,3 +203,44 @@ func ChangePhase(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"success": "Phase changed", "currentPhase": settings.CurrentPhase})
 }
+
+func UpdateAutoTransition(c *gin.Context) {
+
+	var body struct {
+		AutoTransition bool `json:"autoTransition"`
+	}
+
+	if err := c.Bind(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		return
+	}
+
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authenticated"})
+		return
+	}
+	currentUser := user.(models.User)
+
+	var settings models.PomodoroModel
+	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro settings not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant fetch pomodoro settings"})
+		}
+		return
+	}
+
+	settings.AutoTransition = body.AutoTransition
+
+	if err := initializers.DB.Save(&settings).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant update auto transition"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":        "Auto transition updated successfully",
+		"autoTransition": settings.AutoTransition,
+	})
+}
