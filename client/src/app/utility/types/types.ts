@@ -85,10 +85,10 @@ export interface PomodoroState {
     pomodoro: number;
     shortBreak: number;
     longBreak: number;
+    autoTransitionEnabled: boolean;
   };
   currentPhase: "pomodoro" | "shortBreak" | "longBreak";
   remainingTime: number;
-  autoTransitionEnabled: boolean;
   isLoading: boolean;
   isRunning: boolean;
   completedPomodoros: number;

@@ -1,22 +1,24 @@
 import {
   getPomodoroSettings,
+  updateAutoTransition,
   updatePomodoroTime,
 } from "@/app/redux/slices/pomodoroSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { MyContext } from "../../Pomodoro";
-import { setAutotransition } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
 
 const PomoTimerSettings = () => {
   const dispatch: AppDispatch = useDispatch();
   const settings = useSelector((state: RootState) => state.pomodoro.settings);
-  const autoTransitionEnabled = useSelector(
-    (state: RootState) => state.pomodoro.autoTransitionEnabled
-  );
 
-  const [localSettings, setLocalSettings] = useState(settings);
+  const [localSettings, setLocalSettings] = useState({
+    pomodoro: settings.pomodoro,
+    shortBreak: settings.shortBreak,
+    longBreak: settings.longBreak,
+    autoTransition: settings.autoTransitionEnabled,
+  });
 
   const context = useContext(MyContext);
 
@@ -28,15 +30,32 @@ const PomoTimerSettings = () => {
 
   const { theme } = context;
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setAutotransition(e.target.checked));
-  };
-
   const handleSave = () => {
     dispatch(updatePomodoroTime(localSettings)).then(() => {
       dispatch(getPomodoroSettings());
     });
   };
+
+  //transition timer change
+  const handleAutoTransitionChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = e.target.checked;
+    setLocalSettings({
+      ...localSettings,
+      autoTransition: newValue,
+    });
+    dispatch(updateAutoTransition(newValue));
+  };
+
+  useEffect(() => {
+    setLocalSettings({
+      pomodoro: settings.pomodoro,
+      shortBreak: settings.shortBreak,
+      longBreak: settings.longBreak,
+      autoTransition: settings.autoTransitionEnabled,
+    });
+  }, [settings]);
 
   return (
     <div className=" font-medium " id="pomo-timer">
@@ -49,8 +68,8 @@ const PomoTimerSettings = () => {
           <input
             type="checkbox"
             id="trans_timer"
-            checked={autoTransitionEnabled}
-            onChange={handleCheckboxChange}
+            checked={localSettings.autoTransition}
+            onChange={handleAutoTransitionChange}
             className="w-4 "
           />
           <label htmlFor="trans_timer" className="dark:text-lightText">
