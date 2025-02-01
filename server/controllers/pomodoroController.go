@@ -12,9 +12,10 @@ import (
 
 func UpdatePomodoroSettings(c *gin.Context) {
 	var body struct {
-		Pomodoro   int `json:"pomodoro"`
-		ShortBreak int `json:"shortBreak"`
-		LongBreak  int `json:"longBreak"`
+		Pomodoro       int  `json:"pomodoro"`
+		ShortBreak     int  `json:"shortBreak"`
+		LongBreak      int  `json:"longBreak"`
+		AutoTransition bool `json:"autoTransition"`
 	}
 
 	if c.Bind(&body) != nil {
@@ -33,6 +34,7 @@ func UpdatePomodoroSettings(c *gin.Context) {
 				PomodoroDuration:   body.Pomodoro,
 				ShortBreakDuration: body.ShortBreak,
 				LongBreakDuration:  body.LongBreak,
+				AutoTransition:     body.AutoTransition,
 			}
 			initializers.DB.Create(&settings)
 		} else {
@@ -43,6 +45,7 @@ func UpdatePomodoroSettings(c *gin.Context) {
 		settings.PomodoroDuration = body.Pomodoro
 		settings.ShortBreakDuration = body.ShortBreak
 		settings.LongBreakDuration = body.LongBreak
+		settings.AutoTransition = body.AutoTransition
 		initializers.DB.Save(&settings)
 	}
 
@@ -60,12 +63,13 @@ func GetPomodoroSettings(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"pomodoro":      settings.PomodoroDuration,
-		"shortBreak":    settings.ShortBreakDuration,
-		"longBreak":     settings.LongBreakDuration,
-		"remainingTime": settings.RemainingTime,
-		"isRunning":     settings.IsRunning,
-		"currentPhase":  settings.CurrentPhase,
+		"pomodoro":       settings.PomodoroDuration,
+		"shortBreak":     settings.ShortBreakDuration,
+		"longBreak":      settings.LongBreakDuration,
+		"remainingTime":  settings.RemainingTime,
+		"isRunning":      settings.IsRunning,
+		"currentPhase":   settings.CurrentPhase,
+		"autoTransition": settings.AutoTransition,
 	})
 }
 
@@ -81,9 +85,11 @@ func FetchPomodoroStatus(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 
-		"remainingTime": settings.RemainingTime,
-		"isRunning":     settings.IsRunning,
-		"currentPhase":  settings.CurrentPhase,
+		"remainingTime":      settings.RemainingTime,
+		"isRunning":          settings.IsRunning,
+		"currentPhase":       settings.CurrentPhase,
+		"completedPomodoros": settings.CompletedPomodoros,
+		"autoTransition":     settings.AutoTransition,
 	})
 }
 
@@ -181,6 +187,7 @@ func ChangePhase(c *gin.Context) {
 	}
 
 	if settings.CurrentPhase != body.Phase {
+
 		settings.CurrentPhase = body.Phase
 		switch settings.CurrentPhase {
 		case "pomodoro":
