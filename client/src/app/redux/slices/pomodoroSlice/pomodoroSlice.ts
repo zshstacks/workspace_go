@@ -39,10 +39,6 @@ const pomodoroSlice = createSlice({
     updateRemainingTime: (state, action: PayloadAction<number>) => {
       state.remainingTime = action.payload;
     },
-
-    updateCompletedPomodoros: (state) => {
-      state.completedPomodoros += 1;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -101,7 +97,6 @@ const pomodoroSlice = createSlice({
   },
 });
 
-export const { changeMode, updateRemainingTime, updateCompletedPomodoros } =
-  pomodoroSlice.actions;
+export const { changeMode, updateRemainingTime } = pomodoroSlice.actions;
 
 export default pomodoroSlice.reducer;

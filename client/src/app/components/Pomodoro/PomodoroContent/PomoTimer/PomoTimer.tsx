@@ -135,10 +135,17 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   //play alarm audio when timer is on the 2 sec
   useEffect(() => {
-    if (remainingTime === 2) {
+    if (remainingTime === 1) {
       alarmAudio();
     }
   }, [remainingTime]);
+
+  //change website title
+  useEffect(() => {
+    document.title = isRunning
+      ? `${formatTime(remainingTime)} | wlr1`
+      : "workspace_go by wlr1";
+  }, [remainingTime, isRunning]);
 
   //fetch custom time from user
   useEffect(() => {
