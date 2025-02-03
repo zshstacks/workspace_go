@@ -4,7 +4,7 @@ import { PiGithubLogo } from "react-icons/pi";
 import { VscSettings } from "react-icons/vsc";
 
 import { UserMenuProps } from "@/app/utility/types/types";
-import { MyContext } from "../../Pomodoro/Pomodoro";
+import { MyContext } from "@/app/components/Workspace/Workspace";
 
 const UserMenu: React.FC<UserMenuProps> = ({
   setOpenUISettings,

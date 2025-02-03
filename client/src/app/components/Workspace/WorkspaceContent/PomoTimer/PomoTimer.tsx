@@ -2,7 +2,7 @@
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
 
-import { MyContext } from "../../Pomodoro";
+import { MyContext } from "../../Workspace";
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
 
 import { useDraggable } from "@dnd-kit/core";
@@ -143,9 +143,9 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   //change website title
   useEffect(() => {
     document.title = isRunning
-      ? `${formatTime(remainingTime)} | wlr1`
+      ? `${formatTime(remainingTime)} | ${currentPhase}`
       : "workspace_go by wlr1";
-  }, [remainingTime, isRunning]);
+  }, [remainingTime, isRunning, currentPhase]);
 
   //fetch custom time from user
   useEffect(() => {

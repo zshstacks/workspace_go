@@ -1,6 +1,6 @@
 import React from "react";
 import "@/app/styles/globals.css";
-import Pomodoro from "../components/Pomodoro/Pomodoro";
+import Pomodoro from "@/app/components/Workspace/Workspace";
 
 const page = () => {
   return (

@@ -4,7 +4,9 @@ export interface HeaderProps {
   setOpenUISettings: () => void;
   setOpenAccSettings: () => void;
   setIsTimerActive: () => void;
+  setIsTodoActive: () => void;
   isTimerActive: boolean;
+  isTodoActive: boolean;
   hideElementsActive: boolean;
   hideAfterSeconds: number;
 }
@@ -31,6 +33,10 @@ export interface PomoTimerProps {
   setOpenSettings: () => void;
   setIsTimerActive: () => void;
   position: Position;
+}
+
+export interface TodoProps {
+  setIsTodoActive: () => void;
 }
 
 //redux auth slice

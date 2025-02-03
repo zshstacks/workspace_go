@@ -12,15 +12,17 @@ import { DndContext } from "@dnd-kit/core";
 import { Position } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
+import Todo from "./Todo/Todo";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
-const PomodoroContent = () => {
+const WorkspaceContent = () => {
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const [openUISettings, setOpenUISettings] = useToggleState(false);
   const [openAccSettings, setOpenAccSettings] = useToggleState(false);
   const [openSettings, setOpenSettings] = useToggleState(false);
   const [isTimerActive, setIsTimerActive] = useToggleState(true);
+  const [isTodoActive, setIsTodoActive] = useToggleState(false);
   const [hideElementsActive, setHideElementsActive] = useState(false);
   const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
 
@@ -53,7 +55,9 @@ const PomodoroContent = () => {
           setOpenUISettings={setOpenUISettings}
           setOpenAccSettings={setOpenAccSettings}
           setIsTimerActive={setIsTimerActive}
+          setIsTodoActive={setIsTodoActive}
           isTimerActive={isTimerActive}
+          isTodoActive={isTodoActive}
           hideElementsActive={hideElementsActive}
           hideAfterSeconds={hideAfterSeconds}
         />
@@ -81,7 +85,6 @@ const PomodoroContent = () => {
           setOpenUISettings={setOpenUISettings}
           setHideElementsActive={setHideElementsActive}
           setHideAfterSeconds={setHideAfterSeconds}
-          
         />
       )}
 
@@ -113,8 +116,10 @@ const PomodoroContent = () => {
           />
         </DndContext>
       )}
+
+      {isTodoActive && <Todo setIsTodoActive={setIsTodoActive} />}
     </>
   );
 };
 
-export default PomodoroContent;
+export default WorkspaceContent;

@@ -8,7 +8,7 @@ import { useToggleState } from "@/app/hooks/useToggleState";
 
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import { BsFire } from "react-icons/bs";
-import { LuUserRound } from "react-icons/lu";
+import { LuPencilLine, LuUserRound } from "react-icons/lu";
 import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
@@ -16,13 +16,15 @@ import {
 } from "react-icons/md";
 
 import "animate.css";
-import { MyContext } from "../Pomodoro/Pomodoro";
+import { MyContext } from "@/app/components/Workspace/Workspace";
 
 const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,
   setOpenAccSettings,
   setIsTimerActive,
+  setIsTodoActive,
   isTimerActive,
+  isTodoActive,
   hideElementsActive,
   hideAfterSeconds,
 }) => {
@@ -81,17 +83,18 @@ const Header: React.FC<HeaderProps> = ({
       className={`w-full p-2 flex justify-between items-center fixed  h-[50px] animate__animated ${animation} `}
     >
       {/* Left Section */}
-      <div className="bg-main dark:bg-lightMain rounded-md px-2 py-1 flex justify-center items-center ">
-        <div className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md px-1  cursor-pointer">
+      <div className="bg-main dark:bg-lightMain rounded-md w-12 h-[32px] flex justify-center items-center ">
+        <div className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md py-[2px] px-[4px]  cursor-pointer">
           <span className="text-white dark:text-lightText text-md mr-1">2</span>
           <BsFire color="darkorange" size={19} />
         </div>
       </div>
 
       {/* center section */}
-      <div className="flex justify-center text-center align-middle bg-main dark:bg-lightMain rounded-md w-9 h-[32px]">
+      <div className="flex justify-center bg-main dark:bg-lightMain rounded-md w-[88px] h-[32px]">
+        {/* timer */}
         <div
-          className="flex m-auto hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md hover:p-[3px] cursor-pointer"
+          className="flex my-auto ml-2 p-1  hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
           onClick={setIsTimerActive}
         >
           <MdOutlineTimer
@@ -102,6 +105,23 @@ const Header: React.FC<HeaderProps> = ({
                 : theme === "dark"
                 ? "#4e4e4e"
                 : "white"
+            }
+              `}
+          />
+        </div>
+
+        {/* divider */}
+        <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder my-auto mx-2"></div>
+
+        {/* todo */}
+        <div
+          className="flex my-auto mr-2 p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
+          onClick={setIsTodoActive}
+        >
+          <LuPencilLine
+            size={19}
+            color={`${
+              isTodoActive ? " #e89688" : theme === "dark" ? "#4e4e4e" : "white"
             }
               `}
           />

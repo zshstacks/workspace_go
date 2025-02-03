@@ -7,7 +7,7 @@ import { AppDispatch, RootState } from "@/app/redux/store";
 import React, { useContext, useEffect, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
-import { MyContext } from "../../Pomodoro";
+import { MyContext } from "../../Workspace";
 
 const PomoTimerSettings = () => {
   const dispatch: AppDispatch = useDispatch();

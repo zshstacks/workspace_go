@@ -1,6 +1,6 @@
 "use client";
 
-import { MyContext } from "@/app/components/Pomodoro/Pomodoro";
+import { MyContext } from "@/app/components/Workspace/Workspace";
 import { AppearanceProps } from "@/app/utility/types/types";
 import React, { useContext, useEffect, useState } from "react";
 import { IoIosCheckmark, IoIosClose } from "react-icons/io";

@@ -1,4 +1,4 @@
-import { MyContext } from "@/app/components/Pomodoro/Pomodoro";
+import { MyContext } from "@/app/components/Workspace/Workspace";
 import { logoutUser } from "@/app/redux/slices/authSlice/asyncActions";
 import { clearLogout } from "@/app/redux/slices/authSlice/authSlice";
 import {
