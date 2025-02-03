@@ -1,12 +1,24 @@
 "use client";
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import UserMenu from "./UserMenu/UserMenu";
+import { MyContext } from "@/app/components/Workspace/Workspace";
 import { HeaderProps } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 
-import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
+import {
+  AiOutlineFullscreen,
+  AiOutlineFullscreenExit,
+  AiOutlineMuted,
+  AiOutlineSound,
+} from "react-icons/ai";
 import { BsFire } from "react-icons/bs";
 import { LuPencilLine, LuUserRound } from "react-icons/lu";
 import {
@@ -16,7 +28,8 @@ import {
 } from "react-icons/md";
 
 import "animate.css";
-import { MyContext } from "@/app/components/Workspace/Workspace";
+
+import { Howl } from "howler";
 
 const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,
@@ -32,6 +45,7 @@ const Header: React.FC<HeaderProps> = ({
   const [openUserMenu, setOpenUserMenu] = useToggleState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [animation, setAnimation] = useState("animate__slideInDown");
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
 
   const context = useContext(MyContext);
 
@@ -42,6 +56,19 @@ const Header: React.FC<HeaderProps> = ({
   }
 
   const { theme } = context;
+
+  const rainSoundRef = useRef<Howl | null>(null);
+
+  const handleRainSound = () => {
+    if (!rainSoundRef.current) return;
+
+    if (!isSoundEnabled) {
+      rainSoundRef.current.play();
+    } else {
+      rainSoundRef.current.stop();
+    }
+    setIsSoundEnabled(!isSoundEnabled);
+  };
 
   const toggleFullscreenMode = () => {
     const element = document.documentElement;
@@ -65,6 +92,19 @@ const Header: React.FC<HeaderProps> = ({
       }, hideAfterSeconds * 1000);
     }
   }, [hideElementsActive, hideAfterSeconds]);
+
+  //rain sound only once
+  useEffect(() => {
+    rainSoundRef.current = new Howl({
+      src: [`${process.env.NEXT_PUBLIC_RAIN_AUDIO}`],
+      volume: 0.1,
+      loop: true,
+    });
+
+    return () => {
+      rainSoundRef.current?.unload();
+    };
+  }, []);
 
   useEffect(() => {
     document.addEventListener("mousemove", resetTimer);
@@ -130,6 +170,24 @@ const Header: React.FC<HeaderProps> = ({
 
       {/* Right Section */}
       <div className="flex items-center bg-main dark:bg-lightMain rounded-md text-white p-1 ">
+        <div
+          className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
+          onClick={handleRainSound}
+        >
+          {isSoundEnabled ? (
+            <AiOutlineSound
+              size={19}
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+            />
+          ) : (
+            <AiOutlineMuted
+              size={19}
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+            />
+          )}
+        </div>
+        {/* divider */}
+        <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder mx-2"></div>
         {/* enter/exit fullscreen */}
         <div
           className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"

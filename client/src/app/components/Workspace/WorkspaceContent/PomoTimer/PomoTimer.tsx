@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { MyContext } from "../../Workspace";
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
@@ -24,6 +30,8 @@ import {
 
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
+
+import { Howl } from "howler";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   position,
@@ -65,15 +73,29 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     [dispatch]
   );
 
+  const startAudio = useMemo(() => {
+    return new Howl({
+      src: [`${process.env.NEXT_PUBLIC_START_PAUSE_AUDIO}`],
+      volume: 0.2,
+    });
+  }, []);
+
   //stop start btn audio
-  const playAudio = () => {
-    new Audio(process.env.NEXT_PUBLIC_START_PAUSE_AUDIO).play();
-  };
+  const playAudio = useCallback(() => {
+    startAudio.play();
+  }, [startAudio]);
+
+  const alarmAudio = useMemo(() => {
+    return new Howl({
+      src: [`${process.env.NEXT_PUBLIC_ALARM_AUDIO}`],
+      volume: 0.2,
+    });
+  }, []);
 
   //alarm audio
-  const alarmAudio = () => {
-    new Audio(process.env.NEXT_PUBLIC_ALARM_AUDIO).play();
-  };
+  const startAlarmAudio = useCallback(() => {
+    alarmAudio.play();
+  }, [alarmAudio]);
 
   //start timer
   const handleStart = useCallback(() => {
@@ -81,7 +103,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       dispatch(startPomodoro(currentPhase));
       playAudio();
     }
-  }, [dispatch, currentPhase, isRunning]);
+  }, [dispatch, currentPhase, isRunning, playAudio]);
 
   //stop timer
   const handleStop = async () => {
@@ -136,9 +158,9 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   //play alarm audio when timer is on the 2 sec
   useEffect(() => {
     if (remainingTime === 1) {
-      alarmAudio();
+      startAlarmAudio();
     }
-  }, [remainingTime]);
+  }, [remainingTime, startAlarmAudio]);
 
   //change website title
   useEffect(() => {
