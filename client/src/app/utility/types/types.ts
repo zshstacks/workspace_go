@@ -1,5 +1,3 @@
-export type Position = { x: number; y: number };
-
 export interface HeaderProps {
   setOpenUISettings: () => void;
   setOpenAccSettings: () => void;
@@ -28,15 +26,26 @@ export interface UserMenuProps {
   setOpenAccSettings: () => void;
 }
 
+export interface WidgetInfo {
+  xPos: number;
+  yPos: number;
+}
+
+export interface SavedWidgetLayoutInfo {
+  TimerWidget?: WidgetInfo;
+  TodoWidget?: WidgetInfo;
+}
+
 export interface PomoTimerProps {
   openSettings: boolean;
   setOpenSettings: () => void;
   setIsTimerActive: () => void;
-  position: Position;
+  widgetInfo?: WidgetInfo;
 }
 
 export interface TodoProps {
   setIsTodoActive: () => void;
+  widgetInfo?: WidgetInfo;
 }
 
 //redux auth slice

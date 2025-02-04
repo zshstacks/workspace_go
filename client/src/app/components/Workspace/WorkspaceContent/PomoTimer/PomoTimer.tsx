@@ -7,7 +7,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-
 import { MyContext } from "../../Workspace";
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
 
@@ -30,16 +29,14 @@ import {
 
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
-
 import { Howl } from "howler";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
-  position,
+  widgetInfo,
   setOpenSettings,
   openSettings,
   setIsTimerActive,
 }) => {
-  const [localPosition, setLocalPosition] = useState(position);
   const [isDragging, setIsDragging] = useState(false);
 
   const dispatch: AppDispatch = useDispatch();
@@ -47,18 +44,16 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     (state: RootState) => state.pomodoro
   );
 
-  //change color theme
+  // Main theme no konteksta
   const context = useContext(MyContext);
-
   if (!context) {
     throw new Error(
       "The PomoTimer component should be used within MyContext.Provider."
     );
   }
-
   const { theme } = context;
 
-  //change timer mode
+  // Timer mode switch
   const handleChangeMode = useCallback(
     async (mode: string) => {
       if (
@@ -73,6 +68,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     [dispatch]
   );
 
+  // Audio
   const startAudio = useMemo(() => {
     return new Howl({
       src: [`${process.env.NEXT_PUBLIC_START_PAUSE_AUDIO}`],
@@ -80,7 +76,6 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     });
   }, []);
 
-  //stop start btn audio
   const playAudio = useCallback(() => {
     startAudio.play();
   }, [startAudio]);
@@ -92,12 +87,11 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     });
   }, []);
 
-  //alarm audio
   const startAlarmAudio = useCallback(() => {
     alarmAudio.play();
   }, [alarmAudio]);
 
-  //start timer
+  // Start/Stop timer
   const handleStart = useCallback(() => {
     if (!isRunning) {
       dispatch(startPomodoro(currentPhase));
@@ -105,22 +99,21 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     }
   }, [dispatch, currentPhase, isRunning, playAudio]);
 
-  //stop timer
   const handleStop = async () => {
     await dispatch(stopPomodoro());
     dispatch(fetchTimerStatus());
     playAudio();
   };
 
-  //format time to 00:00
+  // format time
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" + secs : secs}`;
   };
 
+  // Restores the original time if the timer is not running
   useEffect(() => {
-    //  Refresh time, if timer is not started
     if (!isRunning) {
       const updateInitialTime = () => {
         let initialTime = 0;
@@ -131,10 +124,9 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         } else if (currentPhase === "longBreak") {
           initialTime = settings.longBreak * 60;
         }
-        dispatch(updateRemainingTime(initialTime)); // Refreshed, if timer is not started
+        dispatch(updateRemainingTime(initialTime));
       };
-
-      updateInitialTime(); // Check mode changes
+      updateInitialTime();
     }
   }, [
     currentPhase,
@@ -145,7 +137,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     isRunning,
   ]);
 
-  //get current time
+  // timer isRunning then refresh time
   useEffect(() => {
     if (isRunning) {
       const interval = setInterval(() => {
@@ -155,28 +147,30 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     }
   }, [dispatch, isRunning, remainingTime]);
 
-  //play alarm audio when timer is on the 2 sec
+  // alarm audio if timer = 1
   useEffect(() => {
     if (remainingTime === 1) {
       startAlarmAudio();
     }
   }, [remainingTime, startAlarmAudio]);
 
-  //change website title
+  // website title change
   useEffect(() => {
     document.title = isRunning
       ? `${formatTime(remainingTime)} | ${currentPhase}`
       : "workspace_go by wlr1";
   }, [remainingTime, isRunning, currentPhase]);
 
-  //fetch custom time from user
+  // fetch settings
   useEffect(() => {
     dispatch(getPomodoroSettings());
   }, [dispatch]);
 
   //=====================
-  //dnd
+  // DnD logic
   //=====================
+
+  const staticPosition = widgetInfo ? widgetInfo : { xPos: 0, yPos: 0 };
 
   const {
     attributes,
@@ -188,36 +182,29 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     id: "pomo-timer",
   });
 
-  useEffect(() => {
-    if (transform) {
-      setLocalPosition({
-        x: position.x + transform.x,
-        y: position.y + transform.y,
-      });
-    }
-  }, [transform, position]);
+  const dynamicPosition = transform
+    ? { x: transform.x, y: transform.y }
+    : { x: 0, y: 0 };
+
+  const combinedPosition = {
+    xPos: staticPosition.xPos + dynamicPosition.x,
+    yPos: staticPosition.yPos + dynamicPosition.y,
+  };
 
   useEffect(() => {
     setIsDragging(dragging);
   }, [dragging]);
 
-  // update pos when it changes
-  useEffect(() => {
-    if (position !== localPosition) {
-      setLocalPosition(position);
-    }
-  }, [position]);
-
   return (
     <div
-      className={`bg-main dark:bg-lightMain text-white  w-[360px] p-4 rounded-lg shadow-md `}
+      className="bg-main dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-md"
       style={{
-        transform: `translate3d(${localPosition.x}px, ${localPosition.y}px, 0)`,
+        transform: `translate3d(${combinedPosition?.xPos}px, ${combinedPosition?.yPos}px, 0)`,
         position: "fixed",
       }}
     >
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-2 ">
+      {/* Header sadaļa */}
+      <div className="flex justify-between items-center mb-2">
         <div className="flex gap-1">
           <div className="w-2 h-2 bg-gray-700 dark:bg-neutral-700 rounded-full"></div>
           <div className="w-2 h-2 bg-gray-600 dark:bg-neutral-600 rounded-full"></div>
@@ -225,7 +212,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
           <div className="w-2 h-2 bg-gray-400 dark:bg-neutral-400 rounded-full"></div>
         </div>
 
-        {/* div for dnd  */}
+        {/* "Drag handle" element */}
         <div
           className="w-[270px] h-[40px] absolute"
           ref={setNodeRef}
@@ -235,7 +222,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         ></div>
 
         <button
-          className="text-gray-400 dark:text-lightText  pb-2"
+          className="text-gray-400 dark:text-lightText pb-2"
           onClick={setIsTimerActive}
         >
           <FaRegWindowMinimize
@@ -245,10 +232,10 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         </button>
       </div>
 
-      {/* divider */}
+      {/* Dalītājs */}
       <div className="w-[360px] h-[1px] bg-white/25 dark:bg-lightBorder absolute right-0"></div>
 
-      {/* Timer Section */}
+      {/* Timer sadaļa */}
       <div className="flex justify-center mt-6">
         <div className="w-full">
           <h1 className="text-5xl dark:text-lightText font-bold">
@@ -256,10 +243,10 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
           </h1>
         </div>
 
-        {/* Buttons Section */}
-        <div className="flex m-auto gap-4  ">
+        {/* Pogas sadaļa */}
+        <div className="flex m-auto gap-4">
           <button
-            className="px-8 py-1 bg-transparent border border-white dark:border-lightBorder rounded-lg "
+            className="px-8 py-1 bg-transparent border border-white dark:border-lightBorder rounded-lg"
             onClick={isRunning ? handleStop : handleStart}
           >
             <span className="font-semibold text-md dark:text-lightText">
@@ -275,12 +262,12 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         </div>
       </div>
 
-      {/* Tabs Section */}
-      <div className="flex justify-around mt-6 text-sm ">
+      {/* Tabs sadaļa */}
+      <div className="flex justify-around mt-6 text-sm">
         <button
           className={
             currentPhase === "pomodoro"
-              ? "border-b-2 border-gray-400 dark:border-lightBorder  pb-1"
+              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1"
               : ""
           }
           onClick={() => handleChangeMode("pomodoro")}
@@ -290,18 +277,17 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         <button
           className={
             currentPhase === "shortBreak"
-              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1 "
+              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1"
               : ""
           }
           onClick={() => handleChangeMode("shortBreak")}
         >
           <span className="dark:text-lightText">Short break</span>
         </button>
-
         <button
           className={
             currentPhase === "longBreak"
-              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1 "
+              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1"
               : ""
           }
           onClick={() => handleChangeMode("longBreak")}
@@ -309,7 +295,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
           <span className="dark:text-lightText">Long break</span>
         </button>
 
-        {/* Settings Icon */}
+        {/* Settings ikona */}
         <div className="flex">
           <button onClick={setOpenSettings}>
             <FiSettings

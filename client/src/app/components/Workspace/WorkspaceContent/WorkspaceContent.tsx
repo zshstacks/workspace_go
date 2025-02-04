@@ -9,7 +9,7 @@ import Appearance from "../../Header/UserMenu/Appearance/Appearance";
 import UserAccount from "../../Header/UserMenu/UserAccount/UserAccount";
 
 import { DndContext } from "@dnd-kit/core";
-import { Position } from "@/app/utility/types/types";
+import { SavedWidgetLayoutInfo, WidgetInfo } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import Todo from "./Todo/Todo";
@@ -17,7 +17,6 @@ import Todo from "./Todo/Todo";
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
 const WorkspaceContent = () => {
-  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const [openUISettings, setOpenUISettings] = useToggleState(false);
   const [openAccSettings, setOpenAccSettings] = useToggleState(false);
   const [openSettings, setOpenSettings] = useToggleState(false);
@@ -26,25 +25,52 @@ const WorkspaceContent = () => {
   const [hideElementsActive, setHideElementsActive] = useState(false);
   const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
 
-  // load saved pos from localstorage, if there is
+  const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
+
   useEffect(() => {
     const savedPosition = localStorage.getItem(localStorageKey);
     if (savedPosition) {
-      setPosition(JSON.parse(savedPosition));
+      setWidgetLayout(JSON.parse(savedPosition));
     }
   }, []);
 
-  // save new pos to localstorage
-  const savePosition = (newPosition: Position) => {
-    setPosition(newPosition);
-    localStorage.setItem(localStorageKey, JSON.stringify(newPosition));
+  const updateWidgetLayout = (
+    widgetKey: keyof SavedWidgetLayoutInfo,
+    newInfo: WidgetInfo
+  ) => {
+    const updatedLayout: SavedWidgetLayoutInfo = {
+      ...widgetLayout,
+      [widgetKey]: newInfo,
+    };
+    setWidgetLayout(updatedLayout);
+    localStorage.setItem(localStorageKey, JSON.stringify(updatedLayout));
+  };
+
+  const handleTimerDragEnd = (delta: { x: number; y: number }) => {
+    const currentTimer = widgetLayout.TimerWidget || { xPos: 0, yPos: 0 };
+    const newTimerInfo = {
+      ...currentTimer,
+      xPos: currentTimer.xPos + delta.x,
+      yPos: currentTimer.yPos + delta.y,
+    };
+    updateWidgetLayout("TimerWidget", newTimerInfo);
+  };
+
+  const handleTodoDragEnd = (delta: { x: number; y: number }) => {
+    const currentTimer = widgetLayout.TodoWidget || { xPos: 0, yPos: 0 };
+    const newTimerInfo = {
+      ...currentTimer,
+      xPos: currentTimer.xPos + delta.x,
+      yPos: currentTimer.yPos + delta.y,
+    };
+    updateWidgetLayout("TodoWidget", newTimerInfo);
   };
 
   //reset pos (dev)
   const resetPos = () => {
-    const resetPosition = { x: 0, y: 0 };
-    setPosition(resetPosition);
-    localStorage.setItem(localStorageKey, JSON.stringify(resetPosition));
+    const defaultPos = { xPos: 0, yPos: 0 };
+    updateWidgetLayout("TimerWidget", defaultPos);
+    updateWidgetLayout("TodoWidget", defaultPos);
   };
 
   return (
@@ -101,23 +127,32 @@ const WorkspaceContent = () => {
           modifiers={[restrictToBoundingBox(openSettings)]}
           onDragEnd={(event) => {
             const { delta } = event;
-            const newPosition = {
-              x: position.x + delta.x,
-              y: position.y + delta.y,
-            };
-            savePosition(newPosition);
+            handleTimerDragEnd(delta);
           }}
         >
           <PomoTimer
-            position={position}
             setOpenSettings={setOpenSettings}
             openSettings={openSettings}
             setIsTimerActive={setIsTimerActive}
+            widgetInfo={widgetLayout.TimerWidget}
           />
         </DndContext>
       )}
 
-      {isTodoActive && <Todo setIsTodoActive={setIsTodoActive} />}
+      {isTodoActive && (
+        <DndContext
+          modifiers={[restrictToBoundingBox(openSettings)]}
+          onDragEnd={(event) => {
+            const { delta } = event;
+            handleTodoDragEnd(delta);
+          }}
+        >
+          <Todo
+            setIsTodoActive={setIsTodoActive}
+            widgetInfo={widgetLayout.TodoWidget}
+          />
+        </DndContext>
+      )}
     </>
   );
 };
