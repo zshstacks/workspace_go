@@ -4,6 +4,10 @@ import { FaRegWindowMinimize } from "react-icons/fa";
 import { MyContext } from "../../Workspace";
 import { useDraggable } from "@dnd-kit/core";
 
+import { ResizableBox } from "react-resizable";
+import "react-resizable/css/styles.css";
+import { IoResizeOutline } from "react-icons/io5";
+
 const Todo: React.FC<TodoProps> = ({ setIsTodoActive, widgetInfo }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -47,19 +51,23 @@ const Todo: React.FC<TodoProps> = ({ setIsTodoActive, widgetInfo }) => {
   }, [dragging]);
 
   return (
-    <div
-      className="w-[390px] h-[411px] bg-main dark:bg-lightMain text-white rounded-lg shadow-md p-3 "
+    <ResizableBox
+      width={390}
+      height={411}
+      minConstraints={[400, 400]}
+      maxConstraints={[650, 650]}
       style={{
-        transform: `translate3d(${combinedPosition?.xPos}px, ${combinedPosition?.yPos}px, 0)`,
+        transform: `translate3d(${combinedPosition.xPos}px, ${combinedPosition.yPos}px, 0)`,
         position: "fixed",
       }}
+      className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-md p-3"
     >
       {/* header section */}
       <div className="flex justify-between">
-        <div>header</div>
+        <div className="">header</div>
         {/* div for dnd  */}
         <div
-          className="w-[270px] h-[40px] absolute"
+          className=" w-full h-[30px] flex "
           ref={setNodeRef}
           {...listeners}
           {...attributes}
@@ -77,8 +85,8 @@ const Todo: React.FC<TodoProps> = ({ setIsTodoActive, widgetInfo }) => {
       </div>
 
       {/* divider */}
-      <div className="w-[390px] h-[1px] bg-white/25 dark:bg-lightBorder absolute right-0"></div>
-    </div>
+      <div className="w-full h-[1px] bg-white/25 dark:bg-lightBorder absolute right-0"></div>
+    </ResizableBox>
   );
 };
 
