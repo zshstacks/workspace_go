@@ -8,8 +8,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { MyContext } from "../../Workspace";
+import { PomoTimerSettingsProps } from "@/app/utility/types/types";
 
-const PomoTimerSettings = () => {
+const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
+  setIsHideCount,
+  ishideCount,
+}) => {
   const dispatch: AppDispatch = useDispatch();
   const settings = useSelector((state: RootState) => state.pomodoro.settings);
 
@@ -77,7 +81,13 @@ const PomoTimerSettings = () => {
           </label>
         </div>
         <div className="gap-2 flex">
-          <input type="checkbox" id="count_timer" className="w-4 " />
+          <input
+            type="checkbox"
+            id="count_timer"
+            className="w-4 "
+            checked={ishideCount}
+            onChange={setIsHideCount}
+          />
           <label htmlFor="count_timer" className="dark:text-lightText">
             Hide Pomodoro Count
           </label>

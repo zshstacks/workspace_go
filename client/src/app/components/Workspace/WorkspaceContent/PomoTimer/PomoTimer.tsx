@@ -10,8 +10,8 @@ import React, {
 import { MyContext } from "../../Workspace";
 import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
 
-import { useDraggable } from "@dnd-kit/core";
 import { PomoTimerProps } from "@/app/utility/types/types";
+import { useToggleState } from "@/app/hooks/useToggleState";
 
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,7 +29,9 @@ import {
 
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { FiSettings, FiRefreshCw } from "react-icons/fi";
+
 import { Howl } from "howler";
+import { useDraggable } from "@dnd-kit/core";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   widgetInfo,
@@ -38,6 +40,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   setIsTimerActive,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [ishideCount, setIsHideCount] = useToggleState();
 
   const dispatch: AppDispatch = useDispatch();
   const { settings, currentPhase, isRunning, remainingTime } = useSelector(
@@ -203,14 +206,17 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         position: "fixed",
       }}
     >
-      {/* Header sadaļa */}
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex gap-1">
-          <div className="w-2 h-2 bg-gray-700 dark:bg-neutral-700 rounded-full"></div>
-          <div className="w-2 h-2 bg-gray-600 dark:bg-neutral-600 rounded-full"></div>
-          <div className="w-2 h-2 bg-gray-500 dark:bg-neutral-500 rounded-full"></div>
-          <div className="w-2 h-2 bg-gray-400 dark:bg-neutral-400 rounded-full"></div>
-        </div>
+      {/* Header */}
+      <div className="flex  items-center pb-[11px]">
+        {!ishideCount && (
+          <div className="flex gap-1 ">
+            <div className="w-2 h-2 bg-gray-700 dark:bg-neutral-700 rounded-full"></div>
+            <div className="w-2 h-2 bg-gray-600 dark:bg-neutral-600 rounded-full"></div>
+            <div className="w-2 h-2 bg-gray-500 dark:bg-neutral-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-gray-400 dark:bg-neutral-400 rounded-full"></div>
+          </div>
+        )}
+        {/* pomodoro count */}
 
         {/* "Drag handle" element */}
         <div
@@ -222,7 +228,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         ></div>
 
         <button
-          className="text-gray-400 dark:text-lightText pb-2"
+          className="text-gray-400 dark:text-lightText  absolute top-1 right-4"
           onClick={setIsTimerActive}
         >
           <FaRegWindowMinimize
@@ -232,10 +238,10 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         </button>
       </div>
 
-      {/* Dalītājs */}
-      <div className="w-[360px] h-[1px] bg-white/25 dark:bg-lightBorder absolute right-0"></div>
+      {/* divider */}
+      <div className="w-[360px] h-[1px] bg-white/25 dark:bg-lightBorder absolute right-0 "></div>
 
-      {/* Timer sadaļa */}
+      {/* Timer */}
       <div className="flex justify-center mt-6">
         <div className="w-full">
           <h1 className="text-5xl dark:text-lightText font-bold">
@@ -243,7 +249,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
           </h1>
         </div>
 
-        {/* Pogas sadaļa */}
+        {/* start stop btn*/}
         <div className="flex m-auto gap-4">
           <button
             className="px-8 py-1 bg-transparent border border-white dark:border-lightBorder rounded-lg"
@@ -262,7 +268,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         </div>
       </div>
 
-      {/* Tabs sadaļa */}
+      {/* phases */}
       <div className="flex justify-around mt-6 text-sm">
         <button
           className={
@@ -295,7 +301,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
           <span className="dark:text-lightText">Long break</span>
         </button>
 
-        {/* Settings ikona */}
+        {/* Settings */}
         <div className="flex">
           <button onClick={setOpenSettings}>
             <FiSettings
@@ -306,7 +312,12 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         </div>
       </div>
 
-      {openSettings && <PomoTimerSettings />}
+      {openSettings && (
+        <PomoTimerSettings
+          setIsHideCount={setIsHideCount}
+          ishideCount={ishideCount}
+        />
+      )}
     </div>
   );
 };

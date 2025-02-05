@@ -43,6 +43,11 @@ export interface PomoTimerProps {
   widgetInfo?: WidgetInfo;
 }
 
+export interface PomoTimerSettingsProps {
+  setIsHideCount: () => void;
+  ishideCount: boolean;
+}
+
 export interface TodoProps {
   setIsTodoActive: () => void;
   widgetInfo?: WidgetInfo;

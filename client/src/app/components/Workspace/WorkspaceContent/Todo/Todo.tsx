@@ -6,7 +6,6 @@ import { useDraggable } from "@dnd-kit/core";
 
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
-import { IoResizeOutline } from "react-icons/io5";
 
 const Todo: React.FC<TodoProps> = ({ setIsTodoActive, widgetInfo }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -74,7 +73,7 @@ const Todo: React.FC<TodoProps> = ({ setIsTodoActive, widgetInfo }) => {
           style={{ cursor: isDragging ? "grabbing" : "grab" }}
         ></div>
         <button
-          className="text-gray-400 dark:text-lightText  pb-4"
+          className="text-gray-400 dark:text-lightText  pb-4 pl-2"
           onClick={setIsTodoActive}
         >
           <FaRegWindowMinimize
