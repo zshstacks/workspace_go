@@ -226,7 +226,7 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
       {/* save settings */}
       <div className="flex justify-center mt-5 mb-3">
         <button
-          className="w-[303px] p-1 rounded-md bg-[#e89688]"
+          className="w-[303px] p-1 rounded-md bg-secondary"
           onClick={handleSave}
         >
           Save

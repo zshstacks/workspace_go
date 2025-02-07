@@ -2,7 +2,7 @@
 
 import { MyContext } from "@/app/components/Workspace/Workspace";
 import { AppearanceProps } from "@/app/utility/types/types";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { IoIosCheckmark, IoIosClose } from "react-icons/io";
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
 
@@ -25,8 +25,20 @@ const Appearance: React.FC<AppearanceProps> = ({
 
   const { theme, setTheme } = context;
 
+  const clickAudio = useMemo(() => {
+    return new Howl({
+      src: [`${process.env.NEXT_PUBLIC_CLICK_AUDIO}`],
+      volume: 0.5,
+    });
+  }, []);
+
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    const timeout = setTimeout(() => {
+      setTheme((prev) => (prev === "light" ? "dark" : "light"));
+
+      clickAudio.play();
+    }, 100);
+    return () => clearInterval(timeout);
   };
 
   const handleCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -220,12 +220,12 @@ const Header: React.FC<HeaderProps> = ({
             className="mr-[2px]"
           />
           {openUserMenu ? (
-            <MdOutlineKeyboardArrowDown
+            <MdOutlineKeyboardArrowUp
               color={theme === "dark" ? "#4e4e4e" : "white"}
               size={18}
             />
           ) : (
-            <MdOutlineKeyboardArrowUp
+            <MdOutlineKeyboardArrowDown
               color={theme === "dark" ? "#4e4e4e" : "white"}
               size={18}
             />

@@ -43,9 +43,13 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   const [ishideCount, setIsHideCount] = useToggleState();
 
   const dispatch: AppDispatch = useDispatch();
-  const { settings, currentPhase, isRunning, remainingTime } = useSelector(
-    (state: RootState) => state.pomodoro
-  );
+  const {
+    settings,
+    currentPhase,
+    isRunning,
+    remainingTime,
+    completedPomodoros,
+  } = useSelector((state: RootState) => state.pomodoro);
 
   // Main theme no konteksta
   const context = useContext(MyContext);
@@ -200,7 +204,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   return (
     <div
-      className="bg-main dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-md"
+      className="bg-main dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-sm shadow-white/5 "
       style={{
         transform: `translate3d(${combinedPosition?.xPos}px, ${combinedPosition?.yPos}px, 0)`,
         position: "fixed",
@@ -208,15 +212,28 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     >
       {/* Header */}
       <div className="flex  items-center pb-[11px]">
+        {/* pomodoro count */}
         {!ishideCount && (
           <div className="flex gap-1 ">
-            <div className="w-2 h-2 bg-gray-700 dark:bg-neutral-700 rounded-full"></div>
-            <div className="w-2 h-2 bg-gray-600 dark:bg-neutral-600 rounded-full"></div>
-            <div className="w-2 h-2 bg-gray-500 dark:bg-neutral-500 rounded-full"></div>
-            <div className="w-2 h-2 bg-gray-400 dark:bg-neutral-400 rounded-full"></div>
+            {(() => {
+              const displayCount =
+                currentPhase === "longBreak" ? 4 : completedPomodoros % 4;
+              return Array.from({ length: 4 }, (_, i) => {
+                const indicatorClass =
+                  i < displayCount
+                    ? "bg-secondary "
+                    : "bg-gray-500 dark:bg-neutral-400";
+
+                return (
+                  <div
+                    key={i}
+                    className={`w-2 h-2 rounded-full ${indicatorClass}`}
+                  ></div>
+                );
+              });
+            })()}
           </div>
         )}
-        {/* pomodoro count */}
 
         {/* "Drag handle" element */}
         <div
