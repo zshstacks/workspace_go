@@ -51,7 +51,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     completedPomodoros,
   } = useSelector((state: RootState) => state.pomodoro);
 
-  // Main theme no konteksta
+  // theme context
   const context = useContext(MyContext);
   if (!context) {
     throw new Error(
@@ -234,6 +234,8 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
             })()}
           </div>
         )}
+        
+
 
         {/* "Drag handle" element */}
         <div
