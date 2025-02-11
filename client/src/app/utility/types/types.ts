@@ -51,6 +51,8 @@ export interface PomoTimerSettingsProps {
 export interface TodoProps {
   setIsTodoActive: () => void;
   widgetInfo?: WidgetInfo;
+  dimensions: { width: number; height: number };
+  setDimensions: (dimensions: { width: number; height: number }) => void;
 }
 
 //redux auth slice

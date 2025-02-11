@@ -13,6 +13,7 @@ import { SavedWidgetLayoutInfo, WidgetInfo } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import Todo from "./Todo/Todo";
+import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
@@ -24,6 +25,7 @@ const WorkspaceContent = () => {
   const [isTodoActive, setIsTodoActive] = useToggleState(false);
   const [hideElementsActive, setHideElementsActive] = useState(false);
   const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
+  const [dimensions, setDimensions] = useState({ width: 490, height: 478 });
 
   const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
 
@@ -105,6 +107,7 @@ const WorkspaceContent = () => {
         </span>
       </div>
 
+      {/* appearance settings */}
       {openUISettings && (
         <Appearance
           openUISettings={openUISettings}
@@ -114,6 +117,7 @@ const WorkspaceContent = () => {
         />
       )}
 
+      {/* user settings */}
       {openAccSettings && (
         <UserAccount
           setOpenAccSettings={setOpenAccSettings}
@@ -139,9 +143,10 @@ const WorkspaceContent = () => {
         </DndContext>
       )}
 
+      {/* todo */}
       {isTodoActive && (
         <DndContext
-          modifiers={[restrictToBoundingBox(openSettings)]}
+          modifiers={[restrictToTodoBoundingBox(dimensions)]}
           onDragEnd={(event) => {
             const { delta } = event;
             handleTodoDragEnd(delta);
@@ -150,6 +155,8 @@ const WorkspaceContent = () => {
           <Todo
             setIsTodoActive={setIsTodoActive}
             widgetInfo={widgetLayout.TodoWidget}
+            setDimensions={setDimensions}
+            dimensions={dimensions}
           />
         </DndContext>
       )}

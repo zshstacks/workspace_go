@@ -10,9 +10,13 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import TodoContent from "./TodoContent/TodoContent";
 import { IoIosAdd } from "react-icons/io";
 
-const Todo: React.FC<TodoProps> = ({ setIsTodoActive, widgetInfo }) => {
+const Todo: React.FC<TodoProps> = ({
+  setIsTodoActive,
+  widgetInfo,
+  setDimensions,
+  dimensions,
+}) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [dimensions, setDimensions] = useState({ width: 490, height: 478 });
 
   const context = useContext(MyContext);
 
@@ -53,10 +57,13 @@ const Todo: React.FC<TodoProps> = ({ setIsTodoActive, widgetInfo }) => {
     yPos: staticPosition.yPos + dynamicPosition.y,
   };
 
+  //=====================
+  // resize logic
+  //=====================
   const minWidth = 300;
   const minHeight = 300;
-  const maxWidth = 950;
-  const maxHeight = 650;
+  const maxWidth = 1150;
+  const maxHeight = 750;
 
   const handleMouseDown = (event: React.MouseEvent) => {
     event.preventDefault();
