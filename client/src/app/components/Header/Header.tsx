@@ -42,10 +42,15 @@ const Header: React.FC<HeaderProps> = ({
   hideAfterSeconds,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+
   const [openUserMenu, setOpenUserMenu] = useToggleState(false);
+
   const [isVisible, setIsVisible] = useState(false);
+
   const [animation, setAnimation] = useState("animate__slideInDown");
+
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
+  const [volume, setVolume] = useState(0.2);
 
   const context = useContext(MyContext);
 
@@ -97,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     rainSoundRef.current = new Howl({
       src: [`${process.env.NEXT_PUBLIC_RAIN_AUDIO}`],
-      volume: 0.1,
+      volume: volume,
       loop: true,
     });
 
@@ -105,6 +110,13 @@ const Header: React.FC<HeaderProps> = ({
       rainSoundRef.current?.unload();
     };
   }, []);
+
+  //change sound volume
+  useEffect(() => {
+    if (rainSoundRef.current) {
+      rainSoundRef.current.volume(volume);
+    }
+  }, [volume]);
 
   useEffect(() => {
     document.addEventListener("mousemove", resetTimer);
@@ -120,7 +132,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`w-full p-2 flex justify-between items-center fixed  h-[50px] animate__animated ${animation} `}
+      className={`w-full p-2 flex justify-between items-center fixed  h-[50px] animate__animated  ${animation} `}
     >
       {/* Left Section */}
       <div className="bg-main dark:bg-lightMain rounded-md w-12 h-[32px] flex justify-center items-center ">
@@ -170,22 +182,39 @@ const Header: React.FC<HeaderProps> = ({
 
       {/* Right Section */}
       <div className="flex items-center bg-main dark:bg-lightMain rounded-md text-white p-1 ">
-        <div
-          className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
-          onClick={handleRainSound}
-        >
-          {isSoundEnabled ? (
-            <AiOutlineSound
-              size={19}
-              color={theme === "dark" ? "#4e4e4e" : "white"}
+        <div className="relative inline-block group">
+          <div
+            className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer   "
+            onClick={handleRainSound}
+          >
+            {isSoundEnabled ? (
+              <AiOutlineSound
+                size={19}
+                color={theme === "dark" ? "#4e4e4e" : "white"}
+              />
+            ) : (
+              <AiOutlineMuted
+                size={19}
+                color={theme === "dark" ? "#4e4e4e" : "white"}
+              />
+            )}
+          </div>
+          <div className="absolute right-1 bg-main rounded-md p-2 invisible group-hover:visible w-[122px]  ">
+            <label htmlFor="" className="block ">
+              Volume: {volume}
+            </label>{" "}
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={volume}
+              onChange={(e) => setVolume(parseFloat(e.target.value))}
+              className="w-full h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300"
             />
-          ) : (
-            <AiOutlineMuted
-              size={19}
-              color={theme === "dark" ? "#4e4e4e" : "white"}
-            />
-          )}
+          </div>
         </div>
+
         {/* divider */}
         <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder mx-2"></div>
         {/* enter/exit fullscreen */}
@@ -211,7 +240,7 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* user dropdown menu */}
         <div
-          className="flex items-center  p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer transition-all"
+          className="flex items-center  p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer transition-all "
           onClick={setOpenUserMenu}
         >
           <LuUserRound

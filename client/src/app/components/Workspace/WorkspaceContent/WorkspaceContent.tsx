@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 
 import Header from "../../Header/Header";
 import PomoTimer from "./PomoTimer/PomoTimer";
 import Appearance from "../../Header/UserMenu/Appearance/Appearance";
 import UserAccount from "../../Header/UserMenu/UserAccount/UserAccount";
+import Todo from "./Todo/Todo";
 
 import { DndContext } from "@dnd-kit/core";
 import { SavedWidgetLayoutInfo, WidgetInfo } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
-import Todo from "./Todo/Todo";
 import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
@@ -69,11 +68,11 @@ const WorkspaceContent = () => {
   };
 
   //reset pos (dev)
-  const resetPos = () => {
-    const defaultPos = { xPos: 0, yPos: 0 };
-    updateWidgetLayout("TimerWidget", defaultPos);
-    updateWidgetLayout("TodoWidget", defaultPos);
-  };
+  // const resetPos = () => {
+  //   const defaultPos = { xPos: 0, yPos: 0 };
+  //   updateWidgetLayout("TimerWidget", defaultPos);
+  //   updateWidgetLayout("TodoWidget", defaultPos);
+  // };
 
   return (
     <>
@@ -92,20 +91,14 @@ const WorkspaceContent = () => {
       </div>
 
       {/* dev */}
-      <div
+      {/* <div
         className="w-[15px] h-[10px]  absolute top-1/2 cursor-pointer z-[9999] "
         onClick={resetPos}
       >
         <span color="red" className=" border-2 bg-red-300 ">
           resetPos
         </span>
-      </div>
-
-      <div className="w-[15px] h-[10px]  absolute top-[55%] cursor-pointer z-[9999]">
-        <span className="border-2 bg-red-300">
-          <Link href="/signin">Auth</Link>
-        </span>
-      </div>
+      </div> */}
 
       {/* appearance settings */}
       {openUISettings && (

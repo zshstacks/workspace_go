@@ -1,19 +1,17 @@
 import React from "react";
+import { BsThreeDots } from "react-icons/bs";
 
 const TodoContent = () => {
   return (
-    <div className="flex flex-col absolute gap-2 p-4 w-full">
+    <div className="flex flex-col absolute gap-2 p-3 w-full">
       {[...Array(5)].map((_, i) => (
         <div
           key={i}
           className="border border-neutral-600 rounded-lg hover:border-sky-300/40  transition duration-200"
         >
           <div className="flex flex-col p-2 gap-2">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center ">
               <span className="text-neutral-300 text-sm">Task Name</span>
-              <button className="text-neutral-400 hover:text-sky-300 transition duration-150">
-                + add tag
-              </button>
             </div>
 
             <div className="relative w-full">
@@ -26,10 +24,9 @@ const TodoContent = () => {
               ></textarea>
             </div>
 
-            <div className="flex justify-between items-center">
-              <span className="text-neutral-400 text-xs">Additional Info</span>
+            <div className="flex justify-end items-center">
               <button className="text-neutral-400 hover:text-sky-300 transition duration-150">
-                Options
+                <BsThreeDots size={18} />
               </button>
             </div>
           </div>
