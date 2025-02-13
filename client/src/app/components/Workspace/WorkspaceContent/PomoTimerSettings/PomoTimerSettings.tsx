@@ -13,6 +13,10 @@ import { PomoTimerSettingsProps } from "@/app/utility/types/types";
 const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
   setIsHideCount,
   ishideCount,
+  setVolume,
+  volume,
+  setTimerSound,
+  timerSound,
 }) => {
   const dispatch: AppDispatch = useDispatch();
   const settings = useSelector((state: RootState) => state.pomodoro.settings);
@@ -183,25 +187,23 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
             <select
               name=""
               id=""
+              onChange={(e) => {
+                const newSound = e.target.value;
+                setTimerSound(newSound);
+              }}
               className="w-[207px] bg-[#3d3e42] dark:bg-[#d3d1d1] dark:text-lightText py-1 px-2 text-sm cursor-pointer focus:outline-none "
             >
-              <option value="twinkle" className="dark:text-lightText">
+              <option
+                value={process.env.NEXT_PUBLIC_ALARM_AUDIO}
+                className="dark:text-lightText"
+              >
+                Alarm digital
+              </option>
+              <option
+                value={process.env.NEXT_PUBLIC_TWINKLE_AUDIO}
+                className="dark:text-lightText"
+              >
                 Twinkle
-              </option>
-              <option value="playtime" className="dark:text-lightText">
-                Playtime
-              </option>
-              <option value="sci-fi" className="dark:text-lightText">
-                Sci Fi
-              </option>
-              <option value="slow-rise" className="dark:text-lightText">
-                Slow Rise
-              </option>
-              <option value="rooster" className="dark:text-lightText">
-                Rooster
-              </option>
-              <option value="bird" className="dark:text-lightText">
-                Bird
               </option>
             </select>
           </div>
@@ -219,6 +221,14 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
           <input
             id="volume"
             type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={volume}
+            onChange={(e) => {
+              const newVolume = parseFloat(e.target.value);
+              setVolume(newVolume);
+            }}
             className="w-full h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300"
           />
         </div>

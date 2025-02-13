@@ -85,6 +85,7 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  //focus timer
   const resetTimer = useCallback(() => {
     setAnimation("animate__slideInDown");
     setIsVisible(true);
@@ -97,6 +98,16 @@ const Header: React.FC<HeaderProps> = ({
       }, hideAfterSeconds * 1000);
     }
   }, [hideElementsActive, hideAfterSeconds]);
+
+  useEffect(() => {
+    document.addEventListener("mousemove", resetTimer);
+    document.addEventListener("keydown", resetTimer);
+
+    return () => {
+      document.removeEventListener("mousemove", resetTimer);
+      document.removeEventListener("keydown", resetTimer);
+    };
+  }, [resetTimer]);
 
   //rain sound only once
   useEffect(() => {
@@ -117,16 +128,6 @@ const Header: React.FC<HeaderProps> = ({
       rainSoundRef.current.volume(volume);
     }
   }, [volume]);
-
-  useEffect(() => {
-    document.addEventListener("mousemove", resetTimer);
-    document.addEventListener("keydown", resetTimer);
-
-    return () => {
-      document.removeEventListener("mousemove", resetTimer);
-      document.removeEventListener("keydown", resetTimer);
-    };
-  }, [resetTimer]);
 
   if (!isVisible) return null;
 
@@ -199,7 +200,7 @@ const Header: React.FC<HeaderProps> = ({
               />
             )}
           </div>
-          <div className="absolute right-1 bg-main rounded-md p-2 invisible group-hover:visible w-[122px]  ">
+          <div className="absolute -right-2 bg-main rounded-md p-2 invisible group-hover:visible w-[122px]  ">
             <label htmlFor="" className="block ">
               Volume: {volume}
             </label>{" "}

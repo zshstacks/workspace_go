@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { MyContext } from "../../Workspace";
@@ -42,6 +43,11 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [ishideCount, setIsHideCount] = useToggleState();
 
+  const [timerSound, setTimerSound] = useState<string>(
+    process.env.NEXT_PUBLIC_ALARM_AUDIO!
+  );
+  const [volume, setVolume] = useState(0.2);
+
   const dispatch: AppDispatch = useDispatch();
   const {
     settings,
@@ -50,6 +56,8 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     remainingTime,
     completedPomodoros,
   } = useSelector((state: RootState) => state.pomodoro);
+
+  const alarmAudioRef = useRef<Howl | null>(null);
 
   // theme context
   const context = useContext(MyContext);
@@ -87,16 +95,32 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     startAudio.play();
   }, [startAudio]);
 
-  const alarmAudio = useMemo(() => {
-    return new Howl({
-      src: [`${process.env.NEXT_PUBLIC_ALARM_AUDIO}`],
-      volume: 0.2,
+  //alarm sounds
+  useEffect(() => {
+    if (alarmAudioRef.current) {
+      alarmAudioRef.current.unload();
+    }
+
+    alarmAudioRef.current = new Howl({
+      src: [timerSound],
+      volume: volume,
     });
-  }, []);
+
+    return () => {
+      alarmAudioRef.current?.unload();
+    };
+  }, [timerSound]);
+
+  //change volume
+  useEffect(() => {
+    if (alarmAudioRef.current) {
+      alarmAudioRef.current.volume(volume);
+    }
+  }, [volume]);
 
   const startAlarmAudio = useCallback(() => {
-    alarmAudio.play();
-  }, [alarmAudio]);
+    alarmAudioRef.current?.play();
+  }, [alarmAudioRef]);
 
   // Start/Stop timer
   const handleStart = useCallback(() => {
@@ -204,7 +228,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   return (
     <div
-      className="bg-main dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-sm shadow-white/5 "
+      className="bg-main z-50 dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-sm shadow-white/5 "
       style={{
         transform: `translate3d(${combinedPosition?.xPos}px, ${combinedPosition?.yPos}px, 0)`,
         position: "fixed",
@@ -234,8 +258,6 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
             })()}
           </div>
         )}
-        
-
 
         {/* "Drag handle" element */}
         <div
@@ -335,6 +357,10 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         <PomoTimerSettings
           setIsHideCount={setIsHideCount}
           ishideCount={ishideCount}
+          timerSound={timerSound}
+          setTimerSound={setTimerSound}
+          volume={volume}
+          setVolume={setVolume}
         />
       )}
     </div>
