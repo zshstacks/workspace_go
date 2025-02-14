@@ -253,7 +253,7 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	//Ensure Pomodoro settings exist for the user
+	//Ensure Workspace settings exist for the user
 	var settings models.PomodoroModel
 	if err := initializers.DB.First(&settings, "user_id = ?", user.ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

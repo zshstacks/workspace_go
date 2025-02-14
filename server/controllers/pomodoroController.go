@@ -58,7 +58,7 @@ func GetPomodoroSettings(c *gin.Context) {
 
 	var settings models.PomodoroModel
 	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Workspace setting not found"})
 		return
 	}
 
@@ -79,17 +79,18 @@ func FetchPomodoroStatus(c *gin.Context) {
 
 	var settings models.PomodoroModel
 	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Workspace setting not found"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 
-		"remainingTime":      settings.RemainingTime,
-		"isRunning":          settings.IsRunning,
-		"currentPhase":       settings.CurrentPhase,
-		"completedPomodoros": settings.CompletedPomodoros,
-		"autoTransition":     settings.AutoTransition,
+		"remainingTime":           settings.RemainingTime,
+		"isRunning":               settings.IsRunning,
+		"currentPhase":            settings.CurrentPhase,
+		"completedPomodoros":      settings.CompletedPomodoros,
+		"totalCompletedPomodoros": settings.TotalCompletedPomodoros,
+		"autoTransition":          settings.AutoTransition,
 	})
 }
 
@@ -108,7 +109,7 @@ func StartPomodoro(c *gin.Context) {
 
 	var settings models.PomodoroModel
 	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Workspace setting not found"})
 		return
 	}
 
@@ -147,7 +148,7 @@ func StopPomodoro(c *gin.Context) {
 
 	var settings models.PomodoroModel
 	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Workspace setting not found"})
 		return
 	}
 
@@ -182,7 +183,7 @@ func ChangePhase(c *gin.Context) {
 
 	var settings models.PomodoroModel
 	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Pomodoro settings not found"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Workspace settings not found"})
 		return
 	}
 
@@ -225,7 +226,7 @@ func UpdateAutoTransition(c *gin.Context) {
 	var settings models.PomodoroModel
 	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro settings not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "Workspace settings not found"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant fetch pomodoro settings"})
 		}

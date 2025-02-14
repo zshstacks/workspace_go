@@ -60,6 +60,7 @@ func StartPomodoroTimer(userID uint) {
 				// Switch to the next phase
 				switch settings.CurrentPhase {
 				case "pomodoro":
+					settings.TotalCompletedPomodoros++
 					settings.CompletedPomodoros++
 					if settings.CompletedPomodoros%4 == 0 {
 						settings.CurrentPhase = "longBreak"
