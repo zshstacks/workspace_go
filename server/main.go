@@ -4,9 +4,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
-	"server/controllers"
 	"server/initializers"
-	"server/middleware"
+	"server/routes"
 	"time"
 )
 
@@ -35,28 +34,9 @@ func main() {
 		MaxAge:           24 * time.Hour,
 	}))
 
-	r.POST("/signup", controllers.SignUp)
-	r.POST("/login", controllers.SignIn)
-	r.POST("/confirm-email", controllers.ConfirmEmail)
-	r.POST("/resend-confirmation-code", controllers.ResendConfirmationCode)
-	r.PUT("/update-username", middleware.RequireAuth, controllers.ChangeUsername)
-
-	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
-	r.GET("/logout", middleware.RequireAuth, controllers.Logout)
-
-	r.DELETE("/delete-user", middleware.RequireAuth, controllers.DeleteUser)
-
-	//pomodoro routes
-
-	r.GET("/pomodoro-settings", middleware.RequireAuth, controllers.GetPomodoroSettings)
-	r.GET("/pomodoro-timer-status", middleware.RequireAuth, controllers.FetchPomodoroStatus)
-
-	r.POST("/pomodoro-update-settings", middleware.RequireAuth, controllers.UpdatePomodoroSettings)
-	r.POST("/pomodoro-start", middleware.RequireAuth, controllers.StartPomodoro)
-	r.POST("/pomodoro-stop", middleware.RequireAuth, controllers.StopPomodoro)
-	r.POST("/pomodoro-phase", middleware.RequireAuth, controllers.ChangePhase)
-	r.POST("/pomodoro-auto-mode", middleware.RequireAuth, controllers.UpdateAutoTransition)
-	r.POST("/pomodoro-reset", middleware.RequireAuth, controllers.ResetCompletedPomodoros)
+	//routes
+	routes.UserRoutes(r)
+	routes.PomodoroRoutes(r)
 
 	log.Fatal(r.Run())
 
