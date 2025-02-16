@@ -110,3 +110,17 @@ export const updateAutoTransition = createAsyncThunk(
     }
   }
 );
+
+export const resetCompletedPomodoros = createAsyncThunk(
+  "pomodoro/resetCompletedPomodoros",
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.post("/pomodoro-reset");
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Failed to reset completed pomodoros"
+      );
+    }
+  }
+);

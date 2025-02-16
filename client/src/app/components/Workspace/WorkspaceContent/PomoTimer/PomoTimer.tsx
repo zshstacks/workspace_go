@@ -24,6 +24,7 @@ import {
   changePhase,
   fetchTimerStatus,
   getPomodoroSettings,
+  resetCompletedPomodoros,
   startPomodoro,
   stopPomodoro,
 } from "@/app/redux/slices/pomodoroSlice/asyncActions";
@@ -134,6 +135,11 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     await dispatch(stopPomodoro());
     dispatch(fetchTimerStatus());
     playAudio();
+  };
+
+  const handleReset = async () => {
+    await dispatch(resetCompletedPomodoros());
+    dispatch(fetchTimerStatus());
   };
 
   // format time
@@ -290,8 +296,9 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
           </h1>
         </div>
 
-        {/* start stop btn*/}
+        {/* actions */}
         <div className="flex m-auto gap-4">
+          {/* start stop btn*/}
           <button
             className="px-8 py-1 bg-transparent border border-white dark:border-lightBorder rounded-lg"
             onClick={isRunning ? handleStop : handleStart}
@@ -300,7 +307,8 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
               {isRunning ? "Stop" : "Start"}
             </span>
           </button>
-          <button className="">
+          {/* refresh btn */}
+          <button className="" onClick={handleReset}>
             <FiRefreshCw
               color={theme === "dark" ? "#4e4e4e" : "white"}
               size={20}

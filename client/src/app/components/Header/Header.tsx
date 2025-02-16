@@ -200,10 +200,7 @@ const Header: React.FC<HeaderProps> = ({
               />
             )}
           </div>
-          <div className="absolute -right-2 bg-main rounded-md p-2 invisible group-hover:visible w-[122px]  ">
-            <label htmlFor="" className="block ">
-              Volume: {volume}
-            </label>{" "}
+          <div className="absolute -right-2 bg-main rounded-md p-4 invisible group-hover:visible w-[122px]  ">
             <input
               type="range"
               min="0"
@@ -211,7 +208,7 @@ const Header: React.FC<HeaderProps> = ({
               step="0.1"
               value={volume}
               onChange={(e) => setVolume(parseFloat(e.target.value))}
-              className="w-full h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300"
+              className="w-full flex h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300"
             />
           </div>
         </div>

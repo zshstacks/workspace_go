@@ -3,6 +3,7 @@ import {
   changePhase,
   fetchTimerStatus,
   getPomodoroSettings,
+  resetCompletedPomodoros,
   startPomodoro,
   stopPomodoro,
   updateAutoTransition,
@@ -77,6 +78,10 @@ const pomodoroSlice = createSlice({
       .addCase(updateAutoTransition.fulfilled, (state, action) => {
         state.isLoading = false;
         state.settings.autoTransitionEnabled = action.payload.autoTransition;
+      })
+
+      .addCase(resetCompletedPomodoros.fulfilled, (state) => {
+        state.isLoading = false;
       })
 
       .addMatcher(
