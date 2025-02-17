@@ -41,6 +41,8 @@ export interface PomoTimerProps {
   setOpenSettings: () => void;
   setIsTimerActive: () => void;
   widgetInfo?: WidgetInfo;
+  activeWidget: string;
+  setActiveWidget: (value: "pomodoro" | "todo") => void;
 }
 
 export interface PomoTimerSettingsProps {
@@ -57,6 +59,8 @@ export interface TodoProps {
   widgetInfo?: WidgetInfo;
   dimensions: { width: number; height: number };
   setDimensions: (dimensions: { width: number; height: number }) => void;
+  activeWidget: string;
+  setActiveWidget: (value: "pomodoro" | "todo") => void;
 }
 
 //redux auth slice

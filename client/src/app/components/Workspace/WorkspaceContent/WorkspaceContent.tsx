@@ -22,9 +22,13 @@ const WorkspaceContent = () => {
   const [openSettings, setOpenSettings] = useToggleState(false);
   const [isTimerActive, setIsTimerActive] = useToggleState(true);
   const [isTodoActive, setIsTodoActive] = useToggleState(false);
+
   const [hideElementsActive, setHideElementsActive] = useState(false);
   const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
   const [dimensions, setDimensions] = useState({ width: 490, height: 478 });
+  const [activeWidget, setActiveWidget] = useState<"todo" | "pomodoro">(
+    "pomodoro"
+  );
 
   const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
 
@@ -132,6 +136,8 @@ const WorkspaceContent = () => {
             openSettings={openSettings}
             setIsTimerActive={setIsTimerActive}
             widgetInfo={widgetLayout.TimerWidget}
+            activeWidget={activeWidget}
+            setActiveWidget={setActiveWidget}
           />
         </DndContext>
       )}
@@ -150,6 +156,8 @@ const WorkspaceContent = () => {
             widgetInfo={widgetLayout.TodoWidget}
             setDimensions={setDimensions}
             dimensions={dimensions}
+            activeWidget={activeWidget}
+            setActiveWidget={setActiveWidget}
           />
         </DndContext>
       )}

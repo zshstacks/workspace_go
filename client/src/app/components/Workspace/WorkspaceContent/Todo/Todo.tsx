@@ -15,6 +15,8 @@ const Todo: React.FC<TodoProps> = ({
   widgetInfo,
   setDimensions,
   dimensions,
+  activeWidget,
+  setActiveWidget,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -97,12 +99,14 @@ const Todo: React.FC<TodoProps> = ({
 
   return (
     <div
+      onMouseDown={() => setActiveWidget("todo")}
       className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-sm shadow-white/5 flex-1 flex flex-col "
       style={{
         transform: `translate3d(${combinedPosition.xPos}px, ${combinedPosition.yPos}px, 0)`,
         position: "fixed",
         width: dimensions.width,
         height: dimensions.height,
+        zIndex: activeWidget === "todo" ? 100 : 50,
       }}
     >
       {/* header section */}

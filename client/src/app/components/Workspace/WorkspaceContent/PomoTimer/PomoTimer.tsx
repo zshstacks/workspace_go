@@ -40,6 +40,8 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   setOpenSettings,
   openSettings,
   setIsTimerActive,
+  activeWidget,
+  setActiveWidget,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [ishideCount, setIsHideCount] = useToggleState();
@@ -234,10 +236,12 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   return (
     <div
-      className="bg-main z-50 dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-sm shadow-white/5 "
+      onMouseDown={() => setActiveWidget("pomodoro")}
+      className="bg-main dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-sm shadow-white/5 "
       style={{
         transform: `translate3d(${combinedPosition?.xPos}px, ${combinedPosition?.yPos}px, 0)`,
         position: "fixed",
+        zIndex: activeWidget === "pomodoro" ? 100 : 50,
       }}
     >
       {/* Header */}
