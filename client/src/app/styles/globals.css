@@ -23,6 +23,4 @@ textarea::-webkit-scrollbar {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgb(115 115 115 / 0.7);
   border-radius: 12px;
-  border: 1px solid #0f181b;
-  transition: background-color 0.2s ease-in-out, border 0.2s ease-in-out;
 }

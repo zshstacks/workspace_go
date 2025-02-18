@@ -237,7 +237,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   return (
     <div
       onMouseDown={() => setActiveWidget("pomodoro")}
-      className="bg-main dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-sm shadow-white/5 "
+      className="bg-main dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-md shadow-white/5 "
       style={{
         transform: `translate3d(${combinedPosition?.xPos}px, ${combinedPosition?.yPos}px, 0)`,
         position: "fixed",

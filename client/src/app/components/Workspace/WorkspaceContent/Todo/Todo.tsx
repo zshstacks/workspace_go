@@ -1,5 +1,5 @@
 import { TodoProps } from "@/app/utility/types/types";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { MyContext } from "../../Workspace";
 import { useDraggable } from "@dnd-kit/core";
@@ -9,6 +9,7 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import TodoContent from "./TodoContent/TodoContent";
 import { IoIosAdd } from "react-icons/io";
+import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 
 const Todo: React.FC<TodoProps> = ({
   setIsTodoActive,
@@ -18,6 +19,11 @@ const Todo: React.FC<TodoProps> = ({
   activeWidget,
   setActiveWidget,
 }) => {
+  const [openActionMenu, setOpenActionMenu, toggleOpenActionMenu] =
+    useToggleStateOutside(false);
+  const [openFilterMenu, setOpenFilterMenu, toggleOpenFilterMenu] =
+    useToggleStateOutside(false);
+
   const [isDragging, setIsDragging] = useState(false);
 
   const context = useContext(MyContext);
@@ -29,6 +35,28 @@ const Todo: React.FC<TodoProps> = ({
   }
 
   const { theme } = context;
+
+  //actions menu
+  const menuContainerRef = useRef<HTMLDivElement>(null);
+  //close actions menu if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        menuContainerRef.current &&
+        !menuContainerRef.current.contains(e.target as Node)
+      ) {
+        setOpenActionMenu(false);
+      }
+    };
+
+    if (openActionMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openActionMenu, setOpenActionMenu]);
 
   //=====================
   // DnD logic
@@ -100,7 +128,7 @@ const Todo: React.FC<TodoProps> = ({
   return (
     <div
       onMouseDown={() => setActiveWidget("todo")}
-      className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-sm shadow-white/5 flex-1 flex flex-col "
+      className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-md shadow-white/5 flex-1 flex flex-col "
       style={{
         transform: `translate3d(${combinedPosition.xPos}px, ${combinedPosition.yPos}px, 0)`,
         position: "fixed",
@@ -112,7 +140,10 @@ const Todo: React.FC<TodoProps> = ({
       {/* header section */}
       <div className="flex justify-between p-2 ">
         <div className="text-sm font-semibold ">
-          <button className="bg-[#3d3e42] py-[1px] px-3 rounded-md flex gap-[1px] hover:bg-neutral-500/50">
+          <button
+            className="bg-[#3d3e42] py-[1px] px-3 rounded-md flex gap-[1px] hover:bg-neutral-500/50"
+            onClick={toggleOpenFilterMenu}
+          >
             Filter
             <MdOutlineKeyboardArrowDown
               className=" mt-[2px]"
@@ -120,6 +151,39 @@ const Todo: React.FC<TodoProps> = ({
               size={18}
             />
           </button>
+          {openFilterMenu && (
+            <div className="fixed right-0 left-0 min-w-max transform translate-x-6">
+              <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-lg shadow-white/10 rounded-md">
+                <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                  <div className="inline-block align-middle">
+                    <input
+                      type="checkbox"
+                      className="border-0 h-[1px] -m-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px] [clip:rect(0_0_0_0)]"
+                    />
+                    <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700">
+                      <svg
+                        className="visible stroke-white fill-none "
+                        viewBox="4 4 16 18"
+                      >
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                  </div>
+                  <span>Hide Completed</span>
+                </div>
+                <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="border-0 h-[1px] -m-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px] [clip:rect(0_0_0_0)]"
+                    />
+                    <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700"></div>
+                  </div>
+                  <span>Today</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* div for dnd  */}
@@ -171,9 +235,24 @@ const Todo: React.FC<TodoProps> = ({
         {/* completed bar & actions btn */}
         <div className="flex justify-between align-middle p-2 ">
           {/* actions btn */}
-          <button>
-            <BsThreeDotsVertical size={13} />
-          </button>
+          <div ref={menuContainerRef}>
+            <button onClick={toggleOpenActionMenu}>
+              <BsThreeDotsVertical size={13} />
+            </button>
+            {openActionMenu && (
+              <div className="fixed right-0 left-0 min-w-max transform -translate-x-16">
+                <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-xl shadow-white/15 rounded-md">
+                  <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                    Delete all tasks
+                  </div>
+                  <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                    Delete all completed tasks
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* completed bar */}
           <div className="flex flex-row w-full gap-2">
             <div className="rounded-2xl w-full h-[11px] m-auto bg-neutral-500/70"></div>
@@ -182,9 +261,15 @@ const Todo: React.FC<TodoProps> = ({
         </div>
 
         {/* resize  icon */}
-        <div className="flex justify-end cursor-se-resize ">
+        <div className="flex justify-end">
           <div className="" onMouseDown={handleMouseDown}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="white"
+              className=" cursor-se-resize "
+            >
               <path d="M5.333 11.333a.667.667 0 100-1.333.667.667 0 000 1.333zM8 11.333A.667.667 0 108 10a.667.667 0 000 1.333zM8 8.666a.667.667 0 100-1.333.667.667 0 000 1.333zM10.667 6a.667.667 0 100-1.333.667.667 0 000 1.333zM10.667 11.333a.667.667 0 100-1.333.667.667 0 000 1.333zM10.667 8.666a.667.667 0 100-1.333.667.667 0 000 1.333z"></path>
             </svg>
           </div>

@@ -1,5 +1,4 @@
 import React from "react";
-import { BsThreeDots } from "react-icons/bs";
 
 const TodoContent = () => {
   return (
@@ -25,9 +24,7 @@ const TodoContent = () => {
             </div>
 
             <div className="flex justify-end items-center">
-              <button className="text-neutral-400 hover:text-sky-300 transition duration-150">
-                <BsThreeDots size={18} />
-              </button>
+              <span className="text-neutral-300 text-sm">#124</span>
             </div>
           </div>
         </div>
