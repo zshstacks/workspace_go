@@ -23,7 +23,13 @@ const TodoContent = () => {
               ></textarea>
             </div>
 
-            <div className="flex justify-end items-center">
+            <div className="flex justify-between items-center">
+              <div className="gap-2 flex text-sm text-neutral-500 ">
+                <button className="hover:text-neutral-300">delete</button>
+                <button className="hover:text-neutral-300">edit</button>
+                <button className="hover:text-neutral-300">complete</button>
+              </div>
+
               <span className="text-neutral-300 text-sm">#124</span>
             </div>
           </div>

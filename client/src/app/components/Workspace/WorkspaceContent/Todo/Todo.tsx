@@ -1,15 +1,20 @@
 import { TodoProps } from "@/app/utility/types/types";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaRegWindowMinimize } from "react-icons/fa";
+
+import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
+
 import { MyContext } from "../../Workspace";
+import TodoContent from "./TodoContent/TodoContent";
+
 import { useDraggable } from "@dnd-kit/core";
 
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
-
-import { BsThreeDotsVertical } from "react-icons/bs";
-import TodoContent from "./TodoContent/TodoContent";
+import {
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardArrowUp,
+} from "react-icons/md";
+import { FaRegWindowMinimize } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
-import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 const Todo: React.FC<TodoProps> = ({
   setIsTodoActive,
@@ -36,16 +41,26 @@ const Todo: React.FC<TodoProps> = ({
 
   const { theme } = context;
 
-  //actions menu
-  const menuContainerRef = useRef<HTMLDivElement>(null);
-  //close actions menu if clicked outside
+  // menus
+  const actionContainerRef = useRef<HTMLDivElement>(null);
+  const filterContainerRef = useRef<HTMLDivElement>(null);
+  //close  menu if clicked outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      //action menu
       if (
-        menuContainerRef.current &&
-        !menuContainerRef.current.contains(e.target as Node)
+        actionContainerRef.current &&
+        !actionContainerRef.current.contains(e.target as Node)
       ) {
         setOpenActionMenu(false);
+      }
+
+      //filter menu
+      if (
+        filterContainerRef.current &&
+        !filterContainerRef.current.contains(e.target as Node)
+      ) {
+        setOpenFilterMenu(false);
       }
     };
 
@@ -53,10 +68,14 @@ const Todo: React.FC<TodoProps> = ({
       document.addEventListener("mousedown", handleClickOutside);
     }
 
+    if (openFilterMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [openActionMenu, setOpenActionMenu]);
+  }, [openActionMenu, setOpenActionMenu, setOpenFilterMenu, openFilterMenu]);
 
   //=====================
   // DnD logic
@@ -140,50 +159,60 @@ const Todo: React.FC<TodoProps> = ({
       {/* header section */}
       <div className="flex justify-between p-2 ">
         <div className="text-sm font-semibold ">
-          <button
-            className="bg-[#3d3e42] py-[1px] px-3 rounded-md flex gap-[1px] hover:bg-neutral-500/50"
-            onClick={toggleOpenFilterMenu}
-          >
-            Filter
-            <MdOutlineKeyboardArrowDown
-              className=" mt-[2px]"
-              color={theme === "dark" ? "#4e4e4e" : "white"}
-              size={18}
-            />
-          </button>
-          {openFilterMenu && (
-            <div className="fixed right-0 left-0 min-w-max transform translate-x-6">
-              <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-lg shadow-white/10 rounded-md">
-                <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
-                  <div className="inline-block align-middle">
-                    <input
-                      type="checkbox"
-                      className="border-0 h-[1px] -m-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px] [clip:rect(0_0_0_0)]"
-                    />
-                    <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700">
-                      <svg
-                        className="visible stroke-white fill-none "
-                        viewBox="4 4 16 18"
-                      >
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
+          <div ref={filterContainerRef}>
+            <button
+              className="bg-[#3d3e42] py-[1px] px-3 rounded-md flex gap-[1px] hover:bg-neutral-500/50"
+              onClick={toggleOpenFilterMenu}
+            >
+              Filter
+              {openFilterMenu ? (
+                <MdOutlineKeyboardArrowUp
+                  className=" mt-[2px]"
+                  color={theme === "dark" ? "#4e4e4e" : "white"}
+                  size={18}
+                />
+              ) : (
+                <MdOutlineKeyboardArrowDown
+                  className=" mt-[2px]"
+                  color={theme === "dark" ? "#4e4e4e" : "white"}
+                  size={18}
+                />
+              )}
+            </button>
+            {openFilterMenu && (
+              <div className="fixed right-0 left-0 min-w-max transform translate-x-6 z-50">
+                <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-lg shadow-white/10 rounded-md">
+                  <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                    <div className="inline-block align-middle">
+                      <input
+                        type="checkbox"
+                        className="border-0 h-[1px] -m-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px] [clip:rect(0_0_0_0)]"
+                      />
+                      <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700">
+                        <svg
+                          className="visible stroke-white fill-none "
+                          viewBox="4 4 16 18"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
                     </div>
+                    <span>Hide Completed</span>
                   </div>
-                  <span>Hide Completed</span>
-                </div>
-                <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
-                  <div>
-                    <input
-                      type="checkbox"
-                      className="border-0 h-[1px] -m-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px] [clip:rect(0_0_0_0)]"
-                    />
-                    <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700"></div>
+                  <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                    <div>
+                      <input
+                        type="checkbox"
+                        className="border-0 h-[1px] -m-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px] [clip:rect(0_0_0_0)]"
+                      />
+                      <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700"></div>
+                    </div>
+                    <span>Today</span>
                   </div>
-                  <span>Today</span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* div for dnd  */}
@@ -225,7 +254,7 @@ const Todo: React.FC<TodoProps> = ({
         </div>
 
         {/* content */}
-        <div className=" custom-scrollbar overflow-y-auto overflow-x-hidden relative flex flex-1">
+        <div className=" custom-scrollbar overflow-y-auto overflow-x-hidden relative flex flex-1 z-2">
           <TodoContent />
         </div>
       </div>
@@ -235,13 +264,13 @@ const Todo: React.FC<TodoProps> = ({
         {/* completed bar & actions btn */}
         <div className="flex justify-between align-middle p-2 ">
           {/* actions btn */}
-          <div ref={menuContainerRef}>
+          <div ref={actionContainerRef}>
             <button onClick={toggleOpenActionMenu}>
               <BsThreeDotsVertical size={13} />
             </button>
             {openActionMenu && (
               <div className="fixed right-0 left-0 min-w-max transform -translate-x-16">
-                <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-xl shadow-white/15 rounded-md">
+                <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-xl shadow-white/15 rounded-md text-sm">
                   <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
                     Delete all tasks
                   </div>
