@@ -16,11 +16,11 @@ func IsValidUsername(username string) bool {
 
 // validates a pass (at least 10 char, 1 upper case and 1 special char)
 func IsValidPassword(password string) bool {
-	// Pārbauda, vai parole satur vismaz vienu lielo burtu
+	// Check if pass has atleast 1 chapter symbol
 	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(password)
-	// Pārbauda, vai parole satur vismaz vienu speciālu simbolu
+	// Check if pass has atleast 1 special symbol
 	hasSpecial := regexp.MustCompile(`[!@#$%^&*]`).MatchString(password)
-	// Pārbauda, vai parole ir vismaz 10 rakstzīmes gara
+	// Check if pass has atleas 10 characters length
 	isLongEnough := len(password) >= 10
 
 	return hasUpper && hasSpecial && isLongEnough

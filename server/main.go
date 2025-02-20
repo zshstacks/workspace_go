@@ -37,6 +37,7 @@ func main() {
 	//routes
 	routes.UserRoutes(r)
 	routes.PomodoroRoutes(r)
+	routes.TasksRoutes(r)
 
 	log.Fatal(r.Run())
 

@@ -6,7 +6,7 @@ import (
 )
 
 func SyncDatabase() {
-	err := DB.AutoMigrate(&models.User{}, &models.PomodoroModel{})
+	err := DB.AutoMigrate(&models.User{}, &models.PomodoroModel{}, &models.TasksModel{})
 
 	if err != nil {
 		log.Fatalf("Could not migrate database: %v", err)
