@@ -96,3 +96,79 @@ func UpdateTaskDescription(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": task})
 
 }
+
+func CompleteTask(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	localTaskIDStr := c.Param("id")
+	localTaskID, err := strconv.Atoi(localTaskIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wrong task id!"})
+		return
+	}
+
+	var task models.TasksModel
+
+	if err := initializers.DB.Where("local_id = ? AND user_id = ?", localTaskID, currentUser.ID).First(&task).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cant find a task!"})
+		return
+	}
+
+	var input struct {
+		Completed bool `json:"completed" `
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	task.Completed = input.Completed
+
+	if err := initializers.DB.Save(&task).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant complete task!"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": task})
+}
+
+func DeleteTask(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	localTaskIDStr := c.Param("id")
+	localTaskID, err := strconv.Atoi(localTaskIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wrong task id!"})
+		return
+	}
+
+	var task models.TasksModel
+
+	if err := initializers.DB.Where("local_id = ? AND user_id = ?", localTaskID, currentUser.ID).First(&task).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cant find a task!"})
+		return
+	}
+
+	//delete finded task ( .Unscoped() to completely delete task from db)
+	if err := initializers.DB.Delete(&task).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant delete task!"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Task successfully deleted!"})
+}
+
+func DeleteAllTasks(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	if err := initializers.DB.Where("user_id = ?", currentUser.ID).Delete(&models.TasksModel{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant delete all tasks!"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "All tasks successfully deleted!"})
+}
