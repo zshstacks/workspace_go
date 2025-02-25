@@ -133,3 +133,20 @@ export interface ContextProps {
   theme: "dark" | "light";
   setTheme: React.Dispatch<React.SetStateAction<"dark" | "light">>;
 }
+
+interface Task {
+  LocalID: number;
+  Title: string;
+  Description: string;
+  Completed: boolean;
+}
+
+export interface TaskState {
+  tasks: Task[];
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface TaskErrorPayload {
+  error?: string;
+}
