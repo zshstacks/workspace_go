@@ -1,4 +1,7 @@
-import { getAllTasks } from "@/app/redux/slices/taskSlice/asyncActions";
+import {
+  getAllTasks,
+  updateTaskDescription,
+} from "@/app/redux/slices/taskSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import React, { useEffect } from "react";
 import { IoMdCheckmark } from "react-icons/io";
@@ -32,6 +35,16 @@ const TaskContent = () => {
                 autoComplete="off"
                 placeholder="Write your task here..."
                 defaultValue={task.Description}
+                onBlur={(e) => {
+                  if (e.target.value !== task.Description) {
+                    dispatch(
+                      updateTaskDescription({
+                        id: task.LocalID,
+                        description: e.target.value,
+                      })
+                    );
+                  }
+                }}
               ></textarea>
             </div>
 

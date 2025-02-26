@@ -31,3 +31,22 @@ export const createTask = createAsyncThunk(
     }
   }
 );
+
+export const updateTaskDescription = createAsyncThunk(
+  "tasks/updateTaskDescription",
+  async (
+    { id, description }: { id: number; description: string },
+    thunkAPI
+  ) => {
+    try {
+      const res = await api.put(`/task/update-description/${id}`, {
+        description,
+      });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Cannot update a task description"
+      );
+    }
+  }
+);
