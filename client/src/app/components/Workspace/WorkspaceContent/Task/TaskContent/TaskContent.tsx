@@ -1,9 +1,11 @@
 import { getAllTasks } from "@/app/redux/slices/taskSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import React, { useEffect } from "react";
+import { IoMdCheckmark } from "react-icons/io";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 
-const TodoContent = () => {
+const TaskContent = () => {
   const dispatch: AppDispatch = useDispatch();
   const { tasks } = useSelector((state: RootState) => state.tasks);
 
@@ -35,9 +37,12 @@ const TodoContent = () => {
 
             <div className="flex justify-between items-center">
               <div className="gap-2 flex text-sm text-neutral-500 ">
-                <button className="hover:text-neutral-300">delete</button>
-                <button className="hover:text-neutral-300">edit</button>
-                <button className="hover:text-neutral-300">complete</button>
+                <button className="hover:text-neutral-300">
+                  <IoMdCheckmark />
+                </button>
+                <button className="hover:text-neutral-300">
+                  <RiDeleteBin6Line />
+                </button>
               </div>
 
               <span className="text-neutral-300 text-sm">#{task.LocalID}</span>
@@ -49,4 +54,4 @@ const TodoContent = () => {
   );
 };
 
-export default TodoContent;
+export default TaskContent;

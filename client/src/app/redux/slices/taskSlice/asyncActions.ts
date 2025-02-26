@@ -14,3 +14,20 @@ export const getAllTasks = createAsyncThunk(
     }
   }
 );
+
+export const createTask = createAsyncThunk(
+  "tasks/createTask",
+  async (
+    { title, description }: { title: string; description: string },
+    thunkAPI
+  ) => {
+    try {
+      const res = await api.post("/tasks-create", { title, description });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Can`t create a task"
+      );
+    }
+  }
+);

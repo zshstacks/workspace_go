@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 
 import { MyContext } from "../../Workspace";
-import TodoContent from "./TodoContent/TodoContent";
+import TaskContent from "@/app/components/Workspace/WorkspaceContent/Task/TaskContent/TaskContent";
 
 import { useDraggable } from "@dnd-kit/core";
 
@@ -15,8 +15,9 @@ import {
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import AddTask from "./AddTask/AddTask";
 
-const Todo: React.FC<TodoProps> = ({
+const Task: React.FC<TodoProps> = ({
   setIsTodoActive,
   widgetInfo,
   setDimensions,
@@ -30,12 +31,21 @@ const Todo: React.FC<TodoProps> = ({
     useToggleStateOutside(false);
 
   const [isDragging, setIsDragging] = useState(false);
+  const [showAddTask, setShowAddTask] = useState(false);
+
+  const handleAddTaskClick = () => {
+    setShowAddTask(true);
+  };
+
+  const handleCloseAddTask = () => {
+    setShowAddTask(false);
+  };
 
   const context = useContext(MyContext);
 
   if (!context) {
     throw new Error(
-      "The Todo component should be used within MyContext.Provider."
+      "The Task component should be used within MyContext.Provider."
     );
   }
 
@@ -242,7 +252,10 @@ const Todo: React.FC<TodoProps> = ({
       <div className="flex-1 flex flex-col">
         {/* add todo btn */}
         <div className="text-sm font-semibold px-4 py-2">
-          <button className=" gap-1 hover:bg-neutral-500/50 rounded-md w-full p-1">
+          <button
+            className=" gap-1 hover:bg-neutral-500/50 rounded-md w-full p-1"
+            onClick={handleAddTaskClick}
+          >
             <span className="flex items-center ml-3">
               <IoIosAdd
                 size={19}
@@ -255,9 +268,11 @@ const Todo: React.FC<TodoProps> = ({
 
         {/* content */}
         <div className=" custom-scrollbar overflow-y-auto overflow-x-hidden relative flex flex-1 z-2">
-          <TodoContent />
+          <TaskContent />
         </div>
       </div>
+
+      {showAddTask && <AddTask onClose={handleCloseAddTask} />}
 
       {/* footer */}
       <div>
@@ -308,4 +323,4 @@ const Todo: React.FC<TodoProps> = ({
   );
 };
 
-export default Todo;
+export default Task;

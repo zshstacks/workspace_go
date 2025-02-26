@@ -6,7 +6,7 @@ import Header from "../../Header/Header";
 import PomoTimer from "./PomoTimer/PomoTimer";
 import Appearance from "../../Header/UserMenu/Appearance/Appearance";
 import UserAccount from "../../Header/UserMenu/UserAccount/UserAccount";
-import Todo from "./Todo/Todo";
+import Task from "@/app/components/Workspace/WorkspaceContent/Task/Task";
 
 import { DndContext } from "@dnd-kit/core";
 import { SavedWidgetLayoutInfo, WidgetInfo } from "@/app/utility/types/types";
@@ -151,7 +151,7 @@ const WorkspaceContent = () => {
             handleTodoDragEnd(delta);
           }}
         >
-          <Todo
+          <Task
             setIsTodoActive={setIsTodoActive}
             widgetInfo={widgetLayout.TodoWidget}
             setDimensions={setDimensions}
