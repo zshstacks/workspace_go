@@ -50,3 +50,17 @@ export const updateTaskDescription = createAsyncThunk(
     }
   }
 );
+
+export const deleteTask = createAsyncThunk(
+  "tasks/deleteTask",
+  async (id: number, thunkAPI) => {
+    try {
+      const res = await api.delete(`/task/delete/${id}`);
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Cannot delete a task"
+      );
+    }
+  }
+);

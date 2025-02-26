@@ -1,6 +1,11 @@
 import { TaskErrorPayload, TaskState } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createTask, getAllTasks, updateTaskDescription } from "./asyncActions";
+import {
+  createTask,
+  deleteTask,
+  getAllTasks,
+  updateTaskDescription,
+} from "./asyncActions";
 
 const initialState: TaskState = {
   tasks: [],
@@ -35,6 +40,13 @@ const taskSlice = createSlice({
         if (index !== -1) {
           state.tasks[index] = updatedTask;
         }
+      })
+      //delete task
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.tasks = state.tasks.filter(
+          (task) => task.LocalID !== action.meta.arg
+        );
       })
 
       .addMatcher(

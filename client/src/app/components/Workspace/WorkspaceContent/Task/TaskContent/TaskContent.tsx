@@ -1,19 +1,27 @@
 import {
+  deleteTask,
   getAllTasks,
   updateTaskDescription,
 } from "@/app/redux/slices/taskSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+
 import React, { useEffect } from "react";
+
 import { IoMdCheckmark } from "react-icons/io";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { useDispatch, useSelector } from "react-redux";
 
 const TaskContent = () => {
   const dispatch: AppDispatch = useDispatch();
   const { tasks } = useSelector((state: RootState) => state.tasks);
 
+  //delete task
+  const handleDeleteTask = (taskId: number) => {
+    dispatch(deleteTask(taskId));
+  };
+
   useEffect(() => {
-    dispatch(getAllTasks());
+    dispatch(getAllTasks()); //fetch tasks
   }, [dispatch]);
 
   return (
@@ -53,7 +61,10 @@ const TaskContent = () => {
                 <button className="hover:text-neutral-300">
                   <IoMdCheckmark />
                 </button>
-                <button className="hover:text-neutral-300">
+                <button
+                  className="hover:text-neutral-300"
+                  onClick={() => handleDeleteTask(task.LocalID)}
+                >
                   <RiDeleteBin6Line />
                 </button>
               </div>
