@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   completeTask,
   createTask,
+  deleteAllTasks,
   deleteTask,
   getAllTasks,
   updateTaskDescription,
@@ -20,16 +21,19 @@ const taskSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+
       //fetch tasks
       .addCase(getAllTasks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.tasks = action.payload.data;
       })
+
       //create task
       .addCase(createTask.fulfilled, (state, action) => {
         state.isLoading = false;
         state.tasks.push(action.payload.data);
       })
+
       //update task description
       .addCase(updateTaskDescription.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -43,6 +47,7 @@ const taskSlice = createSlice({
         }
       })
 
+      //complete task
       .addCase(completeTask.fulfilled, (state, action) => {
         state.isLoading = false;
         const updatedTask = action.payload.data;
@@ -61,6 +66,12 @@ const taskSlice = createSlice({
         state.tasks = state.tasks.filter(
           (task) => task.LocalID !== action.meta.arg //take from array
         );
+      })
+
+      //delete all tasks
+      .addCase(deleteAllTasks.fulfilled, (state) => {
+        state.isLoading = false;
+        state.tasks = [];
       })
 
       .addMatcher(

@@ -78,3 +78,17 @@ export const deleteTask = createAsyncThunk(
     }
   }
 );
+
+export const deleteAllTasks = createAsyncThunk(
+  "tasks/deleteAllTasks",
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.delete("/task/delete-all");
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Cannot delete all tasks"
+      );
+    }
+  }
+);

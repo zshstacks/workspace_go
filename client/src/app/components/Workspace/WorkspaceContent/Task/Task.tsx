@@ -16,6 +16,9 @@ import { FaRegWindowMinimize } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import AddTask from "./AddTask/AddTask";
+import { AppDispatch } from "@/app/redux/store";
+import { useDispatch } from "react-redux";
+import { deleteAllTasks } from "@/app/redux/slices/taskSlice/asyncActions";
 
 const Task: React.FC<TodoProps> = ({
   setIsTodoActive,
@@ -32,6 +35,12 @@ const Task: React.FC<TodoProps> = ({
 
   const [isDragging, setIsDragging] = useState(false);
   const [showAddTask, setShowAddTask] = useState(false);
+
+  const dispatch: AppDispatch = useDispatch();
+
+  const handleDeleteAllTasks = () => {
+    dispatch(deleteAllTasks());
+  };
 
   const handleAddTaskClick = () => {
     setShowAddTask(true);
@@ -286,7 +295,10 @@ const Task: React.FC<TodoProps> = ({
             {openActionMenu && (
               <div className="fixed right-0 left-0 min-w-max transform -translate-x-16">
                 <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-xl shadow-white/15 rounded-md text-sm">
-                  <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                  <div
+                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50"
+                    onClick={handleDeleteAllTasks}
+                  >
                     Delete all tasks
                   </div>
                   <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
