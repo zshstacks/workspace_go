@@ -1,4 +1,5 @@
 import {
+  completeTask,
   deleteTask,
   getAllTasks,
   updateTaskDescription,
@@ -15,6 +16,10 @@ const TaskContent = () => {
   const dispatch: AppDispatch = useDispatch();
   const { tasks } = useSelector((state: RootState) => state.tasks);
 
+  const handleCompleteTask = (taskId: number, isCompleted: boolean) => {
+    dispatch(completeTask({ id: taskId, completed: !isCompleted }));
+  };
+
   //delete task
   const handleDeleteTask = (taskId: number) => {
     dispatch(deleteTask(taskId));
@@ -29,16 +34,26 @@ const TaskContent = () => {
       {tasks.map((task) => (
         <div
           key={task.LocalID}
-          className="border border-neutral-600 rounded-lg hover:border-sky-300/40  transition duration-200"
+          className={`border border-neutral-600 rounded-lg hover:border-sky-300/40  transition duration-200 ${
+            task.Completed ? "border-neutral-700 hover:border-sky-500/30" : ""
+          }`}
         >
           <div className="flex flex-col p-2 gap-2">
             <div className="flex items-center ">
-              <span className="text-neutral-300 text-sm">{task.Title}</span>
+              <span
+                className={`text-neutral-300 text-sm ${
+                  task.Completed ? "line-through text-neutral-500" : ""
+                }`}
+              >
+                {task.Title}
+              </span>
             </div>
 
             <div className="relative w-full">
               <textarea
-                className="w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none  hover:bg-neutral-700/50 rounded-md p-2 min-h-[98px] max-h-[400px] overflow-y-auto"
+                className={`w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none  hover:bg-neutral-700/50 rounded-md p-2 min-h-[98px] max-h-[400px] overflow-y-auto ${
+                  task.Completed ? "line-through text-neutral-500" : ""
+                }`}
                 rows={1}
                 autoComplete="off"
                 placeholder="Write your task here..."
@@ -58,7 +73,12 @@ const TaskContent = () => {
 
             <div className="flex justify-between items-center">
               <div className="gap-2 flex text-sm text-neutral-500 ">
-                <button className="hover:text-neutral-300">
+                <button
+                  className="hover:text-neutral-300"
+                  onClick={() =>
+                    handleCompleteTask(task.LocalID, task.Completed)
+                  }
+                >
                   <IoMdCheckmark />
                 </button>
                 <button
@@ -69,7 +89,13 @@ const TaskContent = () => {
                 </button>
               </div>
 
-              <span className="text-neutral-300 text-sm">#{task.LocalID}</span>
+              <span
+                className={`text-neutral-300 text-sm ${
+                  task.Completed ? "line-through text-neutral-500" : ""
+                }`}
+              >
+                #{task.LocalID}
+              </span>
             </div>
           </div>
         </div>

@@ -51,6 +51,20 @@ export const updateTaskDescription = createAsyncThunk(
   }
 );
 
+export const completeTask = createAsyncThunk(
+  "tasks/completeTask",
+  async ({ id, completed }: { id: number; completed: boolean }, thunkAPI) => {
+    try {
+      const res = await api.put(`/task/complete/${id}`, { completed });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Cannot complete a task"
+      );
+    }
+  }
+);
+
 export const deleteTask = createAsyncThunk(
   "tasks/deleteTask",
   async (id: number, thunkAPI) => {
