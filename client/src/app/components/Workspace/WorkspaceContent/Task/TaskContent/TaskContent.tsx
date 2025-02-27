@@ -3,6 +3,7 @@ import {
   deleteTask,
   getAllTasks,
   updateTaskDescription,
+  updateTaskTitle,
 } from "@/app/redux/slices/taskSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,18 +50,30 @@ const TaskContent = () => {
 
           <div className="flex flex-col p-2 gap-2">
             <div className="flex items-center ">
-              <span
-                className={`text-neutral-300 text-sm ${
+              <textarea
+                className={`w-[75%] bg-transparent text-neutral-300 text-sm placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50  rounded-md p-2  overflow-y-auto  ${
                   task.Completed ? "line-through text-neutral-500" : ""
                 }`}
-              >
-                {task.Title}
-              </span>
+                rows={1}
+                autoComplete="off"
+                placeholder="Write your task title here..."
+                defaultValue={task.Title}
+                onBlur={(e) => {
+                  if (e.target.value !== task.Title) {
+                    dispatch(
+                      updateTaskTitle({
+                        id: task.LocalID,
+                        title: e.target.value,
+                      })
+                    );
+                  }
+                }}
+              ></textarea>
             </div>
 
             <div className="relative w-full">
               <textarea
-                className={`w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none  hover:bg-neutral-700/50 rounded-md p-2 min-h-[98px] max-h-[400px] overflow-y-auto ${
+                className={`w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none  hover:bg-neutral-700/50 rounded-md p-2 min-h-[98px] overflow-y-auto ${
                   task.Completed ? "line-through text-neutral-500" : ""
                 }`}
                 rows={1}

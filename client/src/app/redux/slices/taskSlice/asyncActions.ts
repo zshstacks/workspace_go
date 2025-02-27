@@ -32,6 +32,20 @@ export const createTask = createAsyncThunk(
   }
 );
 
+export const updateTaskTitle = createAsyncThunk(
+  "tasks/updateTaskTitle",
+  async ({ id, title }: { id: number; title: string }, thunkAPI) => {
+    try {
+      const res = await api.put(`/task/update-title/${id}`, { title });
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Cannot update task title"
+      );
+    }
+  }
+);
+
 export const updateTaskDescription = createAsyncThunk(
   "tasks/updateTaskDescription",
   async (
