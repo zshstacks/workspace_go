@@ -58,6 +58,43 @@ func CreateTask(c *gin.Context) {
 
 }
 
+func UpdateTaskTitle(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	localTaskIDStr := c.Param("id")
+	localTaskID, err := strconv.Atoi(localTaskIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wrong task id!"})
+		return
+	}
+
+	var task models.TasksModel
+
+	if err := initializers.DB.Where("local_id = ? AND user_id = ?", localTaskID, currentUser.ID).First(&task).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cant find a task!"})
+		return
+	}
+
+	var input struct {
+		Title string `json:"title" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	task.Title = input.Title
+
+	if err := initializers.DB.Save(&task).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant update task title!"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": task})
+}
+
 func UpdateTaskDescription(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
