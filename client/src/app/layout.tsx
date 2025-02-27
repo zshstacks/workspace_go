@@ -11,7 +11,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className="relative">
         <Provider store={store}>
           {children}
           <ToastContainer />
