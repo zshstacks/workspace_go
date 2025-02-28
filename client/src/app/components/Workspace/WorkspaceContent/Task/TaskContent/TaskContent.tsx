@@ -18,6 +18,8 @@ const TaskContent = () => {
   const dispatch: AppDispatch = useDispatch();
   const { tasks } = useSelector((state: RootState) => state.tasks);
 
+  const CHARACTER_LIMIT = 800;
+
   //complete task
   const handleCompleteTask = (taskId: number, isCompleted: boolean) => {
     dispatch(completeTask({ id: taskId, completed: !isCompleted }));
@@ -27,6 +29,37 @@ const TaskContent = () => {
   const handleDeleteTask = (taskId: number) => {
     dispatch(deleteTask(taskId));
   };
+
+  // auto adapt textarea height
+  const autoResizeTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const textarea = e.target;
+    const textLength = textarea.value.length;
+
+    if (textLength <= CHARACTER_LIMIT) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+      textarea.style.overflowY = "hidden";
+    } else {
+      textarea.style.overflowY = "auto";
+    }
+  };
+
+  // Initialize the textarea height after rendering the components
+  useEffect(() => {
+    document.querySelectorAll(".auto-resize-textarea").forEach((textarea) => {
+      if (textarea instanceof HTMLTextAreaElement) {
+        const textLength = textarea.value.length;
+
+        if (textLength <= CHARACTER_LIMIT) {
+          textarea.style.height = "auto";
+          textarea.style.height = `${textarea.scrollHeight}px`;
+          textarea.style.overflowY = "hidden";
+        } else {
+          textarea.style.overflowY = "auto";
+        }
+      }
+    });
+  }, [tasks]);
 
   useEffect(() => {
     dispatch(getAllTasks()); //fetch tasks
@@ -51,13 +84,14 @@ const TaskContent = () => {
           <div className="flex flex-col relative p-2 gap-2">
             <div className="flex items-center ">
               <textarea
-                className={`w-[75%] bg-transparent text-neutral-300 text-sm placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50  rounded-md p-2  overflow-y-auto  ${
+                className={`w-[75%] bg-transparent text-neutral-300 text-sm placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50 rounded-md p-2 ${
                   task.Completed ? "line-through text-neutral-500" : ""
                 }`}
                 rows={1}
                 autoComplete="off"
                 placeholder="Write your task title here..."
                 defaultValue={task.Title}
+                onChange={autoResizeTextarea}
                 onBlur={(e) => {
                   if (e.target.value !== task.Title) {
                     dispatch(
@@ -71,16 +105,17 @@ const TaskContent = () => {
               ></textarea>
             </div>
 
-            <div className=" relative w-full">
-              <div className="flex flex-row justify-start align-baseline min-w-fit w-full ">
+            <div className="relative w-full">
+              <div className="flex flex-row justify-start align-baseline min-w-fit w-full">
                 <textarea
-                  className={`w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none  hover:bg-neutral-700/50 rounded-md p-2 min-h-[98px] max-h-[400px] overflow-y-auto ${
+                  className={`auto-resize-textarea w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50 rounded-md p-2  ${
                     task.Completed ? "line-through text-neutral-500" : ""
                   }`}
                   rows={1}
                   autoComplete="off"
                   placeholder="Write your task here..."
                   defaultValue={task.Description}
+                  onChange={autoResizeTextarea}
                   onBlur={(e) => {
                     if (e.target.value !== task.Description) {
                       dispatch(
@@ -90,6 +125,9 @@ const TaskContent = () => {
                         })
                       );
                     }
+                  }}
+                  style={{
+                    height: "39px",
                   }}
                 ></textarea>
               </div>
