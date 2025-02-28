@@ -209,3 +209,22 @@ func DeleteAllTasks(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "All tasks successfully deleted!"})
 }
+
+func DeleteAllCompletedTasks(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	result := initializers.DB.Where("user_id = ? AND completed = ?", currentUser.ID, true).Delete(&models.TasksModel{})
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant delete all completed tasks!"})
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "No completed tasks to delete"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "All completed tasks successfully deleted!", "count": result.RowsAffected})
+}

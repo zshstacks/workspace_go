@@ -14,4 +14,5 @@ func TasksRoutes(router *gin.Engine) {
 	router.PUT("/task/complete/:id", middleware.RequireAuth, controllers.CompleteTask)
 	router.DELETE("/task/delete/:id", middleware.RequireAuth, controllers.DeleteTask)
 	router.DELETE("/task/delete-all", middleware.RequireAuth, controllers.DeleteAllTasks)
+	router.DELETE("/task/delete-completed", middleware.RequireAuth, controllers.DeleteAllCompletedTasks)
 }
