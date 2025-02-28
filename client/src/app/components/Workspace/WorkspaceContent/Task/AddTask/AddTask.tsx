@@ -23,31 +23,34 @@ const AddTask: React.FC<AddTaskProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-x-0 inset-y-12 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-main dark:bg-lightMain p-4 rounded-md shadow-md">
-        <h2 className="text-lg font-bold mb-2">Create task</h2>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="  p-4 rounded-md  w-full max-w-md">
+        <h2 className="text-lg font-semibold text-neutral-100 mb-3">
+          Create task
+        </h2>
         <input
           type="text"
           placeholder="Title"
-          className="w-full p-2 mb-2 rounded-md border border-neutral-600 bg-transparent text-white"
+          className="w-full p-2 mb-2 rounded-md  bg-main text-neutral-300 placeholder-neutral-500 focus:outline-none hover:bg-neutral-700 transition-colors"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <textarea
           placeholder="Description"
-          className="w-full p-2 mb-2 rounded-md border border-neutral-600 bg-transparent text-white resize-none"
+          className="w-full p-2 mb-4 rounded-md  bg-main text-neutral-300 placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700 transition-colors"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          rows={3}
         />
         <div className="flex justify-end gap-2">
           <button
-            className="px-3 py-1 rounded-md bg-red-500 hover:bg-red-600"
+            className="px-3 py-1 rounded-md border border-neutral-600 bg-neutral-600 text-neutral-300 hover:bg-neutral-700/50 transition-colors"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className="px-3 py-1 rounded-md bg-green-500 hover:bg-green-600"
+            className="px-3 py-1 rounded-md bg-secondary text-white hover:bg-secondary/70 transition-colors"
             onClick={handleSave}
           >
             Save

@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   completeTask,
   createTask,
+  deleteAllCompletedTasks,
   deleteAllTasks,
   deleteTask,
   getAllTasks,
@@ -87,6 +88,12 @@ const taskSlice = createSlice({
       .addCase(deleteAllTasks.fulfilled, (state) => {
         state.isLoading = false;
         state.tasks = [];
+      })
+
+      //delete all completed tasks
+      .addCase(deleteAllCompletedTasks.fulfilled, (state) => {
+        state.isLoading = false;
+        state.tasks = state.tasks.filter((task) => !task.Completed);
       })
 
       .addMatcher(

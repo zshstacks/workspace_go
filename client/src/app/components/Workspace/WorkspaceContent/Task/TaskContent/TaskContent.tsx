@@ -48,7 +48,7 @@ const TaskContent = () => {
             />
           </div>
 
-          <div className="flex flex-col p-2 gap-2">
+          <div className="flex flex-col relative p-2 gap-2">
             <div className="flex items-center ">
               <textarea
                 className={`w-[75%] bg-transparent text-neutral-300 text-sm placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50  rounded-md p-2  overflow-y-auto  ${
@@ -71,26 +71,28 @@ const TaskContent = () => {
               ></textarea>
             </div>
 
-            <div className="relative w-full">
-              <textarea
-                className={`w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none  hover:bg-neutral-700/50 rounded-md p-2 min-h-[98px] overflow-y-auto ${
-                  task.Completed ? "line-through text-neutral-500" : ""
-                }`}
-                rows={1}
-                autoComplete="off"
-                placeholder="Write your task here..."
-                defaultValue={task.Description}
-                onBlur={(e) => {
-                  if (e.target.value !== task.Description) {
-                    dispatch(
-                      updateTaskDescription({
-                        id: task.LocalID,
-                        description: e.target.value,
-                      })
-                    );
-                  }
-                }}
-              ></textarea>
+            <div className=" relative w-full">
+              <div className="flex flex-row justify-start align-baseline min-w-fit w-full ">
+                <textarea
+                  className={`w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none  hover:bg-neutral-700/50 rounded-md p-2 min-h-[98px] max-h-[400px] overflow-y-auto ${
+                    task.Completed ? "line-through text-neutral-500" : ""
+                  }`}
+                  rows={1}
+                  autoComplete="off"
+                  placeholder="Write your task here..."
+                  defaultValue={task.Description}
+                  onBlur={(e) => {
+                    if (e.target.value !== task.Description) {
+                      dispatch(
+                        updateTaskDescription({
+                          id: task.LocalID,
+                          description: e.target.value,
+                        })
+                      );
+                    }
+                  }}
+                ></textarea>
+              </div>
             </div>
 
             <div className="flex justify-between items-center">

@@ -18,7 +18,10 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import AddTask from "./AddTask/AddTask";
 import { AppDispatch } from "@/app/redux/store";
 import { useDispatch } from "react-redux";
-import { deleteAllTasks } from "@/app/redux/slices/taskSlice/asyncActions";
+import {
+  deleteAllCompletedTasks,
+  deleteAllTasks,
+} from "@/app/redux/slices/taskSlice/asyncActions";
 
 const Task: React.FC<TodoProps> = ({
   setIsTodoActive,
@@ -40,6 +43,10 @@ const Task: React.FC<TodoProps> = ({
 
   const handleDeleteAllTasks = () => {
     dispatch(deleteAllTasks());
+  };
+
+  const handleDeleteAllCompletedTasks = () => {
+    dispatch(deleteAllCompletedTasks());
   };
 
   const handleAddTaskClick = () => {
@@ -301,7 +308,10 @@ const Task: React.FC<TodoProps> = ({
                   >
                     Delete all tasks
                   </div>
-                  <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                  <div
+                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50"
+                    onClick={handleDeleteAllCompletedTasks}
+                  >
                     Delete all completed tasks
                   </div>
                 </div>

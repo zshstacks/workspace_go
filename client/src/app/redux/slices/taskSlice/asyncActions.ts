@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, formatProdErrorMessage } from "@reduxjs/toolkit";
 import api from "../../api";
 
 export const getAllTasks = createAsyncThunk(
@@ -102,6 +102,20 @@ export const deleteAllTasks = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
         error.response?.data || "Cannot delete all tasks"
+      );
+    }
+  }
+);
+
+export const deleteAllCompletedTasks = createAsyncThunk(
+  "tasks/deleteAllCompletedTasks",
+  async (_, thunkAPI) => {
+    try {
+      const res = await api.delete("/task/delete-completed");
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Cannot delete all completed tasks"
       );
     }
   }
