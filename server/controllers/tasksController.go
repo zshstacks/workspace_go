@@ -13,7 +13,7 @@ func GetAllTasks(c *gin.Context) {
 	currentUser := user.(models.User)
 
 	var tasks []models.TasksModel
-	if err := initializers.DB.Where("user_id = ?", currentUser.ID).Find(&tasks).Error; err != nil {
+	if err := initializers.DB.Where("user_id = ?", currentUser.ID).Order("\"order\" asc").Find(&tasks).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No tasks found!"})
 		return
 	}
@@ -41,12 +41,27 @@ func CreateTask(c *gin.Context) {
 	initializers.DB.Where("user_id = ?", currentUser.ID).Order("local_id desc").First(&lastTask)
 	newLocalID := lastTask.LocalID + 1
 
+	//get the highest order value
+	var maxOrder int
+	result := initializers.DB.Model(&models.TasksModel{}).
+		Where("user_id = ?", currentUser.ID).
+		Select("COALESCE(MAX(`order`), 0)").
+		Scan(&maxOrder)
+
+	// Ja rodas kļūda, uzstādām maxOrder uz 0
+	if result.Error != nil {
+		maxOrder = 0
+	}
+
+	newOrder := maxOrder + 1
+
 	task := models.TasksModel{
 		UserID:      currentUser.ID,
 		LocalID:     newLocalID,
 		Title:       input.Title,
 		Description: input.Description,
 		Completed:   false,
+		Order:       newOrder,
 	}
 
 	if err := initializers.DB.Create(&task).Error; err != nil {
@@ -55,7 +70,6 @@ func CreateTask(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": task})
-
 }
 
 func UpdateTaskTitle(c *gin.Context) {
@@ -227,4 +241,34 @@ func DeleteAllCompletedTasks(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "All completed tasks successfully deleted!", "count": result.RowsAffected})
+}
+
+func UpdateTasksOrder(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(models.User)
+
+	var input []struct {
+		LocalID int `json:"localId" binding:"required"`
+		Order   int `json:"order" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	tx := initializers.DB.Begin()
+
+	for _, item := range input {
+		if err := tx.Model(&models.TasksModel{}).
+			Where("local_id = ? AND user_id = ?", item.LocalID, currentUser.ID).
+			Update("order", item.Order).Error; err != nil {
+			tx.Rollback()
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot update tasks order!"})
+			return
+		}
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"message": "Tasks order updated successfully!"})
 }

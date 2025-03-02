@@ -9,4 +9,5 @@ type TasksModel struct {
 	Title       string
 	Description string
 	Completed   bool `gorm:"default:false"`
+	Order       int  `gorm:"default:0"`
 }
