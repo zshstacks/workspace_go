@@ -8,6 +8,7 @@ import {
   deleteTask,
   getAllTasks,
   updateTaskDescription,
+  UpdateTaskOrder,
   updateTaskTitle,
 } from "./asyncActions";
 
@@ -20,7 +21,11 @@ const initialState: TaskState = {
 const taskSlice = createSlice({
   name: "tasks",
   initialState,
-  reducers: {},
+  reducers: {
+    reorderTasks: (state, action) => {
+      state.tasks = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
 
@@ -96,6 +101,11 @@ const taskSlice = createSlice({
         state.tasks = state.tasks.filter((task) => !task.Completed);
       })
 
+      //update task order
+      .addCase(UpdateTaskOrder.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+
       .addMatcher(
         (action) => action.type.endsWith("/pending"),
         (state) => {
@@ -114,4 +124,5 @@ const taskSlice = createSlice({
   },
 });
 
+export const { reorderTasks } = taskSlice.actions;
 export default taskSlice.reducer;

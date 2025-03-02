@@ -1,3 +1,5 @@
+import { AppDispatch } from "@/app/redux/store";
+
 export interface HeaderProps {
   setOpenUISettings: () => void;
   setOpenAccSettings: () => void;
@@ -134,11 +136,12 @@ export interface ContextProps {
   setTheme: React.Dispatch<React.SetStateAction<"dark" | "light">>;
 }
 
-interface Task {
+export interface Task {
   LocalID: number;
   Title: string;
   Description: string;
   Completed: boolean;
+  Order: number;
 }
 
 export interface TaskState {
@@ -149,4 +152,15 @@ export interface TaskState {
 
 export interface TaskErrorPayload {
   error?: string;
+}
+
+// Sortable Task Item Component
+export interface SortableTaskItemProps {
+  task: any;
+  handleCompleteTask: (taskId: number, isCompleted: boolean) => void;
+  handleDeleteTask: (taskId: number) => void;
+  autoResizeTextarea: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  CHARACTER_LIMIT: number;
+  dispatch: AppDispatch;
+  isDragging?: boolean;
 }

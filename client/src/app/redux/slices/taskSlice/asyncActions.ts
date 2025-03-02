@@ -120,3 +120,17 @@ export const deleteAllCompletedTasks = createAsyncThunk(
     }
   }
 );
+
+export const UpdateTaskOrder = createAsyncThunk(
+  "tasks/UpdateTaskOrder",
+  async (orderData: { localId: number; order: number }[], thunkAPI) => {
+    try {
+      const res = await api.put("/tasks/order", orderData);
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Cannot update task order"
+      );
+    }
+  }
+);
