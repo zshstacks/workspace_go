@@ -16,8 +16,8 @@ import { FaRegWindowMinimize } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import AddTask from "./AddTask/AddTask";
-import { AppDispatch } from "@/app/redux/store";
-import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import { useDispatch, useSelector } from "react-redux";
 import {
   deleteAllCompletedTasks,
   deleteAllTasks,
@@ -38,6 +38,8 @@ const Task: React.FC<TodoProps> = ({
 
   const [isDragging, setIsDragging] = useState(false);
   const [showAddTask, setShowAddTask] = useState(false);
+
+  const { tasks } = useSelector((state: RootState) => state.tasks);
 
   const dispatch: AppDispatch = useDispatch();
 
@@ -66,6 +68,12 @@ const Task: React.FC<TodoProps> = ({
   }
 
   const { theme } = context;
+
+  // completed count bar
+  const completedTaskCount = tasks.filter((task) => task.Completed).length;
+  const totalTasksCount = tasks.length;
+  const progressPercentage =
+    totalTasksCount > 0 ? (completedTaskCount / totalTasksCount) * 100 : 0;
 
   // menus
   const actionContainerRef = useRef<HTMLDivElement>(null);
@@ -319,10 +327,17 @@ const Task: React.FC<TodoProps> = ({
             )}
           </div>
 
-          {/* completed bar */}
+          {/* completed count bar */}
           <div className="flex flex-row w-full gap-2">
-            <div className="rounded-2xl w-full h-[11px] m-auto bg-neutral-500/70"></div>
-            <span className="text-sm font-semibold ">0/4</span>
+            <div className="rounded-2xl w-full h-[11px] m-auto bg-neutral-500/70">
+              <div
+                className="h-full  rounded-2xl bg-neutral-400/75 transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
+            </div>
+            <span className="text-sm font-semibold ">
+              {completedTaskCount}/{totalTasksCount}
+            </span>
           </div>
         </div>
 

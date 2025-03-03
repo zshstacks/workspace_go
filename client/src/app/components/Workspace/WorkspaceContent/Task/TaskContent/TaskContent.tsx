@@ -4,10 +4,13 @@ import {
   getAllTasks,
   UpdateTaskOrder,
 } from "@/app/redux/slices/taskSlice/asyncActions";
+import { reorderTasks } from "@/app/redux/slices/taskSlice/taskSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 
 import React, { useEffect, useState } from "react";
+
+import SortableTaskItem from "./SortableTaskItem/SortableTaskItem";
 
 import {
   closestCenter,
@@ -27,8 +30,6 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import SortableTaskItem from "./SortableTaskItem/SortableTaskItem";
-import { reorderTasks } from "@/app/redux/slices/taskSlice/taskSlice";
 
 const TaskContent = () => {
   const dispatch: AppDispatch = useDispatch();
