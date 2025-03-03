@@ -164,7 +164,7 @@ const TaskContent = () => {
           {sortedTasks.map((task) => (
             <div key={task.LocalID} className="mb-2">
               {dropIndicator === task.LocalID && activeId !== task.LocalID && (
-                <div className="h-1 w-full bg-sky-500 rounded-full mb-1"></div>
+                <div className="h-1 w-full bg-sky-500 rounded-full "></div>
               )}
               <SortableTaskItem
                 task={task}

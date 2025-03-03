@@ -148,10 +148,19 @@ export interface TaskState {
   tasks: Task[];
   isLoading: boolean;
   error: string | null;
+
+  createTitleError: string | null;
+  createDescriptionError: string | null;
+  updateTitleError: string | null;
+  updateDescriptionError: string | null;
 }
 
 export interface TaskErrorPayload {
   error?: string;
+  createTitleError?: string | null;
+  createDescriptionError?: string | null;
+  updateTitleError?: string | null;
+  updateDescriptionError?: string | null;
 }
 
 // Sortable Task Item Component

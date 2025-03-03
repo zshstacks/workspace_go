@@ -15,7 +15,20 @@ import {
 const initialState: TaskState = {
   tasks: [],
   isLoading: false,
+
   error: null,
+  updateTitleError: null,
+  updateDescriptionError: null,
+  createTitleError: null,
+  createDescriptionError: null,
+};
+
+const resetStates = (state: TaskState) => {
+  state.error = null;
+  state.updateTitleError = null;
+  state.updateDescriptionError = null;
+  state.createTitleError = null;
+  state.createDescriptionError = null;
 };
 
 const taskSlice = createSlice({
@@ -24,6 +37,12 @@ const taskSlice = createSlice({
   reducers: {
     reorderTasks: (state, action) => {
       state.tasks = action.payload;
+    },
+    clearCreateErrors: (state) => {
+      resetStates(state);
+    },
+    clearUpdateErrors: (state) => {
+      resetStates(state);
     },
   },
   extraReducers: (builder) => {
@@ -110,6 +129,7 @@ const taskSlice = createSlice({
         (action) => action.type.endsWith("/pending"),
         (state) => {
           state.isLoading = true;
+          resetStates(state);
         }
       )
 
@@ -118,11 +138,19 @@ const taskSlice = createSlice({
         (state, action: PayloadAction<TaskErrorPayload>) => {
           state.isLoading = false;
 
+          state.createTitleError = action.payload?.createTitleError || null;
+          state.createDescriptionError =
+            action.payload?.createDescriptionError || null;
+          state.updateTitleError = action.payload?.updateTitleError || null;
+          state.updateDescriptionError =
+            action.payload?.updateDescriptionError || null;
+
           state.error = action.payload?.error || null;
         }
       );
   },
 });
 
-export const { reorderTasks } = taskSlice.actions;
+export const { reorderTasks, clearCreateErrors, clearUpdateErrors } =
+  taskSlice.actions;
 export default taskSlice.reducer;
