@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"server/initializers"
 	"server/models"
+	"server/utils"
 	"strconv"
 )
 
@@ -33,6 +34,16 @@ func CreateTask(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if !utils.IsValidTitle(input.Title) {
+		c.JSON(http.StatusBadRequest, gin.H{"createTitleError": "Title must be between 2 and 95 characters!"})
+		return
+	}
+
+	if !utils.IsValidDescription(input.Description) {
+		c.JSON(http.StatusBadRequest, gin.H{"createDescriptionError": "Description must be  between 2 and 870 characters!"})
 		return
 	}
 
@@ -94,6 +105,11 @@ func UpdateTaskTitle(c *gin.Context) {
 		Title string `json:"title" binding:"required"`
 	}
 
+	if !utils.IsValidTitle(input.Title) {
+		c.JSON(http.StatusBadRequest, gin.H{"updateTitleError": "Title must be between 2 and 95 characters!"})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -134,6 +150,11 @@ func UpdateTaskDescription(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if !utils.IsValidDescription(input.Description) {
+		c.JSON(http.StatusBadRequest, gin.H{"updateDescriptionError": "Description must be  between 2 and 870 characters!"})
 		return
 	}
 

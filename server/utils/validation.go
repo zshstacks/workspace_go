@@ -25,3 +25,21 @@ func IsValidPassword(password string) bool {
 
 	return hasUpper && hasSpecial && isLongEnough
 }
+
+func IsValidTitle(title string) bool {
+	if title == "" {
+		return false
+	}
+	isLongEnough := len(title) >= 2 && len(title) <= 95
+
+	return isLongEnough
+}
+
+func IsValidDescription(description string) bool {
+	if description == "" {
+		return false
+	}
+	isLongEnough := len(description) >= 1 && len(description) <= 870
+
+	return isLongEnough
+}
