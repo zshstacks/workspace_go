@@ -7,14 +7,32 @@ import (
 	"server/models"
 	"server/utils"
 	"strconv"
+	"time"
 )
 
 func GetAllTasks(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
+	//get filter params from req
+	hideCompleted := c.Query("hideCompleted") == "true"
+	showTodayOnly := c.Query("showTodayOnly") == "true"
+
+	query := initializers.DB.Where("user_id = ?", currentUser.ID)
+
+	if hideCompleted {
+		query = query.Where("completed = ?", false)
+	}
+
+	if showTodayOnly {
+		now := time.Now()
+		startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+		endOfDay := startOfDay.Add(24 * time.Hour)
+		query = query.Where("created_at >= ? AND created_at < ?", startOfDay, endOfDay)
+	}
+
 	var tasks []models.TasksModel
-	if err := initializers.DB.Where("user_id = ?", currentUser.ID).Order("\"order\" asc").Find(&tasks).Error; err != nil {
+	if err := query.Order("\"order\" asc").Find(&tasks).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No tasks found!"})
 		return
 	}
