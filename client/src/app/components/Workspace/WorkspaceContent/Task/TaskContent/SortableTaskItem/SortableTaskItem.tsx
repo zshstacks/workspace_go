@@ -52,12 +52,16 @@ const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`border border-neutral-600 rounded-lg transition duration-200 
+      className={`border border-neutral-600 dark:border-neutral-300 rounded-lg transition duration-200 
       ${task.Completed ? "border-neutral-700" : ""}
-      ${isSortableDragging ? "opacity-40" : "hover:border-sky-300/40"}
+      ${
+        isSortableDragging
+          ? "opacity-40"
+          : "hover:border-sky-300/40 dark:hover:border-sky-300/40"
+      }
       ${
         isDragging
-          ? "border-sky-500 shadow-lg shadow-sky-500/25 bg-main/70"
+          ? "border-sky-500 shadow-lg shadow-sky-500/25 bg-main/70 dark:bg-neutral-300/30"
           : ""
       }
     `}
@@ -73,7 +77,7 @@ const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
           ${
             isSortableDragging || isDragging
               ? "text-sky-500 "
-              : "text-gray-500 hover:text-white "
+              : "text-gray-500 dark:text-gray-600 hover:text-white dark:hover:text-gray-400"
           }`}
           size={20}
         />
@@ -82,8 +86,10 @@ const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
       <div className="flex flex-col relative p-2 gap-2">
         <div className="flex items-center ">
           <textarea
-            className={`w-[75%] bg-transparent text-neutral-300 text-sm placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50 rounded-md p-2 ${
-              task.Completed ? "line-through text-neutral-500" : ""
+            className={`w-[75%] bg-transparent text-neutral-300 dark:text-neutral-700 text-sm placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50 dark:hover:bg-neutral-300/50 rounded-md p-2 ${
+              task.Completed
+                ? "line-through text-neutral-500 dark:text-neutral-400"
+                : ""
             } `}
             rows={1}
             maxLength={85}
@@ -108,8 +114,10 @@ const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
         <div className="relative w-full">
           <div className="flex flex-row justify-start align-baseline min-w-fit w-full">
             <textarea
-              className={`auto-resize-textarea w-full bg-transparent text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50 rounded-md p-2 ${
-                task.Completed ? "line-through text-neutral-500" : ""
+              className={`auto-resize-textarea w-full bg-transparent text-neutral-200 dark:text-neutral-700 placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700/50 dark:hover:bg-neutral-300/50 rounded-md p-2 ${
+                task.Completed
+                  ? "line-through text-neutral-500 dark:text-neutral-400"
+                  : ""
               }`}
               rows={1}
               maxLength={870}
@@ -136,16 +144,20 @@ const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
         </div>
 
         <div className="flex justify-between items-center">
-          <div className="gap-2 flex text-sm text-neutral-500 ">
+          <div
+            className={`gap-2 flex text-sm text-neutral-500 dark:text-neutral-600 ${
+              task.Completed ? "dark:text-neutral-400" : ""
+            }`}
+          >
             <button
-              className="hover:text-neutral-300"
+              className="hover:text-neutral-300 dark:hover:text-neutral-400"
               onClick={() => handleCompleteTask(task.LocalID, task.Completed)}
               disabled={isDragging || isSortableDragging}
             >
               <IoMdCheckmark />
             </button>
             <button
-              className="hover:text-neutral-300"
+              className="hover:text-neutral-300 dark:hover:text-neutral-400"
               onClick={() => handleDeleteTask(task.LocalID)}
               disabled={isDragging || isSortableDragging}
             >
@@ -154,8 +166,10 @@ const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
           </div>
 
           <span
-            className={`text-neutral-300 text-sm ${
-              task.Completed ? "line-through text-neutral-500" : ""
+            className={`text-neutral-300 dark:text-neutral-600 text-sm ${
+              task.Completed
+                ? "line-through text-neutral-500 dark:text-neutral-400"
+                : ""
             }`}
           >
             #{task.LocalID}

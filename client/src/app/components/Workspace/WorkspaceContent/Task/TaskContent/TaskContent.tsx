@@ -1,7 +1,6 @@
 import {
   completeTask,
   deleteTask,
-  getAllTasks,
   UpdateTaskOrder,
 } from "@/app/redux/slices/taskSlice/asyncActions";
 import { reorderTasks } from "@/app/redux/slices/taskSlice/taskSlice";
@@ -139,10 +138,6 @@ const TaskContent = () => {
     });
   }, [tasks]);
 
-  useEffect(() => {
-    dispatch(getAllTasks()); //fetch tasks
-  }, [dispatch]);
-
   const activeTask = activeId
     ? tasks.find((task) => task.LocalID === activeId)
     : null;
@@ -165,7 +160,7 @@ const TaskContent = () => {
           {sortedTasks.map((task) => (
             <div key={task.LocalID} className="mb-2">
               {dropIndicator === task.LocalID && activeId !== task.LocalID && (
-                <div className="h-1 w-full bg-sky-500 rounded-full "></div>
+                <div className="h-1 w-full bg-sky-500 dark:bg-sky-200 rounded-full "></div>
               )}
               <SortableTaskItem
                 task={task}

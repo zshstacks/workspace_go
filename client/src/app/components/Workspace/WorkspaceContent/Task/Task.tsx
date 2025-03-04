@@ -193,7 +193,7 @@ const Task: React.FC<TodoProps> = ({
   return (
     <div
       onMouseDown={() => setActiveWidget("todo")}
-      className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-md shadow-white/5 flex-1 flex flex-col "
+      className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-md shadow-white/5 dark:shadow-black/30 flex-1 flex flex-col "
       style={{
         transform: `translate3d(${combinedPosition.xPos}px, ${combinedPosition.yPos}px, 0)`,
         position: "fixed",
@@ -207,7 +207,7 @@ const Task: React.FC<TodoProps> = ({
         <div className="text-sm font-semibold ">
           <div ref={filterContainerRef}>
             <button
-              className="bg-[#3d3e42] py-[1px] px-3 rounded-md flex gap-[1px] hover:bg-neutral-500/50"
+              className="bg-[#3d3e42] dark:bg-neutral-300 py-[1px] px-3 rounded-md flex gap-[1px] hover:bg-neutral-500/50 dark:hover:bg-neutral-400/60"
               onClick={toggleOpenFilterMenu}
             >
               Filter{" "}
@@ -234,9 +234,9 @@ const Task: React.FC<TodoProps> = ({
             </button>
             {openFilterMenu && (
               <div className="fixed right-0 left-0 min-w-max transform translate-x-6 z-50">
-                <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-lg shadow-white/10 rounded-md">
+                <div className="bg-main dark:bg-lightMain dark:shadow-black/10 min-w-[250px] m-[4px] w-fit shadow-lg shadow-white/10 rounded-md">
                   <div
-                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50"
+                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50 dark:hover:bg-neutral-300/50"
                     onClick={() => setHideCompleted(!hideCompleted)}
                   >
                     <div className="inline-block align-middle">
@@ -249,7 +249,7 @@ const Task: React.FC<TodoProps> = ({
                       <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700">
                         {hideCompleted && (
                           <svg
-                            className="visible stroke-white fill-none "
+                            className="visible stroke-white dark:stroke-black fill-none "
                             viewBox="4 4 16 18"
                           >
                             <polyline points="20 6 9 17 4 12"></polyline>
@@ -260,7 +260,7 @@ const Task: React.FC<TodoProps> = ({
                     <span>Hide Completed</span>
                   </div>
                   <div
-                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50"
+                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50 dark:hover:bg-neutral-300/50"
                     onClick={() => setShowTodayOnly(!showTodayOnly)}
                   >
                     <div className="inline-block align-middle">
@@ -273,7 +273,7 @@ const Task: React.FC<TodoProps> = ({
                       <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700">
                         {showTodayOnly && (
                           <svg
-                            className="visible stroke-white fill-none "
+                            className="visible stroke-white dark:stroke-black fill-none "
                             viewBox="4 4 16 18"
                           >
                             <polyline points="20 6 9 17 4 12"></polyline>
@@ -318,7 +318,7 @@ const Task: React.FC<TodoProps> = ({
         {/* add todo btn */}
         <div className="text-sm font-semibold px-4 py-2">
           <button
-            className=" gap-1 hover:bg-neutral-500/50 rounded-md w-full p-1"
+            className=" gap-1 hover:bg-neutral-500/50 dark:hover:bg-neutral-300/50 rounded-md w-full p-1"
             onClick={handleAddTaskClick}
           >
             <span className="flex items-center ml-3">
@@ -350,15 +350,15 @@ const Task: React.FC<TodoProps> = ({
             </button>
             {openActionMenu && (
               <div className="fixed right-0 left-0 min-w-max transform -translate-x-16">
-                <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-xl shadow-white/15 rounded-md text-sm">
+                <div className="bg-main dark:bg-lightMain min-w-[250px] m-[4px] w-fit shadow-xl shadow-white/10 dark:shadow-black rounded-md text-sm">
                   <div
-                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50"
+                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50 dark:hover:bg-neutral-300/50"
                     onClick={handleDeleteAllTasks}
                   >
                     Delete all tasks
                   </div>
                   <div
-                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50"
+                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50 dark:hover:bg-neutral-300/50"
                     onClick={handleDeleteAllCompletedTasks}
                   >
                     Delete all completed tasks
@@ -370,9 +370,9 @@ const Task: React.FC<TodoProps> = ({
 
           {/* completed count bar */}
           <div className="flex flex-row w-full gap-2">
-            <div className="rounded-2xl w-full h-[11px] m-auto bg-neutral-500/70">
+            <div className="rounded-2xl w-full h-[11px] m-auto bg-neutral-500/70 dark:bg-neutral-400/50">
               <div
-                className="h-full  rounded-2xl bg-neutral-400/75 transition-all duration-300"
+                className="h-full  rounded-2xl bg-neutral-400/75 dark:bg-neutral-500/75 transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
               ></div>
             </div>
@@ -389,8 +389,7 @@ const Task: React.FC<TodoProps> = ({
               width="16"
               height="16"
               viewBox="0 0 16 16"
-              fill="white"
-              className=" cursor-se-resize "
+              className=" cursor-se-resize fill-white dark:fill-black"
             >
               <path d="M5.333 11.333a.667.667 0 100-1.333.667.667 0 000 1.333zM8 11.333A.667.667 0 108 10a.667.667 0 000 1.333zM8 8.666a.667.667 0 100-1.333.667.667 0 000 1.333zM10.667 6a.667.667 0 100-1.333.667.667 0 000 1.333zM10.667 11.333a.667.667 0 100-1.333.667.667 0 000 1.333zM10.667 8.666a.667.667 0 100-1.333.667.667 0 000 1.333z"></path>
             </svg>
