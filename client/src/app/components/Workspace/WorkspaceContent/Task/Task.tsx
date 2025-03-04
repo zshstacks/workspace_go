@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   deleteAllCompletedTasks,
   deleteAllTasks,
+  getAllTasks,
 } from "@/app/redux/slices/taskSlice/asyncActions";
 
 const Task: React.FC<TodoProps> = ({
@@ -38,6 +39,8 @@ const Task: React.FC<TodoProps> = ({
 
   const [isDragging, setIsDragging] = useState(false);
   const [showAddTask, setShowAddTask] = useState(false);
+  const [hideCompleted, setHideCompleted] = useState(false);
+  const [showTodayOnly, setShowTodayOnly] = useState(false);
 
   const { tasks } = useSelector((state: RootState) => state.tasks);
 
@@ -68,6 +71,10 @@ const Task: React.FC<TodoProps> = ({
   }
 
   const { theme } = context;
+
+  const activeFilterCount = [hideCompleted, showTodayOnly].filter(
+    Boolean
+  ).length;
 
   // completed count bar
   const completedTaskCount = tasks.filter((task) => task.Completed).length;
@@ -178,6 +185,11 @@ const Task: React.FC<TodoProps> = ({
     document.addEventListener("mouseup", handleMouseUp);
   };
 
+  //fetch tasks with filters
+  useEffect(() => {
+    dispatch(getAllTasks({ hideCompleted, showTodayOnly }));
+  }, [hideCompleted, showTodayOnly, dispatch]);
+
   return (
     <div
       onMouseDown={() => setActiveWidget("todo")}
@@ -198,7 +210,14 @@ const Task: React.FC<TodoProps> = ({
               className="bg-[#3d3e42] py-[1px] px-3 rounded-md flex gap-[1px] hover:bg-neutral-500/50"
               onClick={toggleOpenFilterMenu}
             >
-              Filter
+              Filter{" "}
+              <span>
+                {activeFilterCount > 0 && (
+                  <span className="ml-1 text-secondary rounded-full flex items-center justify-center text-xs">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </span>
               {openFilterMenu ? (
                 <MdOutlineKeyboardArrowUp
                   className=" mt-[2px]"
@@ -216,31 +235,53 @@ const Task: React.FC<TodoProps> = ({
             {openFilterMenu && (
               <div className="fixed right-0 left-0 min-w-max transform translate-x-6 z-50">
                 <div className="bg-main min-w-[250px] m-[4px] w-fit shadow-lg shadow-white/10 rounded-md">
-                  <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
+                  <div
+                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50"
+                    onClick={() => setHideCompleted(!hideCompleted)}
+                  >
                     <div className="inline-block align-middle">
                       <input
                         type="checkbox"
                         className="border-0 h-[1px] -m-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px] [clip:rect(0_0_0_0)]"
+                        checked={hideCompleted}
+                        readOnly
                       />
                       <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700">
-                        <svg
-                          className="visible stroke-white fill-none "
-                          viewBox="4 4 16 18"
-                        >
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
+                        {hideCompleted && (
+                          <svg
+                            className="visible stroke-white fill-none "
+                            viewBox="4 4 16 18"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        )}
                       </div>
                     </div>
                     <span>Hide Completed</span>
                   </div>
-                  <div className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50">
-                    <div>
+                  <div
+                    className="flex w-full align-middle p-2 cursor-pointer hover:bg-neutral-700/50"
+                    onClick={() => setShowTodayOnly(!showTodayOnly)}
+                  >
+                    <div className="inline-block align-middle">
                       <input
                         type="checkbox"
                         className="border-0 h-[1px] -m-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px] [clip:rect(0_0_0_0)]"
+                        checked={showTodayOnly}
+                        readOnly
                       />
-                      <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700"></div>
+                      <div className="block w-[16px] h-[16px] mr-[8px] cursor-pointer rounded-sm transition-all duration-150 appearance-none border border-neutral-700">
+                        {showTodayOnly && (
+                          <svg
+                            className="visible stroke-white fill-none "
+                            viewBox="4 4 16 18"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        )}
+                      </div>
                     </div>
+
                     <span>Today</span>
                   </div>
                 </div>

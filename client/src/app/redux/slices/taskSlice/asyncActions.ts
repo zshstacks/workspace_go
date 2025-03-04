@@ -1,11 +1,19 @@
-import { createAsyncThunk, formatProdErrorMessage } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
 
 export const getAllTasks = createAsyncThunk(
   "tasks/getAllTasks",
-  async (_, thunkAPI) => {
+  async (
+    {
+      hideCompleted = false,
+      showTodayOnly = false,
+    }: { hideCompleted?: boolean; showTodayOnly?: boolean } = {},
+    thunkAPI
+  ) => {
     try {
-      const res = await api.get("/tasks");
+      const res = await api.get("/tasks", {
+        params: { hideCompleted, showTodayOnly },
+      });
       return res.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
