@@ -38,7 +38,10 @@ const AddTask: React.FC<AddTaskProps> = ({ onClose }) => {
         <label className=" text-lg font-medium text-neutral-100 mb-1 flex items-center gap-1">
           Create task
           <div className="relative group">
-            <BsQuestion className="text-gray-400 cursor-pointer " size={14} />
+            <BsQuestion
+              className="text-gray-400 dark:text-gray-300 cursor-pointer "
+              size={14}
+            />
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 bg-gray-500/20 backdrop-blur-md  text-neutral-200 text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               Title: 2-85 char.; Description: 1-870 char.;
             </div>
@@ -47,15 +50,15 @@ const AddTask: React.FC<AddTaskProps> = ({ onClose }) => {
         <input
           type="text"
           placeholder="Title"
-          className={`w-full p-2 mb-2 rounded-md  bg-main text-neutral-300 placeholder-neutral-500 focus:outline-none hover:bg-neutral-700 transition-colors ${
-            createTitleError ? "border border-red-500" : ""
+          className={`w-full p-2 mb-2 rounded-md  bg-main dark:bg-lightMain dark:text-neutral-600  text-neutral-300 placeholder-neutral-500 focus:outline-none hover:bg-neutral-700 transition-colors ${
+            createTitleError ? "border border-red-500  " : ""
           }`}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <textarea
           placeholder="Description"
-          className={`w-full p-2 mb-4 rounded-md  bg-main text-neutral-300 placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700 transition-colors ${
+          className={`w-full p-2 mb-4 rounded-md  bg-main dark:bg-lightMain dark:text-neutral-600 text-neutral-300 placeholder-neutral-500 resize-none focus:outline-none hover:bg-neutral-700 transition-colors ${
             createDescriptionError ? "border border-red-500 " : ""
           }`}
           value={description}

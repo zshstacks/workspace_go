@@ -5,6 +5,7 @@ export interface HeaderProps {
   setOpenAccSettings: () => void;
   setIsTimerActive: () => void;
   setIsTodoActive: () => void;
+  setOpenUserStats: () => void;
   isTimerActive: boolean;
   isTodoActive: boolean;
   hideElementsActive: boolean;
@@ -172,4 +173,10 @@ export interface SortableTaskItemProps {
   CHARACTER_LIMIT: number;
   dispatch: AppDispatch;
   isDragging?: boolean;
+}
+
+// user stats props
+export interface UserStatsProps {
+  setOpenUserStats: (a: boolean) => void;
+  openUserStats: boolean;
 }

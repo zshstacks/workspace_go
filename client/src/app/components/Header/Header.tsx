@@ -36,6 +36,7 @@ const Header: React.FC<HeaderProps> = ({
   setOpenAccSettings,
   setIsTimerActive,
   setIsTodoActive,
+  setOpenUserStats,
   isTimerActive,
   isTodoActive,
   hideElementsActive,
@@ -137,7 +138,10 @@ const Header: React.FC<HeaderProps> = ({
     >
       {/* Left Section */}
       <div className="bg-main dark:bg-lightMain rounded-md w-12 h-[32px] flex justify-center items-center ">
-        <div className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md py-[2px] px-[4px]  cursor-pointer">
+        <div
+          className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md py-[2px] px-[4px]  cursor-pointer"
+          onClick={setOpenUserStats}
+        >
           <span className="text-white dark:text-lightText text-md mr-1">2</span>
           <BsFire color="darkorange" size={19} />
         </div>

@@ -13,6 +13,7 @@ import { SavedWidgetLayoutInfo, WidgetInfo } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
+import UserStats from "../../Header/UserStats/UserStats";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
@@ -22,6 +23,7 @@ const WorkspaceContent = () => {
   const [openSettings, setOpenSettings] = useToggleState(false);
   const [isTimerActive, setIsTimerActive] = useToggleState(true);
   const [isTodoActive, setIsTodoActive] = useToggleState(false);
+  const [openUserStats, setOpenUserStats] = useToggleState(false);
 
   const [hideElementsActive, setHideElementsActive] = useState(false);
   const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
@@ -87,6 +89,7 @@ const WorkspaceContent = () => {
           setOpenAccSettings={setOpenAccSettings}
           setIsTimerActive={setIsTimerActive}
           setIsTodoActive={setIsTodoActive}
+          setOpenUserStats={setOpenUserStats}
           isTimerActive={isTimerActive}
           isTodoActive={isTodoActive}
           hideElementsActive={hideElementsActive}
@@ -104,6 +107,14 @@ const WorkspaceContent = () => {
         </span>
       </div> */}
 
+      {/* user stats */}
+
+      {openUserStats && (
+        <UserStats
+          setOpenUserStats={setOpenUserStats}
+          openUserStats={openUserStats}
+        />
+      )}
       {/* appearance settings */}
       {openUISettings && (
         <Appearance
