@@ -38,6 +38,7 @@ func main() {
 	routes.UserRoutes(r)
 	routes.PomodoroRoutes(r)
 	routes.TasksRoutes(r)
+	routes.StatsRoutes(r)
 
 	log.Fatal(r.Run())
 
