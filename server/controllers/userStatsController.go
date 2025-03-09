@@ -152,6 +152,121 @@ func UpdateDailyStreak(c *gin.Context) {
 	})
 }
 
+func GetUserTotalHours(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	currentUser, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get user data",
+		})
+		return
+	}
+
+	var stats models.StatsModel
+	result := initializers.DB.Where("user_id = ?", currentUser.ID).First(&stats)
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusOK, gin.H{
+				"totalHours": 0,
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error"})
+		return
+	}
+
+	var currentHours float64 = 0
+	if stats.IsActive {
+		currentHours = time.Now().Sub(stats.LastActive).Hours()
+		if currentHours < 0 {
+			currentHours = 0
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"totalHours": stats.TotalHours + currentHours,
+	})
+}
+
+func UpdateUserTotalHours(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	currentUser, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get user data",
+		})
+		return
+	}
+
+	var stats models.StatsModel
+	result := initializers.DB.Where("user_id = ?", currentUser.ID).First(&stats)
+
+	now := time.Now()
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			stats = models.StatsModel{
+				UserID:         currentUser.ID,
+				CurrentStreak:  1,
+				HighestStreak:  1,
+				LastVisitDate:  now,
+				TotalVisitDays: 1,
+				TotalHours:     0,
+				LastActive:     now,
+				IsActive:       true,
+			}
+			if err := initializers.DB.Create(&stats).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Failed to create stats",
+				})
+				return
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error"})
+			return
+		}
+	} else {
+
+		if stats.IsActive {
+			hoursDiff := now.Sub(stats.LastActive).Hours()
+
+			if hoursDiff > 0 && hoursDiff <= 1 {
+				stats.TotalHours += hoursDiff
+			}
+		}
+
+		stats.LastActive = now
+		stats.IsActive = true
+
+		if err := initializers.DB.Save(&stats).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to update activity status",
+			})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"totalHours": stats.TotalHours,
+		"lastActive": stats.LastActive,
+	})
+}
+
 //test update daily streak
 //func TestLastVisitDate(c *gin.Context) {
 //	user, exists := c.Get("user")
