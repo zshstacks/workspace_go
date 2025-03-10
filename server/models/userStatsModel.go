@@ -13,6 +13,5 @@ type StatsModel struct {
 	LastVisitDate  time.Time
 	TotalVisitDays int
 	TotalHours     float64
-	LastActive     time.Time
-	IsActive       bool
+	LastLoginTime  time.Time
 }

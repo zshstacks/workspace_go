@@ -35,6 +35,7 @@ func GetUserStats(c *gin.Context) {
 				HighestStreak:  1,
 				LastVisitDate:  time.Now(),
 				TotalVisitDays: 1,
+				TotalHours:     0,
 			}
 			if err := initializers.DB.Create(&stats).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create stats"})
@@ -45,11 +46,24 @@ func GetUserStats(c *gin.Context) {
 			return
 		}
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"currentStreak": stats.CurrentStreak,
-		"highestStreak": stats.HighestStreak,
-		"totalVisits":   stats.TotalVisitDays,
-	})
+
+	// if user is currently in a session, add the current session time
+	if !stats.LastLoginTime.IsZero() {
+		currentSessionHours := time.Now().Sub(stats.LastLoginTime).Hours()
+		c.JSON(http.StatusOK, gin.H{
+			"currentStreak": stats.CurrentStreak,
+			"highestStreak": stats.HighestStreak,
+			"totalVisits":   stats.TotalVisitDays,
+			"totalHours":    stats.TotalHours + currentSessionHours,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"currentStreak": stats.CurrentStreak,
+			"highestStreak": stats.HighestStreak,
+			"totalVisits":   stats.TotalVisitDays,
+			"totalHours":    stats.TotalHours,
+		})
+	}
 }
 
 func UpdateDailyStreak(c *gin.Context) {
@@ -152,71 +166,22 @@ func UpdateDailyStreak(c *gin.Context) {
 	})
 }
 
-func GetUserTotalHours(c *gin.Context) {
+// called when user logs in or starts using the app
+func StartSession(c *gin.Context) {
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Unauthorized",
-		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
 	currentUser, ok := user.(models.User)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get user data",
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user data"})
 		return
 	}
 
 	var stats models.StatsModel
 	result := initializers.DB.Where("user_id = ?", currentUser.ID).First(&stats)
-
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusOK, gin.H{
-				"totalHours": 0,
-			})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error"})
-		return
-	}
-
-	var currentHours float64 = 0
-	if stats.IsActive {
-		currentHours = time.Now().Sub(stats.LastActive).Hours()
-		if currentHours < 0 {
-			currentHours = 0
-		}
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"totalHours": stats.TotalHours + currentHours,
-	})
-}
-
-func UpdateUserTotalHours(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Unauthorized",
-		})
-		return
-	}
-
-	currentUser, ok := user.(models.User)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get user data",
-		})
-		return
-	}
-
-	var stats models.StatsModel
-	result := initializers.DB.Where("user_id = ?", currentUser.ID).First(&stats)
-
-	now := time.Now()
 
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
@@ -224,16 +189,13 @@ func UpdateUserTotalHours(c *gin.Context) {
 				UserID:         currentUser.ID,
 				CurrentStreak:  1,
 				HighestStreak:  1,
-				LastVisitDate:  now,
+				LastVisitDate:  time.Now(),
 				TotalVisitDays: 1,
 				TotalHours:     0,
-				LastActive:     now,
-				IsActive:       true,
+				LastLoginTime:  time.Now(), // Set initial login time
 			}
 			if err := initializers.DB.Create(&stats).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"error": "Failed to create stats",
-				})
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create stats"})
 				return
 			}
 		} else {
@@ -241,29 +203,56 @@ func UpdateUserTotalHours(c *gin.Context) {
 			return
 		}
 	} else {
-
-		if stats.IsActive {
-			hoursDiff := now.Sub(stats.LastActive).Hours()
-
-			if hoursDiff > 0 && hoursDiff <= 1 {
-				stats.TotalHours += hoursDiff
-			}
-		}
-
-		stats.LastActive = now
-		stats.IsActive = true
-
+		// Update last login time for existing stats
+		stats.LastLoginTime = time.Now()
 		if err := initializers.DB.Save(&stats).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to update activity status",
-			})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update stats"})
 			return
 		}
 	}
 
+	c.JSON(http.StatusOK, gin.H{"message": "Session started"})
+}
+
+// called when user logs out or closes the app
+func EndSession(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	currentUser, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user data"})
+		return
+	}
+
+	var stats models.StatsModel
+	result := initializers.DB.Where("user_id = ?", currentUser.ID).First(&stats)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stats not found"})
+		return
+	}
+
+	//calculate time spent in this session
+	if !stats.LastLoginTime.IsZero() {
+		timeSpent := time.Now().Sub(stats.LastLoginTime).Hours()
+		stats.TotalHours += timeSpent
+	}
+
+	//reset last login time
+	stats.LastLoginTime = time.Time{}
+
+	if err := initializers.DB.Save(&stats).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update stats"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
+		"message":    "Session ended",
 		"totalHours": stats.TotalHours,
-		"lastActive": stats.LastActive,
 	})
 }
 
