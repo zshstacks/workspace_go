@@ -292,7 +292,6 @@ func SignIn(c *gin.Context) {
 	})
 
 	c.JSON(http.StatusOK, gin.H{"successLogin": "Login successful!"})
-	StartSession(c)
 
 }
 
@@ -319,7 +318,7 @@ func Validate(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	EndSession(c)
+
 	//delete the jwt cookie
 	c.SetCookie("token", "", -1, "/", "", false, true)
 

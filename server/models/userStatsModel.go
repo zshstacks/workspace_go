@@ -12,6 +12,4 @@ type StatsModel struct {
 	HighestStreak  int
 	LastVisitDate  time.Time
 	TotalVisitDays int
-	TotalHours     float64
-	LastLoginTime  time.Time
 }
