@@ -12,9 +12,9 @@ export const restrictToBoundingBox =
 
     const boundingBox = {
       top: 60, // top y cord
-      bottom: window.innerHeight - 129 - settingsHeight, // bott y cord
+      bottom: window.innerHeight - 133 - settingsHeight, // bott y cord
       left: 16, // left x cord
-      right: window.innerWidth - 73, // right x cord
+      right: window.innerWidth - 74, // right x cord
     };
 
     let newX = transform.x;

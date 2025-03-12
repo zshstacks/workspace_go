@@ -180,3 +180,16 @@ export interface UserStatsProps {
   setOpenUserStats: (a: boolean) => void;
   openUserStats: boolean;
 }
+
+export interface StatsState {
+  currentStreak: number;
+  highestStreak: number;
+  isLoading: boolean;
+  lastVisitDate: number;
+
+  error: string | null;
+}
+
+export interface StatsErrorPayload {
+  error?: string;
+}

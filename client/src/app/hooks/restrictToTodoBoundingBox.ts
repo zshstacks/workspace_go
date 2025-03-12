@@ -12,7 +12,7 @@ export const restrictToTodoBoundingBox =
       top: 68,
       bottom: window.innerHeight + 8,
       left: 83,
-      right: window.innerWidth + 83,
+      right: window.innerWidth + 84,
     };
 
     let newX = transform.x;

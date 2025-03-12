@@ -1,6 +1,8 @@
 "use client";
 
 import React, {
+  lazy,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -8,7 +10,6 @@ import React, {
   useState,
 } from "react";
 
-import UserMenu from "./UserMenu/UserMenu";
 import { MyContext } from "@/app/components/Workspace/Workspace";
 import { HeaderProps } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
@@ -30,6 +31,14 @@ import {
 import "animate.css";
 
 import { Howl } from "howler";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllStats,
+  updateDailyStreak,
+} from "@/app/redux/slices/statsSlice/asyncActions";
+
+const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
 
 const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,
@@ -43,15 +52,16 @@ const Header: React.FC<HeaderProps> = ({
   hideAfterSeconds,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [animation, setAnimation] = useState("animate__slideInDown");
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
+  const [volume, setVolume] = useState(0.2);
 
   const [openUserMenu, setOpenUserMenu] = useToggleState(false);
 
-  const [isVisible, setIsVisible] = useState(false);
+  const dispatch: AppDispatch = useDispatch();
 
-  const [animation, setAnimation] = useState("animate__slideInDown");
-
-  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
-  const [volume, setVolume] = useState(0.2);
+  const { currentStreak } = useSelector((state: RootState) => state.stats);
 
   const context = useContext(MyContext);
 
@@ -110,6 +120,15 @@ const Header: React.FC<HeaderProps> = ({
     };
   }, [resetTimer]);
 
+  //stats
+  useEffect(() => {
+    dispatch(updateDailyStreak())
+      .unwrap()
+      .catch(() => {
+        dispatch(getAllStats());
+      });
+  }, [dispatch]);
+
   //rain sound only once
   useEffect(() => {
     rainSoundRef.current = new Howl({
@@ -142,7 +161,9 @@ const Header: React.FC<HeaderProps> = ({
           className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md py-[2px] px-[4px]  cursor-pointer"
           onClick={setOpenUserStats}
         >
-          <span className="text-white dark:text-lightText text-md mr-1">2</span>
+          <span className="text-white dark:text-lightText text-md mr-1">
+            {currentStreak}
+          </span>
           <BsFire color="darkorange" size={19} />
         </div>
       </div>
@@ -264,10 +285,12 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         {openUserMenu && (
-          <UserMenu
-            setOpenUISettings={setOpenUISettings}
-            setOpenAccSettings={setOpenAccSettings}
-          />
+          <Suspense>
+            <UserMenu
+              setOpenUISettings={setOpenUISettings}
+              setOpenAccSettings={setOpenAccSettings}
+            />
+          </Suspense>
         )}
       </div>
     </header>

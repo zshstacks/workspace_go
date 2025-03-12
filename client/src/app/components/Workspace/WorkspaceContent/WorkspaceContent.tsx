@@ -1,21 +1,29 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useCallback, useEffect, useState } from "react";
 
 import Header from "../../Header/Header";
-import PomoTimer from "./PomoTimer/PomoTimer";
-import Appearance from "../../Header/UserMenu/Appearance/Appearance";
-import UserAccount from "../../Header/UserMenu/UserAccount/UserAccount";
-import Task from "@/app/components/Workspace/WorkspaceContent/Task/Task";
 
 import { DndContext } from "@dnd-kit/core";
 import { SavedWidgetLayoutInfo, WidgetInfo } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
-import UserStats from "../../Header/UserStats/UserStats";
+import { AiOutlineLoading } from "react-icons/ai";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
+
+const UserStats = lazy(() => import("../../Header/UserStats/UserStats"));
+const Task = lazy(
+  () => import("@/app/components/Workspace/WorkspaceContent/Task/Task")
+);
+const UserAccount = lazy(
+  () => import("../../Header/UserMenu/UserAccount/UserAccount")
+);
+const Appearance = lazy(
+  () => import("../../Header/UserMenu/Appearance/Appearance")
+);
+const PomoTimer = lazy(() => import("./PomoTimer/PomoTimer"));
 
 const WorkspaceContent = () => {
   const [openUISettings, setOpenUISettings] = useToggleState(false);
@@ -41,44 +49,43 @@ const WorkspaceContent = () => {
     }
   }, []);
 
-  const updateWidgetLayout = (
-    widgetKey: keyof SavedWidgetLayoutInfo,
-    newInfo: WidgetInfo
-  ) => {
-    const updatedLayout: SavedWidgetLayoutInfo = {
-      ...widgetLayout,
-      [widgetKey]: newInfo,
-    };
-    setWidgetLayout(updatedLayout);
-    localStorage.setItem(localStorageKey, JSON.stringify(updatedLayout));
-  };
+  const updateWidgetLayout = useCallback(
+    (widgetKey: keyof SavedWidgetLayoutInfo, newInfo: WidgetInfo) => {
+      const updatedLayout: SavedWidgetLayoutInfo = {
+        ...widgetLayout,
+        [widgetKey]: newInfo,
+      };
+      setWidgetLayout(updatedLayout);
+      localStorage.setItem(localStorageKey, JSON.stringify(updatedLayout));
+    },
+    [widgetLayout]
+  );
 
-  const handleTimerDragEnd = (delta: { x: number; y: number }) => {
-    const currentTimer = widgetLayout.TimerWidget || { xPos: 0, yPos: 0 };
-    const newTimerInfo = {
-      ...currentTimer,
-      xPos: currentTimer.xPos + delta.x,
-      yPos: currentTimer.yPos + delta.y,
-    };
-    updateWidgetLayout("TimerWidget", newTimerInfo);
-  };
+  const handleTimerDragEnd = useCallback(
+    (delta: { x: number; y: number }) => {
+      const currentTimer = widgetLayout.TimerWidget || { xPos: 0, yPos: 0 };
+      const newTimerInfo = {
+        ...currentTimer,
+        xPos: currentTimer.xPos + delta.x,
+        yPos: currentTimer.yPos + delta.y,
+      };
+      updateWidgetLayout("TimerWidget", newTimerInfo);
+    },
+    [widgetLayout.TimerWidget, updateWidgetLayout]
+  );
 
-  const handleTodoDragEnd = (delta: { x: number; y: number }) => {
-    const currentTimer = widgetLayout.TodoWidget || { xPos: 0, yPos: 0 };
-    const newTimerInfo = {
-      ...currentTimer,
-      xPos: currentTimer.xPos + delta.x,
-      yPos: currentTimer.yPos + delta.y,
-    };
-    updateWidgetLayout("TodoWidget", newTimerInfo);
-  };
-
-  //reset pos (dev)
-  // const resetPos = () => {
-  //   const defaultPos = { xPos: 0, yPos: 0 };
-  //   updateWidgetLayout("TimerWidget", defaultPos);
-  //   updateWidgetLayout("TodoWidget", defaultPos);
-  // };
+  const handleTodoDragEnd = useCallback(
+    (delta: { x: number; y: number }) => {
+      const currentTimer = widgetLayout.TodoWidget || { xPos: 0, yPos: 0 };
+      const newTimerInfo = {
+        ...currentTimer,
+        xPos: currentTimer.xPos + delta.x,
+        yPos: currentTimer.yPos + delta.y,
+      };
+      updateWidgetLayout("TodoWidget", newTimerInfo);
+    },
+    [updateWidgetLayout, widgetLayout.TodoWidget]
+  );
 
   return (
     <>
@@ -97,80 +104,110 @@ const WorkspaceContent = () => {
         />
       </div>
 
-      {/* dev */}
-      {/* <div
-        className="w-[15px] h-[10px]  absolute top-1/2 cursor-pointer z-[9999] "
-        onClick={resetPos}
-      >
-        <span color="red" className=" border-2 bg-red-300 ">
-          resetPos
-        </span>
-      </div> */}
-
       {/* user stats */}
 
       {openUserStats && (
-        <UserStats
-          setOpenUserStats={setOpenUserStats}
-          openUserStats={openUserStats}
-        />
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]  ">
+              <AiOutlineLoading
+                size={23}
+                color="white"
+                className="animate-spin "
+              />
+            </div>
+          }
+        >
+          <UserStats
+            setOpenUserStats={setOpenUserStats}
+            openUserStats={openUserStats}
+          />
+        </Suspense>
       )}
       {/* appearance settings */}
       {openUISettings && (
-        <Appearance
-          openUISettings={openUISettings}
-          setOpenUISettings={setOpenUISettings}
-          setHideElementsActive={setHideElementsActive}
-          setHideAfterSeconds={setHideAfterSeconds}
-        />
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]  ">
+              <AiOutlineLoading
+                size={23}
+                color="white"
+                className="animate-spin "
+              />
+            </div>
+          }
+        >
+          <Appearance
+            openUISettings={openUISettings}
+            setOpenUISettings={setOpenUISettings}
+            setHideElementsActive={setHideElementsActive}
+            setHideAfterSeconds={setHideAfterSeconds}
+          />
+        </Suspense>
       )}
 
       {/* user settings */}
       {openAccSettings && (
-        <UserAccount
-          setOpenAccSettings={setOpenAccSettings}
-          openAccSettings={openAccSettings}
-        />
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]  ">
+              <AiOutlineLoading
+                size={23}
+                color="white"
+                className="animate-spin "
+              />
+            </div>
+          }
+        >
+          <UserAccount
+            setOpenAccSettings={setOpenAccSettings}
+            openAccSettings={openAccSettings}
+          />
+        </Suspense>
       )}
 
       {/* timer */}
       {isTimerActive && (
-        <DndContext
-          modifiers={[restrictToBoundingBox(openSettings)]}
-          onDragEnd={(event) => {
-            const { delta } = event;
-            handleTimerDragEnd(delta);
-          }}
-        >
-          <PomoTimer
-            setOpenSettings={setOpenSettings}
-            openSettings={openSettings}
-            setIsTimerActive={setIsTimerActive}
-            widgetInfo={widgetLayout.TimerWidget}
-            activeWidget={activeWidget}
-            setActiveWidget={setActiveWidget}
-          />
-        </DndContext>
+        <Suspense>
+          <DndContext
+            modifiers={[restrictToBoundingBox(openSettings)]}
+            onDragEnd={(event) => {
+              const { delta } = event;
+              handleTimerDragEnd(delta);
+            }}
+          >
+            <PomoTimer
+              setOpenSettings={setOpenSettings}
+              openSettings={openSettings}
+              setIsTimerActive={setIsTimerActive}
+              widgetInfo={widgetLayout.TimerWidget}
+              activeWidget={activeWidget}
+              setActiveWidget={setActiveWidget}
+            />
+          </DndContext>
+        </Suspense>
       )}
 
       {/* todo */}
       {isTodoActive && (
-        <DndContext
-          modifiers={[restrictToTodoBoundingBox(dimensions)]}
-          onDragEnd={(event) => {
-            const { delta } = event;
-            handleTodoDragEnd(delta);
-          }}
-        >
-          <Task
-            setIsTodoActive={setIsTodoActive}
-            widgetInfo={widgetLayout.TodoWidget}
-            setDimensions={setDimensions}
-            dimensions={dimensions}
-            activeWidget={activeWidget}
-            setActiveWidget={setActiveWidget}
-          />
-        </DndContext>
+        <Suspense>
+          <DndContext
+            modifiers={[restrictToTodoBoundingBox(dimensions)]}
+            onDragEnd={(event) => {
+              const { delta } = event;
+              handleTodoDragEnd(delta);
+            }}
+          >
+            <Task
+              setIsTodoActive={setIsTodoActive}
+              widgetInfo={widgetLayout.TodoWidget}
+              setDimensions={setDimensions}
+              dimensions={dimensions}
+              activeWidget={activeWidget}
+              setActiveWidget={setActiveWidget}
+            />
+          </DndContext>
+        </Suspense>
       )}
     </>
   );
