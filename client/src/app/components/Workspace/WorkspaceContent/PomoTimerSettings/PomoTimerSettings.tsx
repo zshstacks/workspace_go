@@ -4,7 +4,7 @@ import {
   updatePomodoroTime,
 } from "@/app/redux/slices/pomodoroSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { MyContext } from "../../Workspace";
@@ -16,7 +16,6 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
   setVolume,
   volume,
   setTimerSound,
-  timerSound,
 }) => {
   const dispatch: AppDispatch = useDispatch();
   const settings = useSelector((state: RootState) => state.pomodoro.settings);
@@ -38,23 +37,25 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
 
   const { theme } = context;
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     dispatch(updatePomodoroTime(localSettings)).then(() => {
       dispatch(getPomodoroSettings());
     });
-  };
+  }, [dispatch, localSettings]);
 
   //transition timer change
-  const handleAutoTransitionChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const newValue = e.target.checked;
-    setLocalSettings({
-      ...localSettings,
-      autoTransition: newValue,
-    });
-    dispatch(updateAutoTransition(newValue));
-  };
+
+  const handleAutoTransitionChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.checked;
+      setLocalSettings((prev) => ({
+        ...prev,
+        autoTransition: newValue,
+      }));
+      dispatch(updateAutoTransition(newValue));
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     setLocalSettings({

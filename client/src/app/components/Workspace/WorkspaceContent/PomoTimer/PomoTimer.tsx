@@ -4,7 +4,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -61,6 +60,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   } = useSelector((state: RootState) => state.pomodoro);
 
   const alarmAudioRef = useRef<Howl | null>(null);
+  const startAudioRef = useRef<Howl | null>(null);
 
   // theme context
   const context = useContext(MyContext);
@@ -87,16 +87,21 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   );
 
   // Audio
-  const startAudio = useMemo(() => {
-    return new Howl({
+  useEffect(() => {
+    startAudioRef.current = new Howl({
       src: [`${process.env.NEXT_PUBLIC_START_PAUSE_AUDIO}`],
       volume: 0.2,
     });
+
+    return () => {
+      startAudioRef.current?.unload();
+    };
   }, []);
 
+  // Memoized play audio function
   const playAudio = useCallback(() => {
-    startAudio.play();
-  }, [startAudio]);
+    startAudioRef.current?.play();
+  }, []);
 
   //alarm sounds
   useEffect(() => {
@@ -112,7 +117,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     return () => {
       alarmAudioRef.current?.unload();
     };
-  }, [timerSound]);
+  }, [timerSound, volume]);
 
   //change volume
   useEffect(() => {
@@ -133,23 +138,23 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     }
   }, [dispatch, currentPhase, isRunning, playAudio]);
 
-  const handleStop = async () => {
+  const handleStop = useCallback(async () => {
     await dispatch(stopPomodoro());
     dispatch(fetchTimerStatus());
     playAudio();
-  };
+  }, [dispatch, playAudio]);
 
-  const handleReset = async () => {
+  const handleReset = useCallback(async () => {
     await dispatch(resetCompletedPomodoros());
     dispatch(fetchTimerStatus());
-  };
+  }, [dispatch]);
 
   // format time
-  const formatTime = (seconds: number) => {
+  const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" + secs : secs}`;
-  };
+  }, []);
 
   // Restores the original time if the timer is not running
   useEffect(() => {
@@ -179,12 +184,23 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   // timer isRunning then refresh time
   useEffect(() => {
     if (isRunning) {
-      const interval = setInterval(() => {
-        dispatch(fetchTimerStatus());
-      }, 1000);
-      return () => clearInterval(interval);
+      let lastUpdateTime = Date.now();
+      let animationFrameId: number;
+
+      const updateTimer = () => {
+        const now = Date.now();
+        // Only fetch timer status every second instead of every frame
+        if (now - lastUpdateTime >= 1000) {
+          dispatch(fetchTimerStatus());
+          lastUpdateTime = now;
+        }
+        animationFrameId = requestAnimationFrame(updateTimer);
+      };
+
+      animationFrameId = requestAnimationFrame(updateTimer);
+      return () => cancelAnimationFrame(animationFrameId);
     }
-  }, [dispatch, isRunning, remainingTime]);
+  }, [dispatch, isRunning]);
 
   // alarm audio if timer = 1
   useEffect(() => {
@@ -198,7 +214,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     document.title = isRunning
       ? `${formatTime(remainingTime)} | ${currentPhase}`
       : "workspace_go by wlr1";
-  }, [remainingTime, isRunning, currentPhase]);
+  }, [remainingTime, isRunning, currentPhase, formatTime]);
 
   // fetch settings
   useEffect(() => {
@@ -369,7 +385,6 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
         <PomoTimerSettings
           setIsHideCount={setIsHideCount}
           ishideCount={ishideCount}
-          timerSound={timerSound}
           setTimerSound={setTimerSound}
           volume={volume}
           setVolume={setVolume}
@@ -379,4 +394,4 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   );
 };
 
-export default PomoTimer;
+export default React.memo(PomoTimer);

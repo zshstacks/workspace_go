@@ -51,7 +51,7 @@ export interface PomoTimerProps {
 export interface PomoTimerSettingsProps {
   setIsHideCount: () => void;
   ishideCount: boolean;
-  timerSound: string;
+
   setTimerSound: (newSound: string) => void;
   volume: number;
   setVolume: (volume: number) => void;
