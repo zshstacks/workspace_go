@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
+import { AxiosError } from "axios";
 
 export const validateUser = createAsyncThunk(
   "user/validateUser",
@@ -7,9 +8,10 @@ export const validateUser = createAsyncThunk(
     try {
       const res = await api.get("/validate");
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Failed to validate user"
+        axiosError.response?.data || "Failed to validate user"
       );
     }
   }
@@ -21,9 +23,10 @@ export const deleteUser = createAsyncThunk(
     try {
       const res = await api.delete("/delete-user");
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Failed to delete user"
+        axiosError.response?.data || "Failed to delete user"
       );
     }
   }
@@ -35,9 +38,10 @@ export const changeUsername = createAsyncThunk(
     try {
       const res = await api.put("/update-username", { newUsername });
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Failed to change username"
+        axiosError.response?.data || "Failed to change username"
       );
     }
   }

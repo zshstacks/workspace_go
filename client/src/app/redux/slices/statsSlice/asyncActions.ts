@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
+import { AxiosError } from "axios";
 
 export const getAllStats = createAsyncThunk(
   "stats/getAllStats",
@@ -7,9 +8,10 @@ export const getAllStats = createAsyncThunk(
     try {
       const res = await api.get("/stats");
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "cant fetch stats"
+        axiosError.response?.data || "cant fetch stats"
       );
     }
   }
@@ -21,9 +23,10 @@ export const updateDailyStreak = createAsyncThunk(
     try {
       const res = await api.post("/stats/update-streak");
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Cant update daily streak"
+        axiosError.response?.data || "Cant update daily streak"
       );
     }
   }

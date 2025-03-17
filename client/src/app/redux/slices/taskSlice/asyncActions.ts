@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
+import { AxiosError } from "axios";
 
 export const getAllTasks = createAsyncThunk(
   "tasks/getAllTasks",
@@ -15,9 +16,10 @@ export const getAllTasks = createAsyncThunk(
         params: { hideCompleted, showTodayOnly },
       });
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "cannot fetch all tasks"
+        axiosError.response?.data || "cannot fetch all tasks"
       );
     }
   }
@@ -32,9 +34,10 @@ export const createTask = createAsyncThunk(
     try {
       const res = await api.post("/tasks-create", { title, description });
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Can`t create a task"
+        axiosError.response?.data || "Can`t create a task"
       );
     }
   }
@@ -46,9 +49,10 @@ export const updateTaskTitle = createAsyncThunk(
     try {
       const res = await api.put(`/task/update-title/${id}`, { title });
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Cannot update task title"
+        axiosError.response?.data || "Cannot update task title"
       );
     }
   }
@@ -65,9 +69,10 @@ export const updateTaskDescription = createAsyncThunk(
         description,
       });
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Cannot update a task description"
+        axiosError.response?.data || "Cannot update a task description"
       );
     }
   }
@@ -79,9 +84,10 @@ export const completeTask = createAsyncThunk(
     try {
       const res = await api.put(`/task/complete/${id}`, { completed });
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Cannot complete a task"
+        axiosError.response?.data || "Cannot complete a task"
       );
     }
   }
@@ -93,9 +99,10 @@ export const deleteTask = createAsyncThunk(
     try {
       const res = await api.delete(`/task/delete/${id}`);
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Cannot delete a task"
+        axiosError.response?.data || "Cannot delete a task"
       );
     }
   }
@@ -107,9 +114,10 @@ export const deleteAllTasks = createAsyncThunk(
     try {
       const res = await api.delete("/task/delete-all");
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Cannot delete all tasks"
+        axiosError.response?.data || "Cannot delete all tasks"
       );
     }
   }
@@ -121,9 +129,10 @@ export const deleteAllCompletedTasks = createAsyncThunk(
     try {
       const res = await api.delete("/task/delete-completed");
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Cannot delete all completed tasks"
+        axiosError.response?.data || "Cannot delete all completed tasks"
       );
     }
   }
@@ -135,9 +144,10 @@ export const UpdateTaskOrder = createAsyncThunk(
     try {
       const res = await api.put("/tasks/order", orderData);
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Cannot update task order"
+        axiosError.response?.data || "Cannot update task order"
       );
     }
   }

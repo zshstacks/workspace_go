@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
+import { AxiosError } from "axios";
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
@@ -14,9 +15,10 @@ export const registerUser = createAsyncThunk(
     try {
       const res = await api.post("/signup", userData);
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Register failed"
+        axiosError.response?.data || "Register failed"
       );
     }
   }
@@ -31,8 +33,11 @@ export const loginUser = createAsyncThunk(
     try {
       const res = await api.post("/login", { email, password });
       return res.data;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data || "Login failed");
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      return thunkAPI.rejectWithValue(
+        axiosError.response?.data || "Login failed"
+      );
     }
   }
 );
@@ -43,9 +48,10 @@ export const emailConfirmation = createAsyncThunk(
     try {
       const res = await api.post("/confirm-email", { code: data.code });
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Confirmation failed"
+        axiosError.response?.data || "Confirmation failed"
       );
     }
   }
@@ -57,9 +63,10 @@ export const resendConfirmation = createAsyncThunk(
     try {
       const res = await api.post("/resend-confirmation-code", { email });
       return res.data;
-    } catch (error: any) {
+    } catch (error) {
+      const axiosError = error as AxiosError;
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Failed to resend confirmation code"
+        axiosError.response?.data || "Failed to resend confirmation code"
       );
     }
   }
@@ -71,8 +78,11 @@ export const logoutUser = createAsyncThunk(
     try {
       const res = await api.get("/logout");
       return res.data;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data || "Logout failed");
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      return thunkAPI.rejectWithValue(
+        axiosError.response?.data || "Logout failed"
+      );
     }
   }
 );
