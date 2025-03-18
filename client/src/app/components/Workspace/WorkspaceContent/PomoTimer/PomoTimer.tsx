@@ -8,19 +8,15 @@ import React, {
   useState,
 } from "react";
 import { MyContext } from "../../Workspace";
-import PomoTimerSettings from "../PomoTimerSettings/PomoTimerSettings";
+import PomoTimerSettings from "./PomoTimerSettings/PomoTimerSettings";
 
 import { PomoTimerProps } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
+import { updateRemainingTime } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
 import {
-  changeMode,
-  updateRemainingTime,
-} from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
-import {
-  changePhase,
   fetchTimerStatus,
   getPomodoroSettings,
   resetCompletedPomodoros,
@@ -29,10 +25,11 @@ import {
 } from "@/app/redux/slices/pomodoroSlice/asyncActions";
 
 import { FaRegWindowMinimize } from "react-icons/fa";
-import { FiSettings, FiRefreshCw } from "react-icons/fi";
+import { FiRefreshCw } from "react-icons/fi";
 
 import { Howl } from "howler";
 import { useDraggable } from "@dnd-kit/core";
+import PomoTimerPhases from "./PomoTimerPhases/PomoTimerPhases";
 
 const PomoTimer: React.FC<PomoTimerProps> = ({
   widgetInfo,
@@ -70,21 +67,6 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     );
   }
   const { theme } = context;
-
-  // Timer mode switch
-  const handleChangeMode = useCallback(
-    async (mode: string) => {
-      if (
-        mode === "pomodoro" ||
-        mode === "shortBreak" ||
-        mode === "longBreak"
-      ) {
-        await dispatch(changePhase(mode));
-        dispatch(changeMode(mode));
-      }
-    },
-    [dispatch]
-  );
 
   // Audio
   useEffect(() => {
@@ -338,48 +320,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       </div>
 
       {/* phases */}
-      <div className="flex justify-around mt-6 text-sm">
-        <button
-          className={
-            currentPhase === "pomodoro"
-              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1"
-              : ""
-          }
-          onClick={() => handleChangeMode("pomodoro")}
-        >
-          <span className="dark:text-lightText">Pomodoro</span>
-        </button>
-        <button
-          className={
-            currentPhase === "shortBreak"
-              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1"
-              : ""
-          }
-          onClick={() => handleChangeMode("shortBreak")}
-        >
-          <span className="dark:text-lightText">Short break</span>
-        </button>
-        <button
-          className={
-            currentPhase === "longBreak"
-              ? "border-b-2 border-gray-400 dark:border-lightBorder pb-1"
-              : ""
-          }
-          onClick={() => handleChangeMode("longBreak")}
-        >
-          <span className="dark:text-lightText">Long break</span>
-        </button>
-
-        {/* Settings */}
-        <div className="flex">
-          <button onClick={setOpenSettings}>
-            <FiSettings
-              color={theme === "dark" ? "#4e4e4e" : "white"}
-              size={20}
-            />
-          </button>
-        </div>
-      </div>
+      <PomoTimerPhases setOpenSettings={setOpenSettings} />
 
       {openSettings && (
         <PomoTimerSettings

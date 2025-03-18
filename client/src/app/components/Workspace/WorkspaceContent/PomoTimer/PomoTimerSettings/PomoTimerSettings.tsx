@@ -7,7 +7,7 @@ import { AppDispatch, RootState } from "@/app/redux/store";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
-import { MyContext } from "../../Workspace";
+import { MyContext } from "../../../Workspace";
 import { PomoTimerSettingsProps } from "@/app/utility/types/types";
 
 const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
@@ -43,8 +43,15 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
     });
   }, [dispatch, localSettings]);
 
-  //transition timer change
+  //handle input change
+  const handleInputChange = useCallback((field: string, value: number) => {
+    setLocalSettings((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  }, []);
 
+  //transition timer change
   const handleAutoTransitionChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.checked;
@@ -57,6 +64,24 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
     [dispatch]
   );
 
+  //handle timer sound selection
+  const handleSoundChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newSound = e.target.value;
+      setTimerSound(newSound);
+    },
+    [setTimerSound]
+  );
+
+  //handle volume change
+  const handleVolumeChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newVolume = parseFloat(e.target.value);
+      setVolume(newVolume);
+    },
+    [setVolume]
+  );
+
   useEffect(() => {
     setLocalSettings({
       pomodoro: settings.pomodoro,
@@ -65,6 +90,37 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
       autoTransition: settings.autoTransitionEnabled,
     });
   }, [settings]);
+
+  //render time inputs with validation
+  const renderTimeInput = (
+    field: "pomodoro" | "shortBreak" | "longBreak",
+    label: string,
+    defaultValue: number
+  ) => {
+    return (
+      <div>
+        <label htmlFor={field} className="dark:text-lightText">
+          {label}
+        </label>
+        <input
+          id={field}
+          type="number"
+          min={0}
+          max={60}
+          defaultValue={defaultValue}
+          value={localSettings[field]}
+          className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black dark:text-lightText text-sm font-normal"
+          onChange={(e) => {
+            const target = e.target as HTMLInputElement;
+            if (target.value.length > 2) {
+              target.value = target.value.slice(0, 2);
+            }
+            handleInputChange(field, +target.value);
+          }}
+        />
+      </div>
+    );
+  };
 
   return (
     <div className=" font-medium " id="pomo-timer">
@@ -105,78 +161,9 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
       <>
         {/* set time on pomo and breaks */}
         <div className="flex justify-center text-start gap-4">
-          <div className="">
-            <label htmlFor="" className="dark:text-lightText">
-              Pomodoro
-            </label>
-            <input
-              type="number"
-              min={0}
-              max={60}
-              defaultValue={60}
-              value={localSettings.pomodoro}
-              className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black dark:text-lightText text-sm font-normal"
-              onChange={(e) => {
-                const target = e.target as HTMLInputElement;
-                if (target.value.length > 2) {
-                  target.value = target.value.slice(0, 2);
-                }
-
-                setLocalSettings({
-                  ...localSettings,
-                  pomodoro: +e.target.value,
-                });
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="" className="dark:text-lightText">
-              Short Break
-            </label>
-            <input
-              type="number"
-              min={0}
-              max={60}
-              defaultValue={15}
-              value={localSettings.shortBreak}
-              onChange={(e) => {
-                const target = e.target as HTMLInputElement;
-                if (target.value.length > 2) {
-                  target.value = target.value.slice(0, 2);
-                }
-
-                setLocalSettings({
-                  ...localSettings,
-                  shortBreak: +e.target.value,
-                });
-              }}
-              className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black dark:text-lightText text-sm font-normal"
-            />
-          </div>
-          <div>
-            <label htmlFor="" className="dark:text-lightText">
-              Long Break
-            </label>
-            <input
-              type="number"
-              min={0}
-              max={60}
-              defaultValue={30}
-              value={localSettings.longBreak}
-              onChange={(e) => {
-                const target = e.target as HTMLInputElement;
-                if (target.value.length > 2) {
-                  target.value = target.value.slice(0, 2);
-                }
-
-                setLocalSettings({
-                  ...localSettings,
-                  longBreak: +e.target.value,
-                });
-              }}
-              className="w-[100px] rounded-sm mt-2 py-[3px] px-2 text-black dark:text-text text-sm font-normal"
-            />
-          </div>
+          {renderTimeInput("pomodoro", "Pomodoro", 25)}
+          {renderTimeInput("shortBreak", "Short Break", 5)}
+          {renderTimeInput("longBreak", "Long Break", 10)}
         </div>
         {/* choose sound */}
         <div className="flex ">
@@ -188,10 +175,7 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
             <select
               name=""
               id=""
-              onChange={(e) => {
-                const newSound = e.target.value;
-                setTimerSound(newSound);
-              }}
+              onChange={handleSoundChange}
               className="w-[207px] bg-[#3d3e42] dark:bg-[#d3d1d1] dark:text-lightText py-1 px-2 text-sm cursor-pointer focus:outline-none "
             >
               <option
@@ -226,10 +210,7 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
             max="1"
             step="0.1"
             value={volume}
-            onChange={(e) => {
-              const newVolume = parseFloat(e.target.value);
-              setVolume(newVolume);
-            }}
+            onChange={handleVolumeChange}
             className="w-full h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300"
           />
         </div>

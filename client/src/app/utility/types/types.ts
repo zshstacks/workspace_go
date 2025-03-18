@@ -1,4 +1,5 @@
 import { AppDispatch } from "@/app/redux/store";
+import { ComponentType } from "react";
 
 export interface HeaderProps {
   setOpenUISettings: () => void;
@@ -55,6 +56,10 @@ export interface PomoTimerSettingsProps {
   setTimerSound: (newSound: string) => void;
   volume: number;
   setVolume: (volume: number) => void;
+}
+
+export interface PomoTimerPhasesProps {
+  setOpenSettings: () => void;
 }
 
 export interface TodoProps {
@@ -192,4 +197,11 @@ export interface StatsState {
 
 export interface StatsErrorPayload {
   error?: string;
+}
+
+//render modal component
+export interface RenderModalComponentProps<T extends Record<string, any>> {
+  isOpen: boolean;
+  Component: ComponentType<T>;
+  props: T;
 }

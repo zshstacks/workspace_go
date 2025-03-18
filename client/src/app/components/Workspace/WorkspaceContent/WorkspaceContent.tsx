@@ -9,7 +9,7 @@ import { SavedWidgetLayoutInfo, WidgetInfo } from "@/app/utility/types/types";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
-import { AiOutlineLoading } from "react-icons/ai";
+import RenderModalComponent from "@/app/hooks/Modal/RenderModalComponent";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
@@ -105,66 +105,30 @@ const WorkspaceContent = () => {
       </div>
 
       {/* user stats */}
+      <RenderModalComponent
+        isOpen={openUserStats}
+        Component={UserStats}
+        props={{ setOpenUserStats, openUserStats }}
+      />
 
-      {openUserStats && (
-        <Suspense
-          fallback={
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]  ">
-              <AiOutlineLoading
-                size={23}
-                color="white"
-                className="animate-spin "
-              />
-            </div>
-          }
-        >
-          <UserStats
-            setOpenUserStats={setOpenUserStats}
-            openUserStats={openUserStats}
-          />
-        </Suspense>
-      )}
       {/* appearance settings */}
-      {openUISettings && (
-        <Suspense
-          fallback={
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]  ">
-              <AiOutlineLoading
-                size={23}
-                color="white"
-                className="animate-spin "
-              />
-            </div>
-          }
-        >
-          <Appearance
-            openUISettings={openUISettings}
-            setOpenUISettings={setOpenUISettings}
-            setHideElementsActive={setHideElementsActive}
-            setHideAfterSeconds={setHideAfterSeconds}
-          />
-        </Suspense>
-      )}
+      <RenderModalComponent
+        isOpen={openUISettings}
+        Component={Appearance}
+        props={{
+          setOpenUISettings,
+          openUISettings,
+          setHideElementsActive,
+          setHideAfterSeconds,
+        }}
+      />
 
       {/* user settings */}
-      {openAccSettings && (
-        <Suspense
-          fallback={
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]  ">
-              <AiOutlineLoading
-                size={23}
-                color="white"
-                className="animate-spin "
-              />
-            </div>
-          }
-        >
-          <UserAccount
-            setOpenAccSettings={setOpenAccSettings}
-            openAccSettings={openAccSettings}
-          />
-        </Suspense>
-      )}
+      <RenderModalComponent
+        isOpen={openAccSettings}
+        Component={UserAccount}
+        props={{ setOpenAccSettings, openAccSettings }}
+      />
 
       {/* timer */}
       {isTimerActive && (
