@@ -4,13 +4,14 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { MyContext } from "../../Workspace";
 import PomoTimerSettings from "./PomoTimerSettings/PomoTimerSettings";
 
-import { PomoTimerProps } from "@/app/utility/types/types";
+import { PomoTimerProps } from "@/app/utility/types/componentTypes";
 import { useToggleState } from "@/app/hooks/useToggleState";
 
 import { AppDispatch, RootState } from "@/app/redux/store";
@@ -232,6 +233,31 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     setIsDragging(dragging);
   }, [dragging]);
 
+  const pomodoroCounts = useMemo(() => {
+    if (ishideCount) return null;
+
+    const displayCount =
+      currentPhase === "longBreak" ? 4 : completedPomodoros % 4;
+
+    return (
+      <div className="flex gap-1">
+        {Array.from({ length: 4 }, (_, i) => {
+          const indicatorClass =
+            i < displayCount
+              ? "bg-secondary "
+              : "bg-gray-500 dark:bg-neutral-400";
+
+          return (
+            <div
+              key={i}
+              className={`w-2 h-2 rounded-full ${indicatorClass}`}
+            ></div>
+          );
+        })}
+      </div>
+    );
+  }, [ishideCount, currentPhase, completedPomodoros]);
+
   return (
     <div
       onMouseDown={() => setActiveWidget("pomodoro")}
@@ -245,27 +271,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       {/* Header */}
       <div className="flex  items-center pb-[11px]">
         {/* pomodoro count */}
-        {!ishideCount && (
-          <div className="flex gap-1 ">
-            {(() => {
-              const displayCount =
-                currentPhase === "longBreak" ? 4 : completedPomodoros % 4;
-              return Array.from({ length: 4 }, (_, i) => {
-                const indicatorClass =
-                  i < displayCount
-                    ? "bg-secondary "
-                    : "bg-gray-500 dark:bg-neutral-400";
-
-                return (
-                  <div
-                    key={i}
-                    className={`w-2 h-2 rounded-full ${indicatorClass}`}
-                  ></div>
-                );
-              });
-            })()}
-          </div>
-        )}
+        {pomodoroCounts}
 
         {/* "Drag handle" element */}
         <div
@@ -335,4 +341,4 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   );
 };
 
-export default React.memo(PomoTimer);
+export default PomoTimer;

@@ -1,4 +1,4 @@
-import { AuthState, ErrorPayload } from "@/app/utility/types/types";
+import { AuthState, ErrorPayload } from "@/app/utility/types/reduxTypes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   emailConfirmation,

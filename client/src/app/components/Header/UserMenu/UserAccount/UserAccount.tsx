@@ -7,7 +7,7 @@ import {
   validateUser,
 } from "@/app/redux/slices/userSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
-import { UserAccountProps } from "@/app/utility/types/types";
+import { UserAccountProps } from "@/app/utility/types/componentTypes";
 import { useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";

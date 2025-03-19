@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { EmailModalProps } from "@/app/utility/types/types";
+import { EmailModalProps } from "@/app/utility/types/componentTypes";
 
 import "animate.css";
 import { AiOutlineCheck } from "react-icons/ai";

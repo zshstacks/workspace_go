@@ -1,4 +1,4 @@
-import { TodoProps } from "@/app/utility/types/types";
+import { TodoProps } from "@/app/utility/types/componentTypes";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
@@ -189,6 +189,8 @@ const Task: React.FC<TodoProps> = ({
   useEffect(() => {
     dispatch(getAllTasks({ hideCompleted, showTodayOnly }));
   }, [hideCompleted, showTodayOnly, dispatch]);
+
+  // #TODO: react-window for task list to optimize performance
 
   return (
     <div

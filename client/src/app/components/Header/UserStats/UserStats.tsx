@@ -1,4 +1,4 @@
-import { UserStatsProps } from "@/app/utility/types/types";
+import { UserStatsProps } from "@/app/utility/types/componentTypes";
 import React, { useContext, useEffect } from "react";
 import { MyContext } from "../../Workspace/Workspace";
 import { IoIosClose } from "react-icons/io";

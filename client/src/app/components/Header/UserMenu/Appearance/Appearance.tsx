@@ -1,7 +1,7 @@
 "use client";
 
 import { MyContext } from "@/app/components/Workspace/Workspace";
-import { AppearanceProps } from "@/app/utility/types/types";
+import { AppearanceProps } from "@/app/utility/types/componentTypes";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { IoIosCheckmark, IoIosClose } from "react-icons/io";
 import { RiMoonLine, RiSunLine } from "react-icons/ri";

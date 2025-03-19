@@ -1,6 +1,6 @@
-import { StatsErrorPayload, StatsState } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAllStats, updateDailyStreak } from "./asyncActions";
+import { StatsErrorPayload, StatsState } from "@/app/utility/types/reduxTypes";
 
 const initialState: StatsState = {
   currentStreak: 0,

@@ -9,7 +9,10 @@ import {
   updateAutoTransition,
   updatePomodoroTime,
 } from "./asyncActions";
-import { PomodoroErrorPayload, PomodoroState } from "@/app/utility/types/types";
+import {
+  PomodoroErrorPayload,
+  PomodoroState,
+} from "@/app/utility/types/reduxTypes";
 
 const initialState: PomodoroState = {
   settings: {
@@ -55,11 +58,26 @@ const pomodoroSlice = createSlice({
       })
 
       .addCase(fetchTimerStatus.fulfilled, (state, action) => {
-        state.remainingTime = action.payload.remainingTime;
-        state.isRunning = action.payload.isRunning;
-        state.currentPhase = action.payload.currentPhase;
-        state.completedPomodoros = action.payload.completedPomodoros;
-        state.settings.autoTransitionEnabled = action.payload.autoTransition;
+        const {
+          remainingTime,
+          isRunning,
+          currentPhase,
+          completedPomodoros,
+          autoTransition,
+        } = action.payload;
+        if (
+          state.remainingTime !== remainingTime ||
+          state.isRunning !== isRunning ||
+          state.currentPhase !== currentPhase ||
+          state.completedPomodoros !== completedPomodoros ||
+          state.settings.autoTransitionEnabled !== autoTransition
+        ) {
+          state.remainingTime = remainingTime;
+          state.isRunning = isRunning;
+          state.currentPhase = currentPhase;
+          state.completedPomodoros = completedPomodoros;
+          state.settings.autoTransitionEnabled = autoTransition;
+        }
       })
 
       .addCase(startPomodoro.fulfilled, (state) => {

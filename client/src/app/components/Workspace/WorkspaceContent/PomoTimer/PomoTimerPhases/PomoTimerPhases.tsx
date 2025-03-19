@@ -3,7 +3,7 @@ import { changeMode } from "@/app/redux/slices/pomodoroSlice/pomodoroSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 
-import { PomoTimerPhasesProps } from "@/app/utility/types/types";
+import { PomoTimerPhasesProps } from "@/app/utility/types/componentTypes";
 import { MyContext } from "../../../Workspace";
 import React, { useCallback, useContext } from "react";
 

@@ -3,7 +3,7 @@ import {
   updateTaskTitle,
 } from "@/app/redux/slices/taskSlice/asyncActions";
 
-import { SortableTaskItemProps } from "@/app/utility/types/types";
+import { SortableTaskItemProps } from "@/app/utility/types/componentTypes";
 import { useSortable } from "@dnd-kit/sortable";
 
 import React, { useEffect } from "react";

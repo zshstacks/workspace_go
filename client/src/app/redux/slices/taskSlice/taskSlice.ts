@@ -1,4 +1,3 @@
-import { TaskErrorPayload, TaskState } from "@/app/utility/types/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   completeTask,
@@ -11,6 +10,7 @@ import {
   UpdateTaskOrder,
   updateTaskTitle,
 } from "./asyncActions";
+import { TaskErrorPayload, TaskState } from "@/app/utility/types/reduxTypes";
 
 const initialState: TaskState = {
   tasks: [],

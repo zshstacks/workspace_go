@@ -1,4 +1,4 @@
-import { UserErrorPayload, UserState } from "@/app/utility/types/types";
+import { UserErrorPayload, UserState } from "@/app/utility/types/reduxTypes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { changeUsername, deleteUser, validateUser } from "./asyncActions";
 

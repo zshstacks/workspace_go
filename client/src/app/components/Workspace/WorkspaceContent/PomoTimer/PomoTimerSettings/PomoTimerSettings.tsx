@@ -8,7 +8,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { MyContext } from "../../../Workspace";
-import { PomoTimerSettingsProps } from "@/app/utility/types/types";
+import { PomoTimerSettingsProps } from "@/app/utility/types/componentTypes";
 
 const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
   setIsHideCount,

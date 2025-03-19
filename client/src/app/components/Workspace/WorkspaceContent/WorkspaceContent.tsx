@@ -5,11 +5,15 @@ import React, { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import Header from "../../Header/Header";
 
 import { DndContext } from "@dnd-kit/core";
-import { SavedWidgetLayoutInfo, WidgetInfo } from "@/app/utility/types/types";
+import {
+  SavedWidgetLayoutInfo,
+  WidgetInfo,
+} from "@/app/utility/types/componentTypes";
 import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
 import RenderModalComponent from "@/app/hooks/Modal/RenderModalComponent";
+import LoadingSpinner from "@/app/hooks/Modal/LoadingSpinner";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
@@ -44,9 +48,7 @@ const WorkspaceContent = () => {
 
   useEffect(() => {
     const savedPosition = localStorage.getItem(localStorageKey);
-    if (savedPosition) {
-      setWidgetLayout(JSON.parse(savedPosition));
-    }
+    if (savedPosition) setWidgetLayout(JSON.parse(savedPosition));
   }, []);
 
   const updateWidgetLayout = useCallback(
@@ -56,7 +58,10 @@ const WorkspaceContent = () => {
         [widgetKey]: newInfo,
       };
       setWidgetLayout(updatedLayout);
-      localStorage.setItem(localStorageKey, JSON.stringify(updatedLayout));
+      const debounceSave = setTimeout(() => {
+        localStorage.setItem(localStorageKey, JSON.stringify(updatedLayout));
+      }, 500);
+      return () => clearTimeout(debounceSave);
     },
     [widgetLayout]
   );
@@ -132,24 +137,22 @@ const WorkspaceContent = () => {
 
       {/* timer */}
       {isTimerActive && (
-        <Suspense>
-          <DndContext
-            modifiers={[restrictToBoundingBox(openSettings)]}
-            onDragEnd={(event) => {
-              const { delta } = event;
-              handleTimerDragEnd(delta);
-            }}
-          >
-            <PomoTimer
-              setOpenSettings={setOpenSettings}
-              openSettings={openSettings}
-              setIsTimerActive={setIsTimerActive}
-              widgetInfo={widgetLayout.TimerWidget}
-              activeWidget={activeWidget}
-              setActiveWidget={setActiveWidget}
-            />
-          </DndContext>
-        </Suspense>
+        <DndContext
+          modifiers={[restrictToBoundingBox(openSettings)]}
+          onDragEnd={(event) => {
+            const { delta } = event;
+            handleTimerDragEnd(delta);
+          }}
+        >
+          <PomoTimer
+            setOpenSettings={setOpenSettings}
+            openSettings={openSettings}
+            setIsTimerActive={setIsTimerActive}
+            widgetInfo={widgetLayout.TimerWidget}
+            activeWidget={activeWidget}
+            setActiveWidget={setActiveWidget}
+          />
+        </DndContext>
       )}
 
       {/* todo */}
