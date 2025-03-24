@@ -7,7 +7,7 @@ import { reorderTasks } from "@/app/redux/slices/taskSlice/taskSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import SortableTaskItem from "./SortableTaskItem/SortableTaskItem";
 
@@ -59,7 +59,9 @@ const TaskContent = () => {
         distance: 8, // Only start dragging after moving 8px
       },
     }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   );
 
   // Handle drag start event
@@ -77,33 +79,36 @@ const TaskContent = () => {
     }
   };
 
-  const handleDragEnd = (e: DragEndEvent) => {
-    const { active, over } = e;
+  const handleDragEnd = useCallback(
+    (e: DragEndEvent) => {
+      const { active, over } = e;
 
-    if (over && active.id !== over.id) {
-      const oldIndex = tasks.findIndex((task) => task.LocalID === active.id);
-      const newIndex = tasks.findIndex((task) => task.LocalID === over.id);
+      if (over && active.id !== over.id) {
+        const oldIndex = tasks.findIndex((task) => task.LocalID === active.id);
+        const newIndex = tasks.findIndex((task) => task.LocalID === over.id);
 
-      const newTasks = arrayMove(tasks, oldIndex, newIndex);
+        const newTasks = arrayMove(tasks, oldIndex, newIndex);
 
-      const updatedTasks = newTasks.map((task, index) => ({
-        ...task,
-        Order: index + 1,
-      }));
+        const updatedTasks = newTasks.map((task, index) => ({
+          ...task,
+          Order: index + 1,
+        }));
 
-      dispatch(reorderTasks(updatedTasks));
+        dispatch(reorderTasks(updatedTasks));
 
-      const orderUpdates = newTasks.map((task, index) => ({
-        localId: task.LocalID,
-        order: index + 1,
-      }));
+        const orderUpdates = newTasks.map((task, index) => ({
+          localId: task.LocalID,
+          order: index + 1,
+        }));
 
-      dispatch(UpdateTaskOrder(orderUpdates));
-    }
+        dispatch(UpdateTaskOrder(orderUpdates));
+      }
 
-    setActiveId(null);
-    setDropIndicator(null);
-  };
+      setActiveId(null);
+      setDropIndicator(null);
+    },
+    [dispatch, tasks]
+  );
 
   //========================================================
 

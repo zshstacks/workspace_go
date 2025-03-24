@@ -11,5 +11,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/pomodoro"],
+  matcher: ["/workspace"],
 };

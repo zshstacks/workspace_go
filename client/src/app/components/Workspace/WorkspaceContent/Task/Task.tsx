@@ -1,5 +1,11 @@
 import { TodoProps } from "@/app/utility/types/componentTypes";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 
@@ -155,35 +161,38 @@ const Task: React.FC<TodoProps> = ({
   const maxWidth = 1150;
   const maxHeight = 750;
 
-  const handleMouseDown = (event: React.MouseEvent) => {
-    event.preventDefault();
-    const startX = event.clientX;
-    const startY = event.clientY;
-    const startWidth = dimensions.width;
-    const startHeight = dimensions.height;
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const startWidth = dimensions.width;
+      const startHeight = dimensions.height;
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const deltaY = moveEvent.clientY - startY;
-      let newWidth = startWidth + deltaX;
-      let newHeight = startHeight + deltaY;
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const deltaX = moveEvent.clientX - startX;
+        const deltaY = moveEvent.clientY - startY;
+        let newWidth = startWidth + deltaX;
+        let newHeight = startHeight + deltaY;
 
-      if (newWidth < minWidth) newWidth = minWidth;
-      if (newWidth > maxWidth) newWidth = maxWidth;
-      if (newHeight < minHeight) newHeight = minHeight;
-      if (newHeight > maxHeight) newHeight = maxHeight;
+        if (newWidth < minWidth) newWidth = minWidth;
+        if (newWidth > maxWidth) newWidth = maxWidth;
+        if (newHeight < minHeight) newHeight = minHeight;
+        if (newHeight > maxHeight) newHeight = maxHeight;
 
-      setDimensions({ width: newWidth, height: newHeight });
-    };
+        setDimensions({ width: newWidth, height: newHeight });
+      };
 
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
+      const handleMouseUp = () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-  };
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    },
+    [dimensions.width, dimensions.height, setDimensions]
+  );
 
   //fetch tasks with filters
   useEffect(() => {

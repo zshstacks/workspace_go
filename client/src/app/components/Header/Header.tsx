@@ -37,6 +37,7 @@ import {
   getAllStats,
   updateDailyStreak,
 } from "@/app/redux/slices/statsSlice/asyncActions";
+import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
 
@@ -57,23 +58,42 @@ const Header: React.FC<HeaderProps> = ({
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const [volume, setVolume] = useState(0.2);
 
-  const [openUserMenu, setOpenUserMenu] = useToggleState(false);
+  const [openUserMenu, setOpenUserMenu, toggleOpenUserMenu] =
+    useToggleStateOutside(false);
 
   const dispatch: AppDispatch = useDispatch();
-
   const { currentStreak } = useSelector((state: RootState) => state.stats);
 
   const context = useContext(MyContext);
-
   if (!context) {
     throw new Error(
       "The Header component should be used within MyContext.Provider."
     );
   }
-
   const { theme } = context;
 
   const rainSoundRef = useRef<Howl | null>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const headerTimeoutRef = useRef<number | null>(null); //memory leaks fix
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node)
+      ) {
+        setOpenUserMenu(false);
+      }
+    };
+
+    if (openUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openUserMenu, setOpenUserMenu]);
 
   const handleRainSound = () => {
     if (!rainSoundRef.current) return;
@@ -101,9 +121,12 @@ const Header: React.FC<HeaderProps> = ({
     setAnimation("animate__slideInDown");
     setIsVisible(true);
 
+    if (hideElementsActive && headerTimeoutRef.current) {
+      clearTimeout(headerTimeoutRef.current);
+    }
+
     if (hideElementsActive) {
-      clearTimeout((window as any).headerTimeout);
-      (window as any).headerTimeout = setTimeout(() => {
+      headerTimeoutRef.current = window.setTimeout(() => {
         setAnimation("animate__slideOutUp");
         setTimeout(() => setIsVisible(false), 500);
       }, hideAfterSeconds * 1000);
@@ -117,6 +140,9 @@ const Header: React.FC<HeaderProps> = ({
     return () => {
       document.removeEventListener("mousemove", resetTimer);
       document.removeEventListener("keydown", resetTimer);
+      if (headerTimeoutRef.current) {
+        clearTimeout(headerTimeoutRef.current);
+      }
     };
   }, [resetTimer]);
 
@@ -207,7 +233,10 @@ const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center bg-main dark:bg-lightMain rounded-md text-white p-1 ">
+      <div
+        ref={userMenuRef}
+        className="flex items-center bg-main dark:bg-lightMain rounded-md text-white p-1 "
+      >
         <div className="relative inline-block group">
           <div
             className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer   "
@@ -264,7 +293,7 @@ const Header: React.FC<HeaderProps> = ({
         {/* user dropdown menu */}
         <div
           className="flex items-center  p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer transition-all "
-          onClick={setOpenUserMenu}
+          onClick={toggleOpenUserMenu}
         >
           <LuUserRound
             size={19}
@@ -297,4 +326,4 @@ const Header: React.FC<HeaderProps> = ({
   );
 };
 
-export default Header;
+export default React.memo(Header);

@@ -57,7 +57,7 @@ const Signin = () => {
         onClose: () => dispatch(clearSuccessLogin()),
       });
 
-      router.push("/pomodoro");
+      router.push("/workspace");
     }
   }, [successLogin, errorLogin, dispatch, router]);
 
