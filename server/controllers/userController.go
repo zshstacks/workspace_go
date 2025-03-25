@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -271,28 +272,127 @@ func SignIn(c *gin.Context) {
 	}
 
 	//generate jwt token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+		"exp": time.Now().Add(10 * time.Minute).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	accessTokenString, err := accessToken.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create token"})
 		return
 	}
 
+	//generate refreshToken(refreshToken exp > jwt)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub":        user.ID,
+		"exp":        time.Now().Add(7 * 24 * time.Hour).Unix(),
+		"token_type": "refresh",
+	})
+	refreshTokenString, err := refreshToken.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create refresh token"})
+		return
+	}
+
 	//send it back
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "token",
-		Value:    tokenString,
+		Value:    accessTokenString,
 		HttpOnly: true,
-		MaxAge:   int((time.Hour * 24 * 30).Seconds()),
+		MaxAge:   int((10 * time.Minute).Seconds()),
+		Path:     "/",
+	})
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshTokenString,
+		HttpOnly: true,
+		MaxAge:   int((7 * 24 * time.Hour).Seconds()),
+		Path:     "/",
 	})
 
 	c.JSON(http.StatusOK, gin.H{"successLogin": "Login successful!"})
 
+}
+
+func RefreshToken(c *gin.Context) {
+	//get refresh token from cookie
+	refreshTokenString, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "No refresh token found"})
+		return
+	}
+
+	//parse and check refresh token
+	token, err := jwt.Parse(refreshTokenString, func(token *jwt.Token) (interface{}, error) {
+
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signature method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("REFRESH_SECRET")), nil
+	})
+
+	if err != nil || !token.Valid {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid refresh token"})
+		return
+	}
+
+	//get token claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token data"})
+		return
+	}
+
+	//check token_type, to ensure this is a refresh token
+	if tokenType, ok := claims["token_type"].(string); !ok || tokenType != "refresh" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token type"})
+		return
+	}
+
+	//check token exp date
+	exp, ok := claims["exp"].(float64)
+	if !ok || float64(time.Now().Unix()) > exp {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token is expired"})
+		return
+	}
+
+	//get the user id from sub field
+	sub, ok := claims["sub"].(float64)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token data"})
+		return
+	}
+
+	//find user db
+	var user models.User
+	if err := initializers.DB.First(&user, uint(sub)).Error; err != nil || user.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found!"})
+		return
+	}
+
+	//create a new accessToken
+	newAccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.ID,
+		"exp": time.Now().Add(10 * time.Minute).Unix(),
+	})
+	newAccessTokenString, err := newAccessToken.SignedString([]byte(os.Getenv("SECRET")))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot create a new access token"})
+		return
+	}
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "token",
+		Value:    newAccessTokenString,
+		HttpOnly: true,
+		MaxAge:   int((10 * time.Minute).Seconds()),
+		Path:     "/",
+	})
+
+	c.JSON(http.StatusOK, gin.H{"success": "New access token created!"})
 }
 
 func Validate(c *gin.Context) {

@@ -16,7 +16,7 @@ func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("token")
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or invalid token"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or invalid accessToken"})
 		return
 	}
 
