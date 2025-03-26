@@ -22,16 +22,13 @@
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",
     "react-redux": "^9.2.0",
-    "react-toastify": "^11.0.2",
-    "react-virtualized-auto-sizer": "^1.0.25",
-    "react-window": "^1.8.11"
+    "react-toastify": "^11.0.2"
   },
   "devDependencies": {
     "@types/howler": "^2.2.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/react-window": "^1.8.8",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "postcss": "^8",
