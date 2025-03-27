@@ -194,7 +194,6 @@ const Appearance: React.FC<AppearanceProps> = ({
                     value={hideAfterSeconds}
                     onChange={handleHideAfterChange}
                     className="w-16 h-8 bg-main dark:bg-lightMain text-gray-100 dark:text-lightText text-sm font-semibold border border-gray-600 dark:border-lightBorder  rounded-md px-[10px] focus:outline-none focus:ring-1 focus:ring-gray-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    defaultValue={30}
                   />
                 </div>
               </div>

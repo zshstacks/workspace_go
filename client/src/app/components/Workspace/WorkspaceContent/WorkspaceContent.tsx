@@ -1,6 +1,13 @@
 "use client";
 
-import React, { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import React, {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useId,
+  useState,
+} from "react";
 
 import Header from "../../Header/Header";
 
@@ -13,7 +20,6 @@ import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
 import RenderModalComponent from "@/app/hooks/Modal/RenderModalComponent";
-import LoadingSpinner from "@/app/hooks/Modal/LoadingSpinner";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
@@ -43,8 +49,14 @@ const WorkspaceContent = () => {
   const [activeWidget, setActiveWidget] = useState<"todo" | "pomodoro">(
     "pomodoro"
   );
-
+  const [isClient, setIsClient] = useState(false);
   const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
+
+  const dndId = useId(); //generate unique id
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const savedPosition = localStorage.getItem(localStorageKey);
@@ -91,6 +103,10 @@ const WorkspaceContent = () => {
     },
     [updateWidgetLayout, widgetLayout.TodoWidget]
   );
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <>
@@ -143,6 +159,7 @@ const WorkspaceContent = () => {
             const { delta } = event;
             handleTimerDragEnd(delta);
           }}
+          id={dndId}
         >
           <PomoTimer
             setOpenSettings={setOpenSettings}
@@ -164,6 +181,7 @@ const WorkspaceContent = () => {
               const { delta } = event;
               handleTodoDragEnd(delta);
             }}
+            id={dndId}
           >
             <Task
               setIsTodoActive={setIsTodoActive}

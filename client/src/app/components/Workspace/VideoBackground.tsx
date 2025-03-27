@@ -7,7 +7,7 @@ const VideoBackground = memo(() => {
       <div className="w-[100vw] h-[100vh]">
         <iframe
           src="https://www.youtube.com/embed/8plwv25NYRo?autoplay=1&mute=1&controls=0&start=7&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&enablejsapi=1"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allow="autoplay;"
           title="Background Video"
           allowFullScreen
           width="100%"

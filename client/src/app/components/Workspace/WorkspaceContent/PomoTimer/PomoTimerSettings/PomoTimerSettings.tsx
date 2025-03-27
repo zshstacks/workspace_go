@@ -84,9 +84,9 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
 
   useEffect(() => {
     setLocalSettings({
-      pomodoro: settings.pomodoro,
-      shortBreak: settings.shortBreak,
-      longBreak: settings.longBreak,
+      pomodoro: settings.pomodoro || 25,
+      shortBreak: settings.shortBreak || 5,
+      longBreak: settings.longBreak || 15,
       autoTransition: settings.autoTransitionEnabled,
     });
   }, [settings]);
@@ -107,15 +107,20 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
           type="number"
           min={0}
           max={60}
-          defaultValue={defaultValue}
           value={localSettings[field]}
           className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black dark:text-lightText text-sm font-normal"
           onChange={(e) => {
             const target = e.target as HTMLInputElement;
-            if (target.value.length > 2) {
-              target.value = target.value.slice(0, 2);
+            let value = target.value;
+
+            //max 2 num
+            if (value.length > 2) {
+              value = value.slice(0, 2);
             }
-            handleInputChange(field, +target.value);
+            const numValue =
+              value === "" ? defaultValue : Math.min(parseInt(value), 60);
+
+            handleInputChange(field, numValue);
           }}
         />
       </div>
