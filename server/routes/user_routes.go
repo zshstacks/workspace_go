@@ -16,7 +16,7 @@ func UserRoutes(router *gin.Engine) {
 		userGroup.POST("login", controllers.SignIn)
 		userGroup.POST("confirm-email", controllers.ConfirmEmail)
 		userGroup.POST("resend-confirmation-code", controllers.ResendConfirmationCode)
-		userGroup.POST("refresh-token", middleware.RequireAuth, controllers.RefreshToken)
+		userGroup.POST("refresh-token", controllers.RefreshToken)
 
 		userGroup.PUT("update-username", middleware.RequireAuth, controllers.ChangeUsername)
 

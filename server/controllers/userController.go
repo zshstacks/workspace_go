@@ -421,6 +421,8 @@ func Logout(c *gin.Context) {
 
 	//delete the jwt cookie
 	c.SetCookie("token", "", -1, "/", "", false, true)
+	//delete refresh token
+	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"successLogout": "Logged out successfully",
@@ -439,6 +441,7 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	c.SetCookie("token", "", -1, "/", "", false, true)
+	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"successDelete": "User deleted successfully",
