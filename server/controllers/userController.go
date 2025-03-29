@@ -433,10 +433,43 @@ func DeleteUser(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
-	result := initializers.DB.Delete(&currentUser)
+	userID := currentUser.ID
 
-	if result.Error != nil {
+	//use transaction to ensure data integrity
+	tx := initializers.DB.Begin()
+
+	//pomodoro delete
+	if err := tx.Unscoped().Where("user_id = ?", userID).Delete(&models.PomodoroModel{}).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user's pomodoro data"})
+		return
+	}
+
+	//tasks delete
+	if err := tx.Unscoped().Where("user_id = ?", userID).Delete(&models.TasksModel{}).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user's tasks data"})
+		return
+	}
+
+	//stats delete
+	if err := tx.Unscoped().Where("user_id = ?", userID).Delete(&models.StatsModel{}).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user's stats data"})
+		return
+	}
+
+	//user delete(not soft)
+	if err := tx.Unscoped().Delete(&currentUser).Error; err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		return
+	}
+
+	//commit transaction
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to commit transaction"})
 		return
 	}
 
