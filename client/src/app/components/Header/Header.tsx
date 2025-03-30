@@ -182,15 +182,15 @@ const Header: React.FC<HeaderProps> = ({
       className={`w-full p-2 flex justify-between items-center fixed  h-[50px] animate__animated  ${animation} `}
     >
       {/* Left Section */}
-      <div className="bg-main dark:bg-lightMain rounded-md w-12 h-[32px] flex justify-center items-center ">
+      <div className="bg-main dark:bg-lightMain rounded-md  max-w-[24] h-[32px] flex justify-center items-center p-1">
         <div
-          className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md py-[2px] px-[4px]  cursor-pointer"
+          className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  py-[1px] px-[3px] cursor-pointer"
           onClick={setOpenUserStats}
         >
           <span className="text-white dark:text-lightText text-md mr-1">
             {currentStreak}
           </span>
-          <BsFire color="darkorange" size={19} />
+          <BsFire color="darkorange" size={19} className="m-auto" />
         </div>
       </div>
 
