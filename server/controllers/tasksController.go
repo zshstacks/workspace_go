@@ -242,8 +242,8 @@ func DeleteTask(c *gin.Context) {
 		return
 	}
 
-	//delete finded task ( .Unscoped() to completely delete task from db)
-	if err := initializers.DB.Delete(&task).Error; err != nil {
+	//delete finded task
+	if err := initializers.DB.Unscoped().Delete(&task).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant delete task!"})
 		return
 	}
@@ -255,7 +255,7 @@ func DeleteAllTasks(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
-	if err := initializers.DB.Where("user_id = ?", currentUser.ID).Delete(&models.TasksModel{}).Error; err != nil {
+	if err := initializers.DB.Unscoped().Where("user_id = ?", currentUser.ID).Delete(&models.TasksModel{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant delete all tasks!"})
 		return
 	}
@@ -267,7 +267,7 @@ func DeleteAllCompletedTasks(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
-	result := initializers.DB.Where("user_id = ? AND completed = ?", currentUser.ID, true).Delete(&models.TasksModel{})
+	result := initializers.DB.Unscoped().Where("user_id = ? AND completed = ?", currentUser.ID, true).Delete(&models.TasksModel{})
 
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant delete all completed tasks!"})
