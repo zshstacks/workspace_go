@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,94 @@ import (
 	"strconv"
 	"time"
 )
+
+const (
+	UserCachePrefix  = "user:"
+	UserCacheTTL     = 30 * time.Minute
+	StatsCachePrefix = "stats:"
+	StatsCacheTTL    = 15 * time.Minute
+)
+
+// caching helper function
+func cacheUser(user models.User) error {
+	userJSON, err := json.Marshal(user)
+	if err != nil {
+		return err
+	}
+
+	userKey := fmt.Sprintf("%s%d", UserCachePrefix, user.ID)
+	emailKey := fmt.Sprintf("%s%s", UserCachePrefix, user.Email)
+
+	//save user by id
+	if err := initializers.RedisClient.Set(initializers.Ctx, userKey, userJSON, UserCacheTTL).Err(); err != nil {
+		return err
+	}
+
+	//save user by email
+	if err := initializers.RedisClient.Set(initializers.Ctx, emailKey, userJSON, UserCacheTTL).Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getUserByID(userID uint) (models.User, error) {
+	var user models.User
+
+	//try to get from cache
+	userKey := fmt.Sprintf("%s%d", UserCachePrefix, userID)
+	userJSON, err := initializers.RedisClient.Get(initializers.Ctx, userKey).Result()
+
+	if err == nil {
+
+		if err := json.Unmarshal([]byte(userJSON), &user); err != nil {
+			return user, err
+		}
+		return user, nil
+	}
+
+	//no cache, get from db
+	if err := initializers.DB.First(&user, userID).Error; err != nil {
+		return user, err
+	}
+
+	//connect to cache
+	go cacheUser(user)
+	return user, nil
+}
+
+func getUserByEmail(email string) (models.User, error) {
+	var user models.User
+
+	//try to get from cache
+	emailKey := fmt.Sprintf("%s%s", UserCachePrefix, email)
+	userJSON, err := initializers.RedisClient.Get(initializers.Ctx, emailKey).Result()
+
+	if err == nil {
+		if err := json.Unmarshal([]byte(userJSON), &user); err != nil {
+			return user, err
+		}
+		return user, nil
+	}
+
+	//no cache, get from db
+	if err := initializers.DB.First(&user, "email = ?", email).Error; err != nil {
+		return user, err
+	}
+
+	//connect to cache
+	go cacheUser(user)
+	return user, nil
+}
+
+// func, when user is updated, delete cache
+func invalidateUserCache(user models.User) {
+	userKey := fmt.Sprintf("%s%d", UserCachePrefix, user.ID)
+	userEmail := fmt.Sprintf("%s%s", UserCachePrefix, user.Email)
+
+	initializers.RedisClient.Del(initializers.Ctx, userKey)
+	initializers.RedisClient.Del(initializers.Ctx, userEmail)
+}
 
 func generateConfirmationCode() string {
 	return strconv.Itoa(rand.Intn(1000000))
@@ -76,6 +165,9 @@ func ConfirmEmail(c *gin.Context) {
 		return
 	}
 
+	//update cache with new data
+	cacheUser(user)
+
 	c.JSON(http.StatusOK, gin.H{"successCodeEmail": "Email confirmed!"})
 }
 
@@ -89,9 +181,9 @@ func ResendConfirmationCode(c *gin.Context) {
 		return
 	}
 
-	// find by email
-	var user models.User
-	if err := initializers.DB.First(&user, "email = ?", body.Email).Error; err != nil {
+	//find user by email, using cache
+	user, err := getUserByEmail(body.Email)
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Email not registered"})
 		} else {
@@ -115,6 +207,8 @@ func ResendConfirmationCode(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update confirmation code"})
 		return
 	}
+
+	invalidateUserCache(user)
 
 	// send new code
 	if err := sendEmailConfirmation(user.Email, confirmationCode); err != nil {
@@ -211,6 +305,9 @@ func SignUp(c *gin.Context) {
 		initializers.DB.Create(&defaultSettings)
 	}
 
+	//connect new user to cache
+	cacheUser(user)
+
 	if err := sendEmailConfirmation(body.Email, confirmationCode); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"errorConfirmation": "Failed to send confirmation email "})
 		return
@@ -231,17 +328,14 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	//look up req user
-	var user models.User
-	initializers.DB.First(&user, "email = ?", body.Email)
-
-	if user.ID == 0 {
+	user, err := getUserByEmail(body.Email)
+	if err != nil || user.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"errorLogin": "Invalid email or password"})
 		return
 	}
 
 	//compare sent in pass with saved user pass hash
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"errorLogin": "Invalid email or password"})
@@ -256,18 +350,55 @@ func SignIn(c *gin.Context) {
 
 	//Ensure Workspace settings exist for the user
 	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", user.ID).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			defaultSettings := models.PomodoroModel{
-				UserID:             user.ID,
-				PomodoroDuration:   25,
-				ShortBreakDuration: 5,
-				LongBreakDuration:  15,
+	pomodoroKey := fmt.Sprintf("pomodoro:%d", user.ID)
+	pomodoroJSON, redisErr := initializers.RedisClient.Get(initializers.Ctx, pomodoroKey).Result()
+
+	if redisErr == nil {
+		// find cache
+		if err := json.Unmarshal([]byte(pomodoroJSON), &settings); err != nil {
+			// continue with db, if cache is corrupted
+			if err := initializers.DB.First(&settings, "user_id = ?", user.ID).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					defaultSettings := models.PomodoroModel{
+						UserID:             user.ID,
+						PomodoroDuration:   25,
+						ShortBreakDuration: 5,
+						LongBreakDuration:  15,
+					}
+					initializers.DB.Create(&defaultSettings)
+
+					// save new data to cache
+					settingsJSON, _ := json.Marshal(defaultSettings)
+					initializers.RedisClient.Set(initializers.Ctx, pomodoroKey, settingsJSON, UserCacheTTL)
+				} else {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check pomodoro settings"})
+					return
+				}
 			}
-			initializers.DB.Create(&defaultSettings)
+		}
+	} else {
+		// no cache, get from db
+		if err := initializers.DB.First(&settings, "user_id = ?", user.ID).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				defaultSettings := models.PomodoroModel{
+					UserID:             user.ID,
+					PomodoroDuration:   25,
+					ShortBreakDuration: 5,
+					LongBreakDuration:  15,
+				}
+				initializers.DB.Create(&defaultSettings)
+
+				// save new data to cache
+				settingsJSON, _ := json.Marshal(defaultSettings)
+				initializers.RedisClient.Set(initializers.Ctx, pomodoroKey, settingsJSON, UserCacheTTL)
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check pomodoro settings"})
+				return
+			}
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check pomodoro settings"})
-			return
+			// save existing data to cache
+			settingsJSON, _ := json.Marshal(settings)
+			initializers.RedisClient.Set(initializers.Ctx, pomodoroKey, settingsJSON, UserCacheTTL)
 		}
 	}
 
@@ -366,9 +497,9 @@ func RefreshToken(c *gin.Context) {
 		return
 	}
 
-	//find user db
-	var user models.User
-	if err := initializers.DB.First(&user, uint(sub)).Error; err != nil || user.ID == 0 {
+	//find user using cache
+	user, err := getUserByID(uint(sub))
+	if err != nil || user.ID == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found!"})
 		return
 	}
@@ -434,6 +565,17 @@ func DeleteUser(c *gin.Context) {
 	currentUser := user.(models.User)
 
 	userID := currentUser.ID
+
+	//delete user data from cache
+	invalidateUserCache(currentUser)
+
+	//delete pomodoro from cache
+	pomodoroKey := fmt.Sprintf("pomodoro:%d", userID)
+	initializers.RedisClient.Del(initializers.Ctx, pomodoroKey)
+
+	//delete stats from cache
+	statsKey := fmt.Sprintf("%s%d", StatsCachePrefix, userID)
+	initializers.RedisClient.Del(initializers.Ctx, statsKey)
 
 	//use transaction to ensure data integrity
 	tx := initializers.DB.Begin()
@@ -522,11 +664,15 @@ func ChangeUsername(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 	}
 
+	invalidateUserCache(currentUser)
+
 	currentUser.Username = body.NewUsername
 	if err := initializers.DB.Save(&currentUser).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update username"})
 		return
 	}
+
+	cacheUser(currentUser)
 
 	c.JSON(http.StatusOK, gin.H{"success": "Username updated successfully!"})
 }
