@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"errors"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"server/cache"
 	"server/initializers"
 	"server/models"
 	"server/utils"
@@ -26,8 +28,9 @@ func UpdatePomodoroSettings(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+	//get settings using cache
+	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			settings = models.PomodoroModel{
 				UserID:             currentUser.ID,
@@ -37,16 +40,25 @@ func UpdatePomodoroSettings(c *gin.Context) {
 				AutoTransition:     body.AutoTransition,
 			}
 			initializers.DB.Create(&settings)
+
+			//add new settings to cache
+			cache.CachePomodoroSettings(settings)
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch pomodoro settings"})
 			return
 		}
 	} else {
+		//invalidate cache before update
+		cache.InvalidatePomodoroCache(currentUser.ID)
+
 		settings.PomodoroDuration = body.Pomodoro
 		settings.ShortBreakDuration = body.ShortBreak
 		settings.LongBreakDuration = body.LongBreak
 		settings.AutoTransition = body.AutoTransition
 		initializers.DB.Save(&settings)
+
+		//update cache with new settings
+		cache.CachePomodoroSettings(settings)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "Settings updated successfully"})
@@ -56,8 +68,9 @@ func GetPomodoroSettings(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+	//get settings using cache
+	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
 		return
 	}
@@ -77,8 +90,9 @@ func FetchPomodoroStatus(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+	//get settings using cache
+	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
 		return
 	}
@@ -107,8 +121,9 @@ func StartPomodoro(c *gin.Context) {
 		return
 	}
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+	//get settings using cache
+	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
 		return
 	}
@@ -117,6 +132,9 @@ func StartPomodoro(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Timer already running"})
 		return
 	}
+
+	//invalidate cache before update
+	cache.InvalidatePomodoroCache(currentUser.ID)
 
 	if settings.CurrentPhase != body.Phase {
 		settings.CurrentPhase = body.Phase
@@ -133,6 +151,9 @@ func StartPomodoro(c *gin.Context) {
 	settings.IsRunning = true
 	initializers.DB.Save(&settings)
 
+	//update cache with new settings
+	cache.CachePomodoroSettings(settings)
+
 	utils.StartPomodoroTimer(currentUser.ID)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -146,8 +167,9 @@ func StopPomodoro(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+	//get settings using cache
+	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
 		return
 	}
@@ -157,8 +179,12 @@ func StopPomodoro(c *gin.Context) {
 		return
 	}
 
+	cache.InvalidatePomodoroCache(currentUser.ID)
+
 	settings.IsRunning = false
 	initializers.DB.Save(&settings)
+
+	cache.CachePomodoroSettings(settings)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success":       "Timer stopped successfully",
@@ -181,13 +207,16 @@ func ChangePhase(c *gin.Context) {
 		return
 	}
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Pomodoro settings not found"})
+	//get settings using cache
+	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
 		return
 	}
 
 	if settings.CurrentPhase != body.Phase {
+
+		cache.InvalidatePomodoroCache(currentUser.ID)
 
 		settings.CurrentPhase = body.Phase
 		switch settings.CurrentPhase {
@@ -201,6 +230,8 @@ func ChangePhase(c *gin.Context) {
 	}
 
 	initializers.DB.Save(&settings)
+
+	cache.CachePomodoroSettings(settings)
 
 	c.JSON(http.StatusOK, gin.H{"success": "Phase changed", "currentPhase": settings.CurrentPhase})
 }
@@ -223,15 +254,19 @@ func UpdateAutoTransition(c *gin.Context) {
 	}
 	currentUser := user.(models.User)
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+	//get settings using cache
+	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro settings not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant fetch pomodoro settings"})
 		}
 		return
 	}
+
+	cache.InvalidatePomodoroCache(currentUser.ID)
 
 	settings.AutoTransition = body.AutoTransition
 
@@ -239,6 +274,8 @@ func UpdateAutoTransition(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant update auto transition"})
 		return
 	}
+
+	cache.CachePomodoroSettings(settings)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success":        "Auto transition updated successfully",
@@ -250,8 +287,8 @@ func ResetCompletedPomodoros(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", currentUser.ID).Error; err != nil {
+	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro settings not found"})
 		} else {
@@ -260,12 +297,16 @@ func ResetCompletedPomodoros(c *gin.Context) {
 		return
 	}
 
+	cache.InvalidatePomodoroCache(currentUser.ID)
+
 	settings.CompletedPomodoros = 0
 
 	if err := initializers.DB.Save(&settings).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reset completed pomodoros"})
 		return
 	}
+
+	cache.CachePomodoroSettings(settings)
 
 	c.JSON(http.StatusOK, gin.H{"success": "Completed pomodoros reset to 0"})
 }

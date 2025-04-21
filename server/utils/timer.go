@@ -1,8 +1,8 @@
 package utils
 
 import (
+	"server/cache"
 	"server/initializers"
-	"server/models"
 	"sync"
 	"time"
 )
@@ -13,32 +13,8 @@ func StartPomodoroTimer(userID uint) {
 	timerMutex.Lock()
 	defer timerMutex.Unlock()
 
-	var settings models.PomodoroModel
-	if err := initializers.DB.First(&settings, "user_id = ?", userID).Error; err != nil {
-		return
-	}
-
-	var duration int
-	// Set the duration based on the current phase
-	switch settings.CurrentPhase {
-	case "pomodoro":
-		duration = settings.PomodoroDuration * 60
-	case "shortBreak":
-		duration = settings.ShortBreakDuration * 60
-	case "longBreak":
-		duration = settings.LongBreakDuration * 60
-	default:
-		return
-	}
-
-	// Reset RemainingTime to full duration when switching phases
-	if settings.RemainingTime == 0 || settings.IsRunning == false {
-		settings.RemainingTime = duration
-	}
-
-	// Set the timer to "running"
-	settings.IsRunning = true
-	if err := initializers.DB.Save(&settings).Error; err != nil {
+	settings, err := cache.GetPomodoroSettingsByUserID(userID)
+	if err != nil {
 		return
 	}
 
@@ -49,7 +25,13 @@ func StartPomodoroTimer(userID uint) {
 		for {
 			<-timer.C
 			timerMutex.Lock()
-			initializers.DB.First(&settings, "user_id = ?", userID)
+
+			updatedSettings, err := cache.GetPomodoroSettingsByUserID(userID)
+			if err != nil {
+				timerMutex.Unlock()
+				return
+			}
+			settings = updatedSettings
 
 			if !settings.IsRunning {
 				timerMutex.Unlock()
@@ -72,11 +54,9 @@ func StartPomodoroTimer(userID uint) {
 				case "shortBreak":
 					settings.CurrentPhase = "pomodoro"
 					settings.RemainingTime = settings.PomodoroDuration * 60
-
 				case "longBreak":
 					settings.CurrentPhase = "pomodoro"
 					settings.RemainingTime = settings.PomodoroDuration * 60
-
 				}
 
 				if settings.AutoTransition {
@@ -85,10 +65,13 @@ func StartPomodoroTimer(userID uint) {
 					settings.IsRunning = false // Stop timer
 				}
 
+				cache.InvalidatePomodoroCache(userID)
 				if err := initializers.DB.Save(&settings).Error; err != nil {
 					timerMutex.Unlock()
 					return
 				}
+
+				cache.CachePomodoroSettings(settings)
 
 				if !settings.AutoTransition {
 					timerMutex.Unlock()
@@ -100,7 +83,12 @@ func StartPomodoroTimer(userID uint) {
 			}
 
 			settings.RemainingTime--
+
+			cache.InvalidatePomodoroCache(userID)
 			initializers.DB.Save(&settings)
+
+			cache.CachePomodoroSettings(settings)
+
 			timerMutex.Unlock()
 		}
 	}()
