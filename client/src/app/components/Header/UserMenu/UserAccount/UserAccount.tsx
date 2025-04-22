@@ -6,12 +6,14 @@ import {
   deleteUser,
   validateUser,
 } from "@/app/redux/slices/userSlice/asyncActions";
+import { clearUsernameError } from "@/app/redux/slices/userSlice/userSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { UserAccountProps } from "@/app/utility/types/componentTypes";
 import { useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const UserAccount: React.FC<UserAccountProps> = ({
   openAccSettings,
@@ -23,7 +25,9 @@ const UserAccount: React.FC<UserAccountProps> = ({
   const dispatch: AppDispatch = useDispatch();
 
   const { successLogout } = useSelector((state: RootState) => state.auth);
-  const { user, successDelete } = useSelector((state: RootState) => state.user);
+  const { user, successDelete, error } = useSelector(
+    (state: RootState) => state.user
+  );
 
   const router = useRouter();
   const context = useContext(MyContext);
@@ -71,6 +75,17 @@ const UserAccount: React.FC<UserAccountProps> = ({
     if (user) setNewUsername(user.username);
   }, [user]);
 
+  useEffect(() => {
+    if (error) {
+      console.log("Toast triggered with error:", error);
+      toast.error(error, {
+        theme: "dark",
+        autoClose: 2000,
+        onClose: () => dispatch(clearUsernameError()),
+      });
+    }
+  }, [dispatch, error]);
+
   return (
     <>
       {openAccSettings && (
@@ -110,15 +125,16 @@ const UserAccount: React.FC<UserAccountProps> = ({
 
               {/* Name */}
               <div className="mb-4">
-                <label className="text-gray-400 dark:text-lightText text-sm font-medium mb-1 block">
+                <label className="text-gray-400 dark:text-lightText text-sm font-medium mb-1 flex ">
                   Username:
                 </label>
+
                 <input
                   type="text"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full bg-main dark:bg-lightMain text-gray-300 dark:text-lightText text-sm rounded-md px-3 py-2 border border-gray-500 dark:border-lightBorder focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-lightText"
+                  className="w-full  bg-main dark:bg-lightMain text-gray-300 dark:text-lightText text-sm rounded-md px-3 py-2 border border-gray-500 dark:border-lightBorder focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-lightText"
                 />
               </div>
 

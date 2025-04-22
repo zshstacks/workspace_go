@@ -14,7 +14,7 @@ export default function RootLayout({
       <body className="relative">
         <Provider store={store}>
           {children}
-          <ToastContainer />
+          <ToastContainer toastStyle={{ zIndex: 100000 }} />
         </Provider>
       </body>
     </html>

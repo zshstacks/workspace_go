@@ -12,7 +12,6 @@ import React, {
 
 import { MyContext } from "@/app/components/Workspace/Workspace";
 import { HeaderProps } from "@/app/utility/types/componentTypes";
-import { useToggleState } from "@/app/hooks/useToggleState";
 
 import {
   AiOutlineFullscreen,

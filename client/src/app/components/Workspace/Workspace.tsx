@@ -10,7 +10,7 @@ const Workspace = () => {
   const [theme, setTheme] = useState<"dark" | "light">("light");
 
   return (
-    <div className=" min-h-screen  overflow-hidden ">
+    <div className=" min-h-screen overflow-hidden ">
       <VideoBackground />
       <MyContext.Provider value={{ theme, setTheme }}>
         <WorkspaceContent />

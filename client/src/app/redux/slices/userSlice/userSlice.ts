@@ -13,7 +13,11 @@ const initialState: UserState = {
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    clearUsernameError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
 
@@ -50,5 +54,7 @@ const userSlice = createSlice({
       );
   },
 });
+
+export const { clearUsernameError } = userSlice.actions;
 
 export default userSlice.reducer;
