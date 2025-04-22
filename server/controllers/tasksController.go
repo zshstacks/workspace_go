@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"server/initializers"
@@ -10,6 +12,41 @@ import (
 	"time"
 )
 
+const (
+	TasksCachePrefix = "tasks:"
+	TasksCacheTTL    = 15 * time.Minute
+)
+
+// Generate cache key for task lists with filters
+func getTasksListCacheKey(userID uint, hideCompleted bool, showTodayOnly bool) string {
+	return fmt.Sprintf("%s%d:hideCompleted:%t:todayOnly:%t", TasksCachePrefix, userID, hideCompleted, showTodayOnly)
+}
+
+// cache tasks list by filters
+func cacheTaskList(userID uint, hideCompleted bool, showTodayOnly bool, tasks []models.TasksModel) error {
+	tasksJSON, err := json.Marshal(tasks)
+	if err != nil {
+		return err
+	}
+
+	key := getTasksListCacheKey(userID, hideCompleted, showTodayOnly)
+	return initializers.RedisClient.Set(initializers.Ctx, key, tasksJSON, TasksCacheTTL).Err()
+}
+
+// invalidate all task caches for a user
+func invalidateUserTaskCaches(userID uint) {
+	// get all keys with the users prefix
+	pattern := fmt.Sprintf("%s%d:*", TasksCachePrefix, userID)
+	keys, err := initializers.RedisClient.Keys(initializers.Ctx, pattern).Result()
+	if err != nil {
+		return
+	}
+
+	if len(keys) > 0 {
+		initializers.RedisClient.Del(initializers.Ctx, keys...)
+	}
+}
+
 func GetAllTasks(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
@@ -17,6 +54,18 @@ func GetAllTasks(c *gin.Context) {
 	//get filter params from req
 	hideCompleted := c.Query("hideCompleted") == "true"
 	showTodayOnly := c.Query("showTodayOnly") == "true"
+
+	cacheKey := getTasksListCacheKey(currentUser.ID, hideCompleted, showTodayOnly)
+	cachedTasks, err := initializers.RedisClient.Get(initializers.Ctx, cacheKey).Result()
+	if err == nil {
+		// Found in cache
+		var tasks []models.TasksModel
+		if err := json.Unmarshal([]byte(cachedTasks), &tasks); err == nil {
+			c.JSON(http.StatusOK, gin.H{"data": tasks})
+			return
+		}
+
+	}
 
 	query := initializers.DB.Where("user_id = ?", currentUser.ID)
 
@@ -36,6 +85,8 @@ func GetAllTasks(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No tasks found!"})
 		return
 	}
+
+	go cacheTaskList(currentUser.ID, hideCompleted, showTodayOnly, tasks)
 
 	c.JSON(http.StatusOK, gin.H{"data": tasks})
 }
@@ -77,7 +128,6 @@ func CreateTask(c *gin.Context) {
 		Select("COALESCE(MAX(`order`), 0)").
 		Scan(&maxOrder)
 
-	// Ja rodas kļūda, uzstādām maxOrder uz 0
 	if result.Error != nil {
 		maxOrder = 0
 	}
@@ -97,6 +147,8 @@ func CreateTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant create a task!"})
 		return
 	}
+
+	invalidateUserTaskCaches(currentUser.ID)
 
 	c.JSON(http.StatusOK, gin.H{"data": task})
 }
@@ -139,6 +191,8 @@ func UpdateTaskTitle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant update task title!"})
 		return
 	}
+
+	invalidateUserTaskCaches(currentUser.ID)
 
 	c.JSON(http.StatusOK, gin.H{"data": task})
 }
@@ -183,6 +237,8 @@ func UpdateTaskDescription(c *gin.Context) {
 		return
 	}
 
+	invalidateUserTaskCaches(currentUser.ID)
+
 	c.JSON(http.StatusOK, gin.H{"data": task})
 
 }
@@ -221,6 +277,8 @@ func CompleteTask(c *gin.Context) {
 		return
 	}
 
+	invalidateUserTaskCaches(currentUser.ID)
+
 	c.JSON(http.StatusOK, gin.H{"data": task})
 }
 
@@ -248,6 +306,8 @@ func DeleteTask(c *gin.Context) {
 		return
 	}
 
+	invalidateUserTaskCaches(currentUser.ID)
+
 	c.JSON(http.StatusOK, gin.H{"message": "Task successfully deleted!"})
 }
 
@@ -259,6 +319,8 @@ func DeleteAllTasks(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant delete all tasks!"})
 		return
 	}
+
+	invalidateUserTaskCaches(currentUser.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "All tasks successfully deleted!"})
 }
@@ -278,6 +340,8 @@ func DeleteAllCompletedTasks(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "No completed tasks to delete"})
 		return
 	}
+
+	invalidateUserTaskCaches(currentUser.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "All completed tasks successfully deleted!", "count": result.RowsAffected})
 }
@@ -309,5 +373,8 @@ func UpdateTasksOrder(c *gin.Context) {
 	}
 
 	tx.Commit()
+
+	invalidateUserTaskCaches(currentUser.ID)
+
 	c.JSON(http.StatusOK, gin.H{"message": "Tasks order updated successfully!"})
 }
