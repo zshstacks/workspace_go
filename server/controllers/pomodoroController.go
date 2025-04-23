@@ -25,6 +25,20 @@ func UpdatePomodoroSettings(c *gin.Context) {
 		return
 	}
 
+	if body.Pomodoro < 1 || body.Pomodoro > 60 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Pomodoro duration must be between 1 and 60 minutes"})
+		return
+	}
+
+	if body.ShortBreak < 1 || body.ShortBreak > 60 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Short break duration must be between 1 and 60 minutes"})
+		return
+	}
+	if body.LongBreak < 1 || body.LongBreak > 60 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Long break duration must be between 1 and 60 minutes"})
+		return
+	}
+
 	user, _ := c.Get("user")
 	currentUser := user.(models.User)
 
