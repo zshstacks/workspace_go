@@ -14,6 +14,7 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { ImSpinner2 } from "react-icons/im";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +22,7 @@ const Signin = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { successLogin, errorLogin } = useSelector(
+  const { successLogin, errorLogin, isLoading } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -105,9 +106,18 @@ const Signin = () => {
           <div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              disabled={isLoading}
+              className={`w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 focus:ring-2 focus:ring-blue-400 focus:outline-none flex justify-center items-center ${
+                isLoading && "opacity-70 cursor-not-allowed"
+              }`}
             >
-              Login
+              {isLoading ? (
+                <div className="animate-spin">
+                  <ImSpinner2 />
+                </div>
+              ) : (
+                " Login"
+              )}
             </button>
           </div>
         </form>

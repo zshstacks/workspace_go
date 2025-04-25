@@ -53,7 +53,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
       <div className="h-[1px] w-full bg-white/25 dark:bg-lightBorder"></div>
 
       <div className="flex justify-center p-6 ">
-        <a href="https://github.com/wlr1" target="_blank">
+        <a href="https://github.com/zshstacks" target="_blank">
           <PiGithubLogo color={theme === "dark" ? "#4e4e4e" : "white"} />
         </a>
       </div>

@@ -164,6 +164,19 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
     isRunning,
   ]);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "F1" && !isRunning) {
+        handleStart();
+      } else if (e.key === "F1" && isRunning) {
+        handleStop();
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isRunning, handleStart, handleStop]);
+
   // timer isRunning then refresh time
   useEffect(() => {
     if (isRunning) {

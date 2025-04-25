@@ -105,7 +105,7 @@ const PomoTimerSettings: React.FC<PomoTimerSettingsProps> = ({
         <input
           id={field}
           type="number"
-          min={0}
+          min={1}
           max={60}
           value={localSettings[field]}
           className="w-[100px] rounded-sm py-[3px] px-2 mt-2 text-black dark:text-lightText text-sm font-normal"
