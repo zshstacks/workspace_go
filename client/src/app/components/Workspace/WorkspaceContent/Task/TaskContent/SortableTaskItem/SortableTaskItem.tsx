@@ -20,6 +20,10 @@ const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
   dispatch,
   isDragging = false,
 }) => {
+  const userLocale =
+    typeof window !== "undefined" ? navigator.language : "en-US";
+  const isUS = userLocale.startsWith("en-US");
+
   const {
     attributes,
     listeners,
@@ -165,15 +169,34 @@ const SortableTaskItem: React.FC<SortableTaskItemProps> = ({
             </button>
           </div>
 
-          <span
-            className={`text-neutral-300 dark:text-neutral-600 text-sm ${
-              task.Completed
-                ? "line-through text-neutral-500 dark:text-neutral-400"
-                : ""
-            }`}
-          >
-            #{task.LocalID}
-          </span>
+          <div className="flex gap-2 text-xs">
+            <span
+              className={`text-neutral-300 dark:text-neutral-600  ${
+                task.Completed
+                  ? "line-through text-neutral-500 dark:text-neutral-400"
+                  : ""
+              }`}
+            >
+              {task.CreatedAt &&
+                new Date(task.CreatedAt).toLocaleString(userLocale, {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: isUS,
+                })}
+            </span>
+            <span
+              className={`text-neutral-300 dark:text-neutral-600 ${
+                task.Completed
+                  ? "line-through text-neutral-500 dark:text-neutral-400"
+                  : ""
+              }`}
+            >
+              #{task.LocalID}
+            </span>
+          </div>
         </div>
       </div>
     </div>

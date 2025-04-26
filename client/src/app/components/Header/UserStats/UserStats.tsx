@@ -9,6 +9,7 @@ import {
   getAllStats,
   updateDailyStreak,
 } from "@/app/redux/slices/statsSlice/asyncActions";
+import { FcCalendar } from "react-icons/fc";
 
 const UserStats: React.FC<UserStatsProps> = ({
   openUserStats,
@@ -81,10 +82,11 @@ const UserStats: React.FC<UserStatsProps> = ({
                   <div className="h-[51px] w-[1px] bg-neutral-600 dark:bg-lightBorder  my-auto"></div>
                   <div>
                     <div className="text-sm text-center text-white dark:text-lightText mb-2">
-                      Empty
+                      Total visit days
                     </div>
                     <div className="text-secondary text-xl text-center flex justify-center gap-2">
-                      Empty
+                      <FcCalendar size={19} className="mt-[6px]" />
+                      {stats.totalVisits}
                     </div>
                   </div>
                 </div>

@@ -6,6 +6,7 @@ const initialState: StatsState = {
   currentStreak: 0,
   highestStreak: 0,
   lastVisitDate: 0,
+  totalVisits: 0,
   isLoading: false,
   error: null,
 };
@@ -22,6 +23,7 @@ const statsSlice = createSlice({
         state.currentStreak = action.payload.currentStreak;
         state.highestStreak = action.payload.highestStreak;
         state.lastVisitDate = action.payload.lastVisitDate;
+        state.totalVisits = action.payload.totalVisits;
       })
 
       .addCase(updateDailyStreak.fulfilled, (state, action) => {
@@ -29,6 +31,7 @@ const statsSlice = createSlice({
         state.currentStreak = action.payload.currentStreak;
         state.highestStreak = action.payload.highestStreak;
         state.lastVisitDate = action.payload.lastVisitDate;
+        state.totalVisits = action.payload.totalVisits;
       })
 
       .addMatcher(

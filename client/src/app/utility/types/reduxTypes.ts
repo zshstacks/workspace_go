@@ -94,6 +94,7 @@ export interface StatsState {
   highestStreak: number;
   isLoading: boolean;
   lastVisitDate: number;
+  totalVisits: number;
 
   error: string | null;
 }
