@@ -5,8 +5,10 @@ export interface HeaderProps {
   setOpenAccSettings: () => void;
   setIsTimerActive: () => void;
   setIsTodoActive: () => void;
+  setIsPaintActive: () => void;
   setOpenUserStats: () => void;
   isTimerActive: boolean;
+  isPaintActive: boolean;
   isTodoActive: boolean;
   hideElementsActive: boolean;
   hideAfterSeconds: number;

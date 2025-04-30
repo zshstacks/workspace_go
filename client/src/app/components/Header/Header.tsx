@@ -37,6 +37,7 @@ import {
   updateDailyStreak,
 } from "@/app/redux/slices/statsSlice/asyncActions";
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
+import { PiPaintBucketBold } from "react-icons/pi";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
 
@@ -44,9 +45,11 @@ const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,
   setOpenAccSettings,
   setIsTimerActive,
+  setIsPaintActive,
   setIsTodoActive,
   setOpenUserStats,
   isTimerActive,
+  isPaintActive,
   isTodoActive,
   hideElementsActive,
   hideAfterSeconds,
@@ -194,7 +197,7 @@ const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* center section */}
-      <div className="flex justify-center bg-main dark:bg-lightMain rounded-md w-[88px] h-[32px]">
+      <div className="flex justify-center bg-main dark:bg-lightMain rounded-md min-w-[88px] h-[32px]">
         {/* timer */}
         <div
           className="flex my-auto ml-2 p-1  hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
@@ -218,13 +221,34 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* todo */}
         <div
-          className="flex my-auto mr-2 p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
+          className="flex my-auto  p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
           onClick={setIsTodoActive}
         >
           <LuPencilLine
             size={19}
             color={`${
               isTodoActive ? " #e89688" : theme === "dark" ? "#4e4e4e" : "white"
+            }
+              `}
+          />
+        </div>
+
+        {/* divider */}
+        <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder my-auto mx-2"></div>
+
+        {/* paint */}
+        <div
+          className="flex my-auto mr-2 p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
+          onClick={setIsPaintActive}
+        >
+          <PiPaintBucketBold
+            size={19}
+            color={`${
+              isPaintActive
+                ? " #e89688"
+                : theme === "dark"
+                ? "#4e4e4e"
+                : "white"
             }
               `}
           />

@@ -41,6 +41,7 @@ const WorkspaceContent = () => {
   const [openSettings, setOpenSettings] = useToggleState(false);
   const [isTimerActive, setIsTimerActive] = useToggleState(true);
   const [isTodoActive, setIsTodoActive] = useToggleState(false);
+  const [isPaintActive, setIsPaintActive] = useToggleState(false);
   const [openUserStats, setOpenUserStats] = useToggleState(false);
 
   const [hideElementsActive, setHideElementsActive] = useState(false);
@@ -116,9 +117,11 @@ const WorkspaceContent = () => {
           setOpenUISettings={setOpenUISettings}
           setOpenAccSettings={setOpenAccSettings}
           setIsTimerActive={setIsTimerActive}
+          setIsPaintActive={setIsPaintActive}
           setIsTodoActive={setIsTodoActive}
           setOpenUserStats={setOpenUserStats}
           isTimerActive={isTimerActive}
+          isPaintActive={isPaintActive}
           isTodoActive={isTodoActive}
           hideElementsActive={hideElementsActive}
           hideAfterSeconds={hideAfterSeconds}
