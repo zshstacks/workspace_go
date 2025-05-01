@@ -20,6 +20,7 @@ import { useToggleState } from "@/app/hooks/useToggleState";
 import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
 import RenderModalComponent from "@/app/hooks/Modal/RenderModalComponent";
+import { restrictToPaintBoundingBox } from "@/app/hooks/restrictToPaintBoundingBox";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
@@ -34,6 +35,7 @@ const Appearance = lazy(
   () => import("../../Header/UserMenu/Appearance/Appearance")
 );
 const PomoTimer = lazy(() => import("./PomoTimer/PomoTimer"));
+const Paint = lazy(() => import("./Paint/Paint"));
 
 const WorkspaceContent = () => {
   const [openUISettings, setOpenUISettings] = useToggleState(false);
@@ -47,9 +49,13 @@ const WorkspaceContent = () => {
   const [hideElementsActive, setHideElementsActive] = useState(false);
   const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
   const [dimensions, setDimensions] = useState({ width: 490, height: 478 });
-  const [activeWidget, setActiveWidget] = useState<"todo" | "pomodoro">(
-    "pomodoro"
-  );
+  const [dimensionsPaint, setDimensionsPaint] = useState({
+    width: 590,
+    height: 478,
+  });
+  const [activeWidget, setActiveWidget] = useState<
+    "todo" | "pomodoro" | "paint"
+  >("pomodoro");
   const [isClient, setIsClient] = useState(false);
   const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
 
@@ -94,15 +100,28 @@ const WorkspaceContent = () => {
 
   const handleTodoDragEnd = useCallback(
     (delta: { x: number; y: number }) => {
-      const currentTimer = widgetLayout.TodoWidget || { xPos: 0, yPos: 0 };
-      const newTimerInfo = {
-        ...currentTimer,
-        xPos: currentTimer.xPos + delta.x,
-        yPos: currentTimer.yPos + delta.y,
+      const currentTodo = widgetLayout.TodoWidget || { xPos: 0, yPos: 0 };
+      const newTodoInfo = {
+        ...currentTodo,
+        xPos: currentTodo.xPos + delta.x,
+        yPos: currentTodo.yPos + delta.y,
       };
-      updateWidgetLayout("TodoWidget", newTimerInfo);
+      updateWidgetLayout("TodoWidget", newTodoInfo);
     },
     [updateWidgetLayout, widgetLayout.TodoWidget]
+  );
+
+  const handlePaintDragEnd = useCallback(
+    (delta: { x: number; y: number }) => {
+      const currentPaint = widgetLayout.PaintWidget || { xPos: 0, yPos: 0 };
+      const newPaintInfo = {
+        ...currentPaint,
+        xPos: currentPaint.xPos + delta.x,
+        yPos: currentPaint.yPos + delta.y,
+      };
+      updateWidgetLayout("PaintWidget", newPaintInfo);
+    },
+    [updateWidgetLayout, widgetLayout.PaintWidget]
   );
 
   if (!isClient) {
@@ -193,6 +212,29 @@ const WorkspaceContent = () => {
               dimensions={dimensions}
               activeWidget={activeWidget}
               setActiveWidget={setActiveWidget}
+            />
+          </DndContext>
+        </Suspense>
+      )}
+
+      {/* paint */}
+      {isPaintActive && (
+        <Suspense>
+          <DndContext
+            modifiers={[restrictToPaintBoundingBox(dimensionsPaint)]}
+            onDragEnd={(event) => {
+              const { delta } = event;
+              handlePaintDragEnd(delta);
+            }}
+            id={dndId}
+          >
+            <Paint
+              widgetInfo={widgetLayout.PaintWidget}
+              activeWidget={activeWidget}
+              setDimensionsPaint={setDimensionsPaint}
+              dimensionsPaint={dimensionsPaint}
+              setActiveWidget={setActiveWidget}
+              setIsPaintActive={setIsPaintActive}
             />
           </DndContext>
         </Suspense>

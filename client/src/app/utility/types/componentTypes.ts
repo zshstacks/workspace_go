@@ -39,6 +39,7 @@ export interface WidgetInfo {
 export interface SavedWidgetLayoutInfo {
   TimerWidget?: WidgetInfo;
   TodoWidget?: WidgetInfo;
+  PaintWidget?: WidgetInfo;
 }
 
 export interface PomoTimerProps {
@@ -47,7 +48,7 @@ export interface PomoTimerProps {
   setIsTimerActive: () => void;
   widgetInfo?: WidgetInfo;
   activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo") => void;
+  setActiveWidget: (value: "pomodoro" | "todo" | "paint") => void;
 }
 
 export interface PomoTimerSettingsProps {
@@ -69,7 +70,16 @@ export interface TodoProps {
   dimensions: { width: number; height: number };
   setDimensions: (dimensions: { width: number; height: number }) => void;
   activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo") => void;
+  setActiveWidget: (value: "pomodoro" | "todo" | "paint") => void;
+}
+
+export interface PaintProps {
+  setIsPaintActive: () => void;
+  dimensionsPaint: { width: number; height: number };
+  setDimensionsPaint: (dimensions: { width: number; height: number }) => void;
+  widgetInfo?: WidgetInfo;
+  activeWidget: string;
+  setActiveWidget: (value: "pomodoro" | "todo" | "paint") => void;
 }
 
 export interface EmailModalProps {
