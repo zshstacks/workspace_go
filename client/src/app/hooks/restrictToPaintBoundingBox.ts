@@ -11,8 +11,8 @@ export const restrictToPaintBoundingBox =
     const boundingBox = {
       top: 68,
       bottom: window.innerHeight + 8,
-      left: 107,
-      right: window.innerWidth + 105,
+      left: 199,
+      right: window.innerWidth + 200,
     };
 
     let newX = transform.x;

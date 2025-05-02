@@ -102,3 +102,9 @@ export interface UserStatsProps {
   setOpenUserStats: (a: boolean) => void;
   openUserStats: boolean;
 }
+
+//fabric.js paint
+export interface FabricProps {
+  width: number;
+  height: number;
+}

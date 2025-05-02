@@ -50,8 +50,8 @@ const WorkspaceContent = () => {
   const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
   const [dimensions, setDimensions] = useState({ width: 490, height: 478 });
   const [dimensionsPaint, setDimensionsPaint] = useState({
-    width: 590,
-    height: 478,
+    width: 1100,
+    height: 750,
   });
   const [activeWidget, setActiveWidget] = useState<
     "todo" | "pomodoro" | "paint"

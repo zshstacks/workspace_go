@@ -3,6 +3,8 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { MyContext } from "../../Workspace";
 import { useDraggable } from "@dnd-kit/core";
 import { FaRegWindowMinimize } from "react-icons/fa";
+import PaintContent from "./PaintContent/PaintContent";
+import FabricDrawing from "@/app/hooks/FabricDrawing/FabricDrawing";
 
 const Paint: React.FC<PaintProps> = ({
   setIsPaintActive,
@@ -108,10 +110,8 @@ const Paint: React.FC<PaintProps> = ({
     >
       {/* header */}
       <div className="flex justify-between p-2">
-        <div className="flex gap-2">
-          <span>brush</span>
-          <span>pen</span>
-          <span>fill</span>
+        <div className="">
+          <span className="w-48 flex">Draw your imaginations</span>
         </div>
 
         {/* div for dnd  */}
@@ -139,7 +139,12 @@ const Paint: React.FC<PaintProps> = ({
       <div className="w-full h-[1px] bg-white/25 dark:bg-lightBorder "></div>
 
       {/* content */}
-      <div>content</div>
+      <div className="flex-1 overflow-hidden">
+        <FabricDrawing
+          width={dimensionsPaint.width}
+          height={dimensionsPaint.height}
+        />
+      </div>
 
       {/* footer */}
       <div className="mt-auto">
