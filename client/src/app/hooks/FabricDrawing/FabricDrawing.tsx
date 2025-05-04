@@ -166,12 +166,12 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
   return (
     <div className="p-4">
       {/* Control header */}
-      <div className="flex flex-wrap items-center gap-3 mb-4 p-1 bg-[#3d3e42] bg-opacity-50 backdrop-blur-md rounded-2xl shadow-lg">
+      <div className="flex flex-wrap items-center gap-3 mb-4 p-1 bg-[#3d3e42] dark:bg-opacity-30 bg-opacity-50 backdrop-blur-md rounded-2xl shadow-lg">
         <div className="flex items-center gap-2">
           {/* Drawing regime */}
           <button
             onClick={() => setDrawingMode(!drawingMode)}
-            className="px-3 py-2 bg-primary text-gray-100 text-sm rounded-lg hover:bg-primary-dark transition"
+            className="px-3 py-2 bg-primary  text-sm rounded-lg hover:bg-primary-dark transition"
             title={drawingMode ? "Cancel drawing" : "Draw"}
           >
             {drawingMode ? "Cancel" : "Draw"}
@@ -180,7 +180,7 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
           {/* Clear btn */}
           <button
             onClick={() => canvasRef.current?.clear()}
-            className="p-2 bg-secondary text-gray-100 rounded-lg hover:bg-orange-700 transition"
+            className="p-2 bg-secondary  rounded-lg hover:bg-orange-700 transition"
             title="Clear"
           >
             <RiDeleteBin6Line size={20} />
@@ -190,7 +190,7 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
           <select
             value={brushType}
             onChange={(e) => setBrushType(e.target.value)}
-            className="text-sm p-2 bg-main text-gray-100 rounded-lg border border-gray-600 focus:outline-none focus:ring-1 focus:ring-primary focus:ring-sky-500"
+            className="text-sm p-2 bg-main dark:bg-lightMain/65 rounded-lg border border-gray-600 focus:outline-none focus:ring-1 focus:ring-primary focus:ring-sky-500 cursor-pointer"
             title="Choose a brush"
           >
             <option value="Pencil">Pencil</option>
@@ -205,7 +205,7 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
 
         <div className="flex flex-wrap items-center gap-4 ">
           {/* Color */}
-          <label className="flex items-center text-gray-200 text-xs">
+          <label className="flex items-center  text-xs">
             <span className="mr-1">Color:</span>
             <input
               type="color"
@@ -215,7 +215,7 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
               title="Line color"
             />
           </label>
-          <label className="flex items-center text-gray-200 text-xs">
+          <label className="flex items-center  text-xs">
             <span className="mr-1">Shadow:</span>
             <input
               type="color"
@@ -228,7 +228,7 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
 
           {/* sliders */}
           <div className="flex flex-wrap items-center gap-2">
-            <label className="text-xs  text-gray-200">
+            <label className="text-xs ">
               Width: {lineWidth}
               <input
                 type="range"
@@ -241,7 +241,7 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
               />
             </label>
 
-            <label className="text-xs text-gray-200">
+            <label className="text-xs">
               Shadow W: {shadowWidth}
               <input
                 type="range"
@@ -254,7 +254,7 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
               />
             </label>
 
-            <label className="text-xs text-gray-200">
+            <label className="text-xs">
               Offset: {shadowOffset}
               <input
                 type="range"
@@ -271,7 +271,7 @@ const FabricDrawing: React.FC<FabricProps> = ({ width, height }) => {
       </div>
 
       {/* Drawing canvas */}
-      <div className="rounded-xl overflow-hidden ">
+      <div className="rounded-xl overflow-hidden shadow-inner shadow-black">
         <canvas ref={canvasElRef} />
       </div>
     </div>
