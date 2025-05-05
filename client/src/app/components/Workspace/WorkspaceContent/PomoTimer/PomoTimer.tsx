@@ -212,9 +212,27 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       : "workspace_go by wlr1";
   }, [remainingTime, isRunning, currentPhase, formatTime]);
 
+  //after page refresh if timer isRunning, it sets to 0(so basically bug fix when i cant start the timer again after page reload bcs of redis caching)
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      if (isRunning) {
+        await dispatch(stopPomodoro());
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [dispatch, isRunning]);
+
   // fetch settings
   useEffect(() => {
     dispatch(getPomodoroSettings());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchTimerStatus());
   }, [dispatch]);
 
   //=====================

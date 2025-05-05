@@ -3,8 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { MyContext } from "../../Workspace";
 import { useDraggable } from "@dnd-kit/core";
 import { FaRegWindowMinimize } from "react-icons/fa";
-import PaintContent from "./PaintContent/PaintContent";
-import FabricDrawing from "@/app/hooks/FabricDrawing/FabricDrawing";
+import FabricDrawing from "@/app/components/Workspace/WorkspaceContent/Paint/FabricDrawing/FabricDrawing";
 
 const Paint: React.FC<PaintProps> = ({
   setIsPaintActive,
