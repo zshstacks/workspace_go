@@ -159,7 +159,7 @@ const Task: React.FC<TodoProps> = ({
   const minWidth = 300;
   const minHeight = 300;
   const maxWidth = 1150;
-  const maxHeight = 750;
+  const maxHeight = 900;
 
   const handleMouseDown = useCallback(
     (event: React.MouseEvent) => {
