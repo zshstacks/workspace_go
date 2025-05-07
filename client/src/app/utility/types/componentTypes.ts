@@ -7,6 +7,7 @@ export interface HeaderProps {
   setIsTodoActive: () => void;
   setIsPaintActive: () => void;
   setOpenUserStats: () => void;
+  setOpenBackgroundSelect: () => void;
   isTimerActive: boolean;
   isPaintActive: boolean;
   isTodoActive: boolean;
@@ -19,6 +20,11 @@ export interface AppearanceProps {
   openUISettings: boolean;
   setHideElementsActive: (a: boolean) => void;
   setHideAfterSeconds: (a: number) => void;
+}
+
+export interface BackgroundSelectProps {
+  setOpenBackgroundSelect: () => void;
+  openBackgroundSelect: boolean;
 }
 
 export interface UserAccountProps {

@@ -34,6 +34,9 @@ const UserAccount = lazy(
 const Appearance = lazy(
   () => import("../../Header/UserMenu/Appearance/Appearance")
 );
+const BackgroundSelectVideo = lazy(
+  () => import("../../Header/BackgroundSelect/BackgroundSelect")
+);
 const PomoTimer = lazy(() => import("./PomoTimer/PomoTimer"));
 const Paint = lazy(() => import("./Paint/Paint"));
 
@@ -45,6 +48,7 @@ const WorkspaceContent = () => {
   const [isTodoActive, setIsTodoActive] = useToggleState(false);
   const [isPaintActive, setIsPaintActive] = useToggleState(false);
   const [openUserStats, setOpenUserStats] = useToggleState(false);
+  const [openBackgroundSelect, setOpenBackgroundSelect] = useToggleState(false);
 
   const [hideElementsActive, setHideElementsActive] = useState(false);
   const [hideAfterSeconds, setHideAfterSeconds] = useState<number>(30);
@@ -139,6 +143,7 @@ const WorkspaceContent = () => {
           setIsPaintActive={setIsPaintActive}
           setIsTodoActive={setIsTodoActive}
           setOpenUserStats={setOpenUserStats}
+          setOpenBackgroundSelect={setOpenBackgroundSelect}
           isTimerActive={isTimerActive}
           isPaintActive={isPaintActive}
           isTodoActive={isTodoActive}
@@ -171,6 +176,16 @@ const WorkspaceContent = () => {
         isOpen={openAccSettings}
         Component={UserAccount}
         props={{ setOpenAccSettings, openAccSettings }}
+      />
+
+      {/* video background */}
+      <RenderModalComponent
+        isOpen={openBackgroundSelect}
+        Component={BackgroundSelectVideo}
+        props={{
+          setOpenBackgroundSelect,
+          openBackgroundSelect,
+        }}
       />
 
       {/* timer */}

@@ -37,7 +37,7 @@ import {
   updateDailyStreak,
 } from "@/app/redux/slices/statsSlice/asyncActions";
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
-import { PiPaintBucketBold } from "react-icons/pi";
+import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
 
@@ -48,6 +48,7 @@ const Header: React.FC<HeaderProps> = ({
   setIsPaintActive,
   setIsTodoActive,
   setOpenUserStats,
+  setOpenBackgroundSelect,
   isTimerActive,
   isPaintActive,
   isTodoActive,
@@ -260,6 +261,19 @@ const Header: React.FC<HeaderProps> = ({
         ref={userMenuRef}
         className="flex items-center bg-main dark:bg-lightMain rounded-md text-white p-1 "
       >
+        <div
+          className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
+          onClick={setOpenBackgroundSelect}
+        >
+          <PiSelectionBackground
+            size={19}
+            color={theme === "dark" ? "#4e4e4e" : "white"}
+          />
+        </div>
+
+        {/* divider */}
+        <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder mx-2"></div>
+
         <div className="relative inline-block group">
           <div
             className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer   "

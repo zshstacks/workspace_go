@@ -26,5 +26,5 @@ VideoBackground.displayName = "VideoBackground";
 
 export default VideoBackground;
 
-// https://www.youtube.com/embed/8plwv25NYRo?autoplay=1&mute=1&controls=0&start=7&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&enablejsapi=1
-// https://www.youtube.com/embed/29faxSAZXrc?autoplay=1&mute=1&controls=0&start=7&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&enablejsapi=1
+// 8plwv25NYRo
+// 29faxSAZXrc
