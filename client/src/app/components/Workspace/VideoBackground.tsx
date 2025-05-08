@@ -1,12 +1,17 @@
-import React, { memo } from "react";
+import React, { memo, useContext } from "react";
+import { MyContext } from "./Workspace";
 
 const VideoBackground = memo(() => {
+  const context = useContext(MyContext);
+  if (!context) return null;
+  const { videoId } = context;
+
   return (
     <div className="fixed inset-0  overflow-hidden">
       {/* <VideoBackground /> */}
       <div className="w-[100vw] h-[100vh] ">
         <iframe
-          src="https://www.youtube.com/embed/8plwv25NYRo?autoplay=1&mute=1&controls=0&start=7&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&enablejsapi=1"
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&start=7&playsinline=1&rel=0&iv_load_policy=3&modestbranding=1&enablejsapi=1`}
           allow="autoplay;"
           title="Background Video"
           allowFullScreen
@@ -25,6 +30,3 @@ const VideoBackground = memo(() => {
 VideoBackground.displayName = "VideoBackground";
 
 export default VideoBackground;
-
-// 8plwv25NYRo
-// 29faxSAZXrc

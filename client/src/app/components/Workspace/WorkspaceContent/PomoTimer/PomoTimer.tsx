@@ -209,7 +209,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   useEffect(() => {
     document.title = isRunning
       ? `${formatTime(remainingTime)} | ${currentPhase}`
-      : "workspace_go by wlr1";
+      : "workspace_go by zshstacks";
   }, [remainingTime, isRunning, currentPhase, formatTime]);
 
   //after page refresh if timer isRunning, it sets to 0(so basically bug fix when i cant start the timer again after page reload bcs of redis caching)

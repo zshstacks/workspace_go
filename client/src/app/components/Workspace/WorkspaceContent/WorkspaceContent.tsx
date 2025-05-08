@@ -184,7 +184,6 @@ const WorkspaceContent = () => {
         Component={BackgroundSelectVideo}
         props={{
           setOpenBackgroundSelect,
-          openBackgroundSelect,
         }}
       />
 

@@ -6,7 +6,6 @@ import Image from "next/image";
 
 const BackgroundSelect: React.FC<BackgroundSelectProps> = ({
   setOpenBackgroundSelect,
-  openBackgroundSelect,
 }) => {
   const context = useContext(MyContext);
   if (!context) {
@@ -15,7 +14,30 @@ const BackgroundSelect: React.FC<BackgroundSelectProps> = ({
     );
   }
 
-  const { theme } = context;
+  const { theme, setVideoId } = context;
+
+  const options = [
+    {
+      id: "8plwv25NYRo",
+      label: "Forest Rain",
+      preview: process.env.NEXT_PUBLIC_FOREST_PREVIEW as string,
+    },
+    {
+      id: "29faxSAZXrc",
+      label: "Tokyo Rainy Night",
+      preview: process.env.NEXT_PUBLIC_TOKYO_PREVIEW as string,
+    },
+    {
+      id: "l4UBqr3Z6r8",
+      label: "Swiss village",
+      preview: process.env.NEXT_PUBLIC_SWISS_PREVIEW as string,
+    },
+    {
+      id: "Ii9fO5Y7SVo",
+      label: "Space",
+      preview: process.env.NEXT_PUBLIC_SPACE_PREVIEW as string,
+    },
+  ];
 
   return (
     <>
@@ -42,28 +64,24 @@ const BackgroundSelect: React.FC<BackgroundSelectProps> = ({
 
             {/* content */}
             <div className="grid grid-cols-2 gap-x-3 gap-y-4 text-white/90 dark:text-lightText">
-              <div className="grid">
-                <Image
-                  src={process.env.NEXT_PUBLIC_TOKYO_PREVIEW as string}
-                  className="rounded-xl cursor-pointer transition-all duration-300 hover:scale-105"
-                  width={500}
-                  height={500}
-                  alt="dsdas"
-                />
-                <span className="text-center text-sm mt-2">
-                  Tokyo Rainy Night
-                </span>
-              </div>
-              <div className="grid">
-                <Image
-                  src={process.env.NEXT_PUBLIC_FOREST_PREVIEW as string}
-                  className="rounded-xl cursor-pointer transition-all duration-300 hover:scale-105"
-                  width={500}
-                  height={500}
-                  alt="dsdas"
-                />
-                <span className="text-center text-sm mt-2">Forest Rain</span>
-              </div>
+              {options.map((opt) => (
+                <div
+                  key={opt.id}
+                  className="grid"
+                  onClick={() => {
+                    setVideoId(opt.id);
+                  }}
+                >
+                  <Image
+                    src={opt.preview}
+                    className="rounded-xl cursor-pointer transition-all duration-300 hover:scale-105"
+                    width={500}
+                    height={500}
+                    alt={opt.label}
+                  />
+                  <span className="text-center text-sm mt-2">{opt.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

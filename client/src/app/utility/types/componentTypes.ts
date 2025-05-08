@@ -24,7 +24,6 @@ export interface AppearanceProps {
 
 export interface BackgroundSelectProps {
   setOpenBackgroundSelect: () => void;
-  openBackgroundSelect: boolean;
 }
 
 export interface UserAccountProps {
