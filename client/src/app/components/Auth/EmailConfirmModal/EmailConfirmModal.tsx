@@ -133,7 +133,7 @@ const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
                   value={code[index]}
                   onChange={(e) => handleInputChange(e.target.value, index)}
                   onPaste={handlePaste}
-                  className={`w-10 h-12 text-center text-white text-lg bg-white/20 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`w-10 h-12 text-center text-white text-lg bg-white/20 border border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-white ${
                     error
                       ? "border-red-500 transition-all ease-in-out duration-300 animate__animated animate__headShake"
                       : ""
@@ -142,7 +142,7 @@ const EmailConfirmModal: React.FC<EmailModalProps> = ({ email }) => {
               ))}
             </div>
             <button
-              className="mt-6 w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md disabled:bg-gray-500"
+              className="mt-6 w-full py-2 bg-white hover:bg-white/90 text-black  font-semibold rounded-md disabled:bg-white/80"
               onClick={handleSubmit}
               disabled={isLoading}
             >

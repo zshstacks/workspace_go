@@ -15,8 +15,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { ImSpinner2 } from "react-icons/im";
-import Image from "next/image";
-import { LuGalleryVerticalEnd } from "react-icons/lu";
+
 import { IoLogoGithub } from "react-icons/io";
 
 const Signin = () => {
@@ -66,21 +65,10 @@ const Signin = () => {
   }, [successLogin, errorLogin, dispatch, router]);
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Kreisā puse */}
-      <div className="flex flex-col bg-black p-8 md:p-16">
-        <Link
-          href="#"
-          className="flex items-center gap-2 text-white font-medium mb-8"
-        >
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <LuGalleryVerticalEnd className="h-4 w-4" />
-          </div>
-          workspace-go
-        </Link>
-
+    <div className="flex min-h-svh flex-col items-center justify-center bg-[#09090b] gap-6 p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6 ">
         <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-sm  backdrop-blur-md rounded-xl shadow-lg p-8">
+          <div className="w-full max-w-sm  backdrop-blur-md rounded-xl p-8 shadow-white/35 shadow-inner bg-[#09090b] ">
             <h1 className="text-2xl font-bold text-white text-center">
               Login to your account
             </h1>
@@ -96,11 +84,15 @@ const Signin = () => {
                 <input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="email@example.com"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 p-1 bg-black border border-neutral-600 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-white"
+                  className={`w-full px-3 p-1 bg-[#09090b] border border-neutral-600 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-white ${
+                    errorLogin
+                      ? "border-red-500 transition-all ease-in-out duration-300"
+                      : ""
+                  }`}
                 />
               </div>
 
@@ -116,7 +108,11 @@ const Signin = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-1 bg-black border border-neutral-600 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-white"
+                  className={`w-full px-3 py-1 bg-[#09090b] border border-neutral-600 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-white ${
+                    errorLogin
+                      ? "border-red-500 transition-all ease-in-out duration-300"
+                      : ""
+                  }`}
                 />
               </div>
 
@@ -138,7 +134,7 @@ const Signin = () => {
 
               <button
                 type="button"
-                className="w-full flex items-center  justify-center gap-2 py-[6px] border border-neutral-600 rounded-md hover:bg-white/25 transition text-white "
+                className="w-full flex items-center justify-center gap-2 py-[6px] border border-neutral-600 rounded-md hover:bg-white/25 transition text-white "
               >
                 <IoLogoGithub size={18} />
                 <span className="text-sm font-semibold">Login with GitHub</span>
@@ -156,16 +152,6 @@ const Signin = () => {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Labā puse */}
-      <div className="relative hidden lg:block">
-        <Image
-          src={process.env.NEXT_PUBLIC_SPACE_PREVIEW as string}
-          alt="Background"
-          fill
-          className="object-cover brightness-50 "
-        />
       </div>
     </div>
   );
