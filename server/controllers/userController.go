@@ -405,7 +405,7 @@ func SignIn(c *gin.Context) {
 	//generate jwt token
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,
-		"exp": time.Now().Add(10 * time.Minute).Unix(),
+		"exp": time.Now().Add(45 * time.Minute).Unix(),
 	})
 
 	accessTokenString, err := accessToken.SignedString([]byte(os.Getenv("SECRET")))
@@ -432,7 +432,7 @@ func SignIn(c *gin.Context) {
 		Name:     "token",
 		Value:    accessTokenString,
 		HttpOnly: true,
-		MaxAge:   int((10 * time.Minute).Seconds()),
+		MaxAge:   int((45 * time.Minute).Seconds()),
 		Path:     "/",
 	})
 
@@ -507,7 +507,7 @@ func RefreshToken(c *gin.Context) {
 	//create a new accessToken
 	newAccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,
-		"exp": time.Now().Add(10 * time.Minute).Unix(),
+		"exp": time.Now().Add(45 * time.Minute).Unix(),
 	})
 	newAccessTokenString, err := newAccessToken.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
@@ -519,7 +519,7 @@ func RefreshToken(c *gin.Context) {
 		Name:     "token",
 		Value:    newAccessTokenString,
 		HttpOnly: true,
-		MaxAge:   int((10 * time.Minute).Seconds()),
+		MaxAge:   int((45 * time.Minute).Seconds()),
 		Path:     "/",
 	})
 

@@ -21,21 +21,21 @@ func UpdatePomodoroSettings(c *gin.Context) {
 	}
 
 	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Failed to read body"})
 		return
 	}
 
 	if body.Pomodoro < 1 || body.Pomodoro > 60 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Pomodoro duration must be between 1 and 60 minutes"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Pomodoro duration must be between 1 and 60 minutes"})
 		return
 	}
 
 	if body.ShortBreak < 1 || body.ShortBreak > 60 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Short break duration must be between 1 and 60 minutes"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Short break duration must be between 1 and 60 minutes"})
 		return
 	}
 	if body.LongBreak < 1 || body.LongBreak > 60 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Long break duration must be between 1 and 60 minutes"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Long break duration must be between 1 and 60 minutes"})
 		return
 	}
 
@@ -58,7 +58,7 @@ func UpdatePomodoroSettings(c *gin.Context) {
 			//add new settings to cache
 			cache.CachePomodoroSettings(settings)
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch pomodoro settings"})
+			c.JSON(http.StatusInternalServerError, gin.H{"errorTimer": "Failed to fetch pomodoro settings"})
 			return
 		}
 	} else {
@@ -85,7 +85,7 @@ func GetPomodoroSettings(c *gin.Context) {
 	//get settings using cache
 	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"errorTimer": "Pomodoro setting not found"})
 		return
 	}
 
@@ -107,7 +107,7 @@ func FetchPomodoroStatus(c *gin.Context) {
 	//get settings using cache
 	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"errorTimer": "Pomodoro setting not found"})
 		return
 	}
 
@@ -131,19 +131,19 @@ func StartPomodoro(c *gin.Context) {
 	}
 
 	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Failed to read body"})
 		return
 	}
 
 	//get settings using cache
 	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"errorTimer": "Pomodoro setting not found"})
 		return
 	}
 
 	if settings.IsRunning {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Timer already running"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Timer already running"})
 		return
 	}
 
@@ -184,12 +184,12 @@ func StopPomodoro(c *gin.Context) {
 	//get settings using cache
 	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"errorTimer": "Pomodoro setting not found"})
 		return
 	}
 
 	if !settings.IsRunning {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Timer is not running"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Timer is not running"})
 		return
 	}
 
@@ -217,14 +217,14 @@ func ChangePhase(c *gin.Context) {
 	}
 
 	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Failed to read body"})
 		return
 	}
 
 	//get settings using cache
 	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+		c.JSON(http.StatusNotFound, gin.H{"errorTimer": "Pomodoro setting not found"})
 		return
 	}
 
@@ -257,13 +257,13 @@ func UpdateAutoTransition(c *gin.Context) {
 	}
 
 	if err := c.Bind(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
+		c.JSON(http.StatusBadRequest, gin.H{"errorTimer": "Failed to read body"})
 		return
 	}
 
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authenticated"})
+		c.JSON(http.StatusUnauthorized, gin.H{"errorTimer": "User is not authenticated"})
 		return
 	}
 	currentUser := user.(models.User)
@@ -272,10 +272,10 @@ func UpdateAutoTransition(c *gin.Context) {
 	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro setting not found"})
+			c.JSON(http.StatusNotFound, gin.H{"errorTimer": "Pomodoro setting not found"})
 
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant fetch pomodoro settings"})
+			c.JSON(http.StatusInternalServerError, gin.H{"errorTimer": "Cant fetch pomodoro settings"})
 		}
 		return
 	}
@@ -285,7 +285,7 @@ func UpdateAutoTransition(c *gin.Context) {
 	settings.AutoTransition = body.AutoTransition
 
 	if err := initializers.DB.Save(&settings).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cant update auto transition"})
+		c.JSON(http.StatusInternalServerError, gin.H{"errorTimer": "Cant update auto transition"})
 		return
 	}
 
@@ -304,9 +304,9 @@ func ResetCompletedPomodoros(c *gin.Context) {
 	settings, err := cache.GetPomodoroSettingsByUserID(currentUser.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Pomodoro settings not found"})
+			c.JSON(http.StatusNotFound, gin.H{"errorTimer": "Pomodoro settings not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch pomodoro settings"})
+			c.JSON(http.StatusInternalServerError, gin.H{"errorTimer": "Failed to fetch pomodoro settings"})
 		}
 		return
 	}
@@ -316,7 +316,7 @@ func ResetCompletedPomodoros(c *gin.Context) {
 	settings.CompletedPomodoros = 0
 
 	if err := initializers.DB.Save(&settings).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reset completed pomodoros"})
+		c.JSON(http.StatusInternalServerError, gin.H{"errorTimer": "Failed to reset completed pomodoros"})
 		return
 	}
 
