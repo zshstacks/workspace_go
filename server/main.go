@@ -14,6 +14,7 @@ func init() {
 	initializers.ConnectToDb()
 	initializers.SyncDatabase()
 	initializers.ConnectToRedis()
+	initializers.InitOAuthConfigs()
 }
 
 func main() {
@@ -40,6 +41,7 @@ func main() {
 	routes.PomodoroRoutes(r)
 	routes.TasksRoutes(r)
 	routes.StatsRoutes(r)
+	routes.OAuthRoutes(r)
 
 	log.Fatal(r.Run())
 
