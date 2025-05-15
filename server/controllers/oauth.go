@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 	"net/http"
+	"os"
 	"server/initializers"
 	"server/models"
 	"server/utils"
@@ -89,7 +90,10 @@ func GithubCallback(c *gin.Context) {
 
 	//generate jwt token and refreshToken
 	utils.SetAuthCookies(c, user)
-	c.JSON(http.StatusOK, gin.H{"message": "Github login successful"})
+
+	frontendURL := os.Getenv("FRONTEND_URL")
+	redirectPath := fmt.Sprintf("%s/auth/github/callback?provider=github&code=%s", frontendURL, code)
+	c.Redirect(http.StatusTemporaryRedirect, redirectPath)
 }
 
 func GoogleLogin(c *gin.Context) {
@@ -142,5 +146,7 @@ func GoogleCallback(c *gin.Context) {
 	}
 
 	utils.SetAuthCookies(c, user)
-	c.JSON(http.StatusOK, gin.H{"message": "Google login successful"})
+	frontendURL := os.Getenv("FRONTEND_URL")
+	redirectPath := fmt.Sprintf("%s/auth/google/callback?provider=google&code=%s", frontendURL, code)
+	c.Redirect(http.StatusTemporaryRedirect, redirectPath)
 }

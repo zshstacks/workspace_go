@@ -84,5 +84,4 @@ func SetAuthCookies(c *gin.Context, user models.User) {
 		true,
 	)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Authorization successful"})
 }
