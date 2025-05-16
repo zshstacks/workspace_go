@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"gorm.io/gorm"
 	"net/http"
 	"os"
 	"server/initializers"
@@ -12,12 +14,19 @@ import (
 
 func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name, avatarURL string) (models.User, error) {
 	var user models.User
+	//try to find user by OAuth provider and ID
 	err := initializers.DB.Where(&models.User{
 		OAuthProvider:   provider,
 		OAuthProviderID: providerID,
 	}).First(&user).Error
-	if err != nil {
+
+	if err == nil {
 		return user, nil
+	}
+
+	//if error "user not found" return the error
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return user, err
 	}
 
 	//if not found, try to find by email
@@ -25,8 +34,15 @@ func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name
 	if err == nil {
 		user.OAuthProvider = provider
 		user.OAuthProviderID = providerID
-		initializers.DB.Save(&user)
+		if err := initializers.DB.Save(&user).Error; err != nil {
+			return user, err
+		}
 		return user, nil
+	}
+
+	//if error "user not found" return the error
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return user, err
 	}
 
 	//if not found, create a new user
@@ -39,6 +55,16 @@ func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name
 		OAuthProviderID:  providerID,
 	}
 	if err := initializers.DB.Create(&user).Error; err != nil {
+		return user, err
+	}
+
+	defaultSettings := models.PomodoroModel{
+		UserID:             user.ID,
+		PomodoroDuration:   25,
+		ShortBreakDuration: 5,
+		LongBreakDuration:  15,
+	}
+	if err := initializers.DB.Create(&defaultSettings).Error; err != nil {
 		return user, err
 	}
 	return user, nil
