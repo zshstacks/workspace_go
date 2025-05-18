@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name, avatarURL string) (models.User, error) {
+func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name, avatarURL string) (*models.User, error) {
 	var user models.User
 	//try to find user by OAuth provider and ID
 	err := initializers.DB.Where(&models.User{
@@ -21,12 +21,12 @@ func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name
 	}).First(&user).Error
 
 	if err == nil {
-		return user, nil
+		return &user, nil
 	}
 
 	//if error "user not found" return the error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return user, err
+		return &user, err
 	}
 
 	//if not found, try to find by email
@@ -35,14 +35,14 @@ func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name
 		user.OAuthProvider = provider
 		user.OAuthProviderID = providerID
 		if err := initializers.DB.Save(&user).Error; err != nil {
-			return user, err
+			return &user, err
 		}
-		return user, nil
+		return &user, nil
 	}
 
 	//if error "user not found" return the error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return user, err
+		return &user, err
 	}
 
 	//if not found, create a new user
@@ -55,7 +55,7 @@ func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name
 		OAuthProviderID:  providerID,
 	}
 	if err := initializers.DB.Create(&user).Error; err != nil {
-		return user, err
+		return &user, err
 	}
 
 	defaultSettings := models.PomodoroModel{
@@ -65,12 +65,12 @@ func FindOrCreateOAuthUser(provider models.AuthProvider, providerID, email, name
 		LongBreakDuration:  15,
 	}
 	if err := initializers.DB.Create(&defaultSettings).Error; err != nil {
-		return user, err
+		return &user, err
 	}
-	return user, nil
+	return &user, nil
 }
 
-func SetAuthCookies(c *gin.Context, user models.User) {
+func SetAuthCookies(c *gin.Context, user *models.User) {
 	//access token with 45min
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,

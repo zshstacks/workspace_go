@@ -11,4 +11,6 @@ func OAuthRoutes(router *gin.Engine) {
 
 	router.GET("/auth/google/login", controllers.GoogleLogin)
 	router.GET("/auth/google/callback", controllers.GoogleCallback)
+
+	router.GET("/api/oauth/:provider/verify", controllers.HandleOAuthLogin)
 }
