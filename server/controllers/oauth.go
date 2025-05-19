@@ -224,8 +224,7 @@ func GithubCallback(c *gin.Context) {
 	utils.SetAuthCookies(c, user)
 
 	frontendURL := os.Getenv("FRONTEND_URL")
-	redirectPath := fmt.Sprintf("%s/auth/github/callback?provider=github&code=%s", frontendURL, code)
-	c.Redirect(http.StatusTemporaryRedirect, redirectPath)
+	c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/workspace", frontendURL))
 }
 
 func GoogleLogin(c *gin.Context) {
@@ -279,6 +278,5 @@ func GoogleCallback(c *gin.Context) {
 
 	utils.SetAuthCookies(c, user)
 	frontendURL := os.Getenv("FRONTEND_URL")
-	redirectPath := fmt.Sprintf("%s/auth/google/callback?provider=google&code=%s", frontendURL, code)
-	c.Redirect(http.StatusTemporaryRedirect, redirectPath)
+	c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/workspace", frontendURL))
 }
