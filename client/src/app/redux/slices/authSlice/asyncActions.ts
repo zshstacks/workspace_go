@@ -86,3 +86,21 @@ export const logoutUser = createAsyncThunk(
     }
   }
 );
+
+export const oauthLogin = createAsyncThunk(
+  "auth/oauthLogin",
+  async (
+    { provider, code }: { provider: "github" | "google"; code: string },
+    thunkAPI
+  ) => {
+    try {
+      const res = await api.get(`/api/oauth/${provider}/verify?code=${code}`);
+      return res.data;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      return thunkAPI.rejectWithValue(
+        axiosError.response?.data || { errorLogin: "OAuth login failed" }
+      );
+    }
+  }
+);

@@ -17,6 +17,8 @@ import { toast } from "react-toastify";
 import { BsQuestion } from "react-icons/bs";
 import { IoLogoGithub } from "react-icons/io";
 import { ImSpinner2 } from "react-icons/im";
+import { FcGoogle } from "react-icons/fc";
+import { useSearchParams } from "next/navigation";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -25,6 +27,9 @@ const Signup = () => {
     username: "",
   });
   const [openModal, setOpenModal] = useState(false);
+
+  const searchParams = useSearchParams();
+  const oauthError = searchParams.get("error");
 
   const dispatch: AppDispatch = useDispatch();
 
@@ -58,6 +63,15 @@ const Signup = () => {
     }
   };
 
+  useEffect(() => {
+    if (oauthError === "oauth") {
+      toast.error("OAuth connection failed. Try again.", {
+        theme: "dark",
+        autoClose: 3000,
+      });
+    }
+  }, [oauthError]);
+
   //display errors and success messages
   useEffect(() => {
     [emailError, passwordError, usernameError, error].forEach((err) => {
@@ -78,6 +92,12 @@ const Signup = () => {
       });
     }
   }, [emailError, passwordError, usernameError, success, error, dispatch]);
+
+  const handleOAuth = (provider: "github" | "google") => {
+    const callbackUrl = `${window.location.origin}/auth/${provider}/callback`;
+    const encodedCallback = encodeURIComponent(callbackUrl);
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/${provider}/login?callback=${encodedCallback}`;
+  };
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-[#09090b] gap-6 p-6 md:p-10">
@@ -195,9 +215,18 @@ const Signup = () => {
               <button
                 type="button"
                 className="w-full flex items-center  justify-center gap-2 py-[6px] border border-neutral-600 rounded-md hover:bg-white/25 transition text-white "
+                onClick={() => handleOAuth("github")}
               >
                 <IoLogoGithub size={18} />
                 <span className="text-sm font-semibold">Login with GitHub</span>
+              </button>
+              <button
+                type="button"
+                className="w-full flex items-center justify-center gap-2 py-[6px] border border-neutral-600 rounded-md hover:bg-white/25 transition text-white "
+                onClick={() => handleOAuth("google")}
+              >
+                <FcGoogle size={18} />
+                <span className="text-sm font-semibold">Login with Google</span>
               </button>
             </form>
 

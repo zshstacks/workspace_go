@@ -4,6 +4,7 @@ import {
   emailConfirmation,
   loginUser,
   logoutUser,
+  oauthLogin,
   registerUser,
   resendConfirmation,
 } from "./asyncActions";
@@ -94,6 +95,14 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.successLogout = action.payload.successLogout;
       })
+
+      .addCase(
+        oauthLogin.fulfilled,
+        (state, action: PayloadAction<AuthState>) => {
+          state.isLoading = false;
+          state.user = action.payload.user || action.payload;
+        }
+      )
 
       .addMatcher(
         (action) => action.type.endsWith("/pending"),
