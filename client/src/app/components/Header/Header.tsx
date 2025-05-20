@@ -38,6 +38,7 @@ import {
 } from "@/app/redux/slices/statsSlice/asyncActions";
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
+import { TfiLayoutMediaOverlayAlt } from "react-icons/tfi";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
 
@@ -47,11 +48,13 @@ const Header: React.FC<HeaderProps> = ({
   setIsTimerActive,
   setIsPaintActive,
   setIsTodoActive,
+  setIsMediaActive,
   setOpenUserStats,
   setOpenBackgroundSelect,
   isTimerActive,
   isPaintActive,
   isTodoActive,
+  isMediaActive,
   hideElementsActive,
   hideAfterSeconds,
 }) => {
@@ -203,6 +206,7 @@ const Header: React.FC<HeaderProps> = ({
         <div
           className="flex my-auto ml-2 p-1  hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
           onClick={setIsTimerActive}
+          title="pomodoro timer"
         >
           <MdOutlineTimer
             size={19}
@@ -224,6 +228,7 @@ const Header: React.FC<HeaderProps> = ({
         <div
           className="flex my-auto  p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
           onClick={setIsTodoActive}
+          title="todo"
         >
           <LuPencilLine
             size={19}
@@ -239,13 +244,36 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* paint */}
         <div
-          className="flex my-auto mr-2 p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
+          className="flex my-auto  p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
           onClick={setIsPaintActive}
+          title="paint"
         >
           <PiPaintBucketBold
             size={19}
             color={`${
               isPaintActive
+                ? " #e89688"
+                : theme === "dark"
+                ? "#4e4e4e"
+                : "white"
+            }
+              `}
+          />
+        </div>
+
+        {/* divider */}
+        <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder my-auto mx-2"></div>
+
+        {/* media */}
+        <div
+          className="flex my-auto mr-2 p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
+          onClick={setIsMediaActive}
+          title="media"
+        >
+          <TfiLayoutMediaOverlayAlt
+            size={19}
+            color={`${
+              isMediaActive
                 ? " #e89688"
                 : theme === "dark"
                 ? "#4e4e4e"

@@ -5,10 +5,12 @@ export interface HeaderProps {
   setOpenAccSettings: () => void;
   setIsTimerActive: () => void;
   setIsTodoActive: () => void;
+  setIsMediaActive: () => void;
   setIsPaintActive: () => void;
   setOpenUserStats: () => void;
   setOpenBackgroundSelect: () => void;
   isTimerActive: boolean;
+  isMediaActive: boolean;
   isPaintActive: boolean;
   isTodoActive: boolean;
   hideElementsActive: boolean;
@@ -45,15 +47,7 @@ export interface SavedWidgetLayoutInfo {
   TimerWidget?: WidgetInfo;
   TodoWidget?: WidgetInfo;
   PaintWidget?: WidgetInfo;
-}
-
-export interface PomoTimerProps {
-  openSettings: boolean;
-  setOpenSettings: () => void;
-  setIsTimerActive: () => void;
-  widgetInfo?: WidgetInfo;
-  activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo" | "paint") => void;
+  MediaWidget?: WidgetInfo;
 }
 
 export interface PomoTimerSettingsProps {
@@ -69,13 +63,22 @@ export interface PomoTimerPhasesProps {
   setOpenSettings: () => void;
 }
 
+export interface PomoTimerProps {
+  openSettings: boolean;
+  setOpenSettings: () => void;
+  setIsTimerActive: () => void;
+  widgetInfo?: WidgetInfo;
+  activeWidget: string;
+  setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+}
+
 export interface TodoProps {
   setIsTodoActive: () => void;
   widgetInfo?: WidgetInfo;
   dimensions: { width: number; height: number };
   setDimensions: (dimensions: { width: number; height: number }) => void;
   activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo" | "paint") => void;
+  setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
 }
 
 export interface PaintProps {
@@ -84,7 +87,16 @@ export interface PaintProps {
   setDimensionsPaint: (dimensions: { width: number; height: number }) => void;
   widgetInfo?: WidgetInfo;
   activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo" | "paint") => void;
+  setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+}
+
+export interface MediaProps {
+  setIsMediaActive: () => void;
+  dimensionsMedia: { width: number; height: number };
+  setDimensionsMedia: (dimensions: { width: number; height: number }) => void;
+  widgetInfo?: WidgetInfo;
+  activeWidget: string;
+  setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
 }
 
 export interface EmailModalProps {

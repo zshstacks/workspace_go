@@ -21,6 +21,7 @@ import { restrictToBoundingBox } from "@/app/hooks/boundingBoxRes";
 import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox";
 import RenderModalComponent from "@/app/hooks/Modal/RenderModalComponent";
 import { restrictToPaintBoundingBox } from "@/app/hooks/restrictToPaintBoundingBox";
+import { restrictToMediaBoundingBox } from "@/app/hooks/restrictToMediaBoundingBox";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 
@@ -39,6 +40,7 @@ const BackgroundSelectVideo = lazy(
 );
 const PomoTimer = lazy(() => import("./PomoTimer/PomoTimer"));
 const Paint = lazy(() => import("./Paint/Paint"));
+const Media = lazy(() => import("./MediaPlayer/MediaPlayer"));
 
 const WorkspaceContent = () => {
   const [openUISettings, setOpenUISettings] = useToggleState(false);
@@ -48,6 +50,7 @@ const WorkspaceContent = () => {
   const [isTodoActive, setIsTodoActive] = useToggleState(false);
   const [isPaintActive, setIsPaintActive] = useToggleState(false);
   const [openUserStats, setOpenUserStats] = useToggleState(false);
+  const [isMediaActive, setIsMediaActive] = useToggleState(false);
   const [openBackgroundSelect, setOpenBackgroundSelect] = useToggleState(false);
 
   const [hideElementsActive, setHideElementsActive] = useState(false);
@@ -57,8 +60,12 @@ const WorkspaceContent = () => {
     width: 1100,
     height: 750,
   });
+  const [dimensionsMedia, setDimensionsMedia] = useState({
+    width: 590,
+    height: 478,
+  });
   const [activeWidget, setActiveWidget] = useState<
-    "todo" | "pomodoro" | "paint"
+    "todo" | "pomodoro" | "paint" | "media"
   >("pomodoro");
   const [isClient, setIsClient] = useState(false);
   const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
@@ -128,6 +135,19 @@ const WorkspaceContent = () => {
     [updateWidgetLayout, widgetLayout.PaintWidget]
   );
 
+  const handleMediaDragEnd = useCallback(
+    (delta: { x: number; y: number }) => {
+      const currentMedia = widgetLayout.MediaWidget || { xPos: 0, yPos: 0 };
+      const newMediaInfo = {
+        ...currentMedia,
+        xPos: currentMedia.xPos + delta.x,
+        yPos: currentMedia.yPos + delta.y,
+      };
+      updateWidgetLayout("MediaWidget", newMediaInfo);
+    },
+    [updateWidgetLayout, widgetLayout.MediaWidget]
+  );
+
   if (!isClient) {
     return null;
   }
@@ -143,10 +163,12 @@ const WorkspaceContent = () => {
           setIsPaintActive={setIsPaintActive}
           setIsTodoActive={setIsTodoActive}
           setOpenUserStats={setOpenUserStats}
+          setIsMediaActive={setIsMediaActive}
           setOpenBackgroundSelect={setOpenBackgroundSelect}
           isTimerActive={isTimerActive}
           isPaintActive={isPaintActive}
           isTodoActive={isTodoActive}
+          isMediaActive={isMediaActive}
           hideElementsActive={hideElementsActive}
           hideAfterSeconds={hideAfterSeconds}
         />
@@ -249,6 +271,29 @@ const WorkspaceContent = () => {
               dimensionsPaint={dimensionsPaint}
               setActiveWidget={setActiveWidget}
               setIsPaintActive={setIsPaintActive}
+            />
+          </DndContext>
+        </Suspense>
+      )}
+
+      {/* media */}
+      {isMediaActive && (
+        <Suspense>
+          <DndContext
+            modifiers={[restrictToMediaBoundingBox(dimensionsMedia)]}
+            onDragEnd={(event) => {
+              const { delta } = event;
+              handleMediaDragEnd(delta);
+            }}
+            id={dndId}
+          >
+            <Media
+              widgetInfo={widgetLayout.MediaWidget}
+              activeWidget={activeWidget}
+              setDimensionsMedia={setDimensionsMedia}
+              dimensionsMedia={dimensionsMedia}
+              setActiveWidget={setActiveWidget}
+              setIsMediaActive={setIsMediaActive}
             />
           </DndContext>
         </Suspense>
