@@ -3,6 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { MyContext } from "../../Workspace";
 import { useDraggable } from "@dnd-kit/core";
+import MediaContent from "./MediaContent/MediaContent";
 
 const MediaPlayer: React.FC<MediaProps> = ({
   widgetInfo,
@@ -137,10 +138,21 @@ const MediaPlayer: React.FC<MediaProps> = ({
       <div className="w-full h-[1px] bg-white/25 dark:bg-lightBorder "></div>
 
       {/* content */}
-      <div className="flex-1 overflow-hidden"></div>
+      <div className="flex-1 overflow-hidden">
+        <MediaContent />
+      </div>
 
       {/* footer */}
       <div className="mt-auto">
+        {/* link input */}
+        <div className="flex gap-2 justify-center">
+          <input
+            type="text"
+            placeholder="Enter Youtube URL here"
+            className="appearance-none focus:appearance-none size-6 bg-main border border-white/25 rounded-lg w-1/2 px-2"
+          />
+          <button className="font-semibold">Save</button>
+        </div>
         {/* resize  icon */}
         <div className="flex justify-end" onMouseDown={handleMouseDown}>
           <div className="">

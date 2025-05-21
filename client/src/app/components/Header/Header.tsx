@@ -38,7 +38,7 @@ import {
 } from "@/app/redux/slices/statsSlice/asyncActions";
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
-import { TfiLayoutMediaOverlayAlt } from "react-icons/tfi";
+import { RiYoutubeLine } from "react-icons/ri";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
 
@@ -270,8 +270,8 @@ const Header: React.FC<HeaderProps> = ({
           onClick={setIsMediaActive}
           title="media"
         >
-          <TfiLayoutMediaOverlayAlt
-            size={19}
+          <RiYoutubeLine
+            size={20}
             color={`${
               isMediaActive
                 ? " #e89688"

@@ -11,8 +11,8 @@ export const restrictToMediaBoundingBox =
     const boundingBox = {
       top: 68,
       bottom: window.innerHeight + 8,
-      left: 199,
-      right: window.innerWidth + 200,
+      left: 53,
+      right: window.innerWidth + 53,
     };
 
     let newX = transform.x;
