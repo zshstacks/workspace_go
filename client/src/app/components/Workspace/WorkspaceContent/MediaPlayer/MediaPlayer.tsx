@@ -5,6 +5,8 @@ import { MyContext } from "../../Workspace";
 import { useDraggable } from "@dnd-kit/core";
 import MediaContent from "./MediaContent/MediaContent";
 
+const MEDIA_KEY = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY_MEDIA as string;
+
 const MediaPlayer: React.FC<MediaProps> = ({
   widgetInfo,
   activeWidget,
@@ -14,6 +16,7 @@ const MediaPlayer: React.FC<MediaProps> = ({
   setIsMediaActive,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
 
   const context = useContext(MyContext);
 
@@ -24,6 +27,15 @@ const MediaPlayer: React.FC<MediaProps> = ({
   }
 
   const { theme } = context;
+
+  useEffect(() => {
+    const saved = localStorage.getItem(MEDIA_KEY);
+    if (saved) setYoutubeUrl(saved);
+  }, []);
+
+  const handleSave = () => {
+    localStorage.setItem(MEDIA_KEY, youtubeUrl);
+  };
 
   //=====================
   // DnD logic
@@ -139,22 +151,31 @@ const MediaPlayer: React.FC<MediaProps> = ({
 
       {/* content */}
       <div className="flex-1 overflow-hidden">
-        <MediaContent />
+        <MediaContent youtubeUrl={youtubeUrl} />
       </div>
 
       {/* footer */}
-      <div className="mt-auto">
+      <div className="mt-auto items-center h-10 flex justify-center">
         {/* link input */}
-        <div className="flex gap-2 justify-center">
+
+        <div className="flex gap-2 justify-center w-full">
           <input
             type="text"
+            value={youtubeUrl}
+            onChange={(e) => setYoutubeUrl(e.target.value)}
             placeholder="Enter Youtube URL here"
-            className="appearance-none focus:appearance-none size-6 bg-main border border-white/25 rounded-lg w-1/2 px-2"
+            className="appearance-none focus:appearance-none size-6 bg-main dark:bg-lightMain border border-white/25 dark:border-lightBorder  rounded-lg w-1/2 px-2"
           />
-          <button className="font-semibold">Save</button>
+          <button className="font-semibold" onClick={handleSave}>
+            Save
+          </button>
         </div>
+
         {/* resize  icon */}
-        <div className="flex justify-end" onMouseDown={handleMouseDown}>
+        <div
+          className="absolute right-0 bottom-0"
+          onMouseDown={handleMouseDown}
+        >
           <div className="">
             <svg
               width="16"

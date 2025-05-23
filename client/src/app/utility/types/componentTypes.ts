@@ -125,3 +125,7 @@ export interface FabricProps {
   width: number;
   height: number;
 }
+
+export interface MediaContentProps {
+  youtubeUrl: string;
+}
