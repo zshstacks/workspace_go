@@ -39,6 +39,7 @@ import {
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
 import { RiYoutubeLine } from "react-icons/ri";
+import { CgDropOpacity } from "react-icons/cg";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
 
@@ -51,6 +52,8 @@ const Header: React.FC<HeaderProps> = ({
   setIsMediaActive,
   setOpenUserStats,
   setOpenBackgroundSelect,
+  setOpacity,
+  opacity,
   isTimerActive,
   isPaintActive,
   isTodoActive,
@@ -285,10 +288,35 @@ const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right Section */}
+
       <div
         ref={userMenuRef}
         className="flex items-center bg-main dark:bg-lightMain rounded-md text-white p-1 "
       >
+        {/* opacity */}
+        <div className="relative inline-block group">
+          <div className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer">
+            <CgDropOpacity
+              size={19}
+              color={theme === "dark" ? "#4e4e4e" : "white"}
+            />
+          </div>
+          <div className="absolute -right-2 bg-main dark:bg-lightMain rounded-md p-4 invisible group-hover:visible w-[122px]  ">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={opacity}
+              onChange={(e) => setOpacity(parseFloat(e.target.value))}
+              className="w-full flex h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300 dark:accent-gray-300 dark:hover:accent-gray-400"
+            />
+          </div>
+        </div>
+
+        {/* divider */}
+        <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder mx-2"></div>
+        {/* bg selection */}
         <div
           className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
           onClick={setOpenBackgroundSelect}
@@ -301,7 +329,7 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* divider */}
         <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder mx-2"></div>
-
+        {/*ambient  */}
         <div className="relative inline-block group">
           <div
             className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer   "

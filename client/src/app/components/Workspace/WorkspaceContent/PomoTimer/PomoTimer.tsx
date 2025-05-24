@@ -39,6 +39,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
   setIsTimerActive,
   activeWidget,
   setActiveWidget,
+  opacity,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [ishideCount, setIsHideCount] = useToggleState();
@@ -294,6 +295,7 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
       onMouseDown={() => setActiveWidget("pomodoro")}
       className="bg-main dark:bg-lightMain text-white w-[360px] p-4 rounded-lg shadow-md shadow-white/5 dark:shadow-black/10"
       style={{
+        opacity: opacity,
         transform: `translate3d(${combinedPosition?.xPos}px, ${combinedPosition?.yPos}px, 0)`,
         position: "fixed",
         zIndex: activeWidget === "pomodoro" ? 100 : 50,

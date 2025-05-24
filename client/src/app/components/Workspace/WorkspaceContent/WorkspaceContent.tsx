@@ -69,6 +69,7 @@ const WorkspaceContent = () => {
   >("pomodoro");
   const [isClient, setIsClient] = useState(false);
   const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
+  const [opacity, setOpacity] = useState(1);
 
   const dndId = useId(); //generate unique id
 
@@ -165,6 +166,8 @@ const WorkspaceContent = () => {
           setOpenUserStats={setOpenUserStats}
           setIsMediaActive={setIsMediaActive}
           setOpenBackgroundSelect={setOpenBackgroundSelect}
+          setOpacity={setOpacity}
+          opacity={opacity}
           isTimerActive={isTimerActive}
           isPaintActive={isPaintActive}
           isTodoActive={isTodoActive}
@@ -226,6 +229,7 @@ const WorkspaceContent = () => {
             widgetInfo={widgetLayout.TimerWidget}
             activeWidget={activeWidget}
             setActiveWidget={setActiveWidget}
+            opacity={opacity}
           />
         </DndContext>
       )}
@@ -248,6 +252,7 @@ const WorkspaceContent = () => {
               dimensions={dimensions}
               activeWidget={activeWidget}
               setActiveWidget={setActiveWidget}
+              opacity={opacity}
             />
           </DndContext>
         </Suspense>
@@ -271,6 +276,7 @@ const WorkspaceContent = () => {
               dimensionsPaint={dimensionsPaint}
               setActiveWidget={setActiveWidget}
               setIsPaintActive={setIsPaintActive}
+              opacity={opacity}
             />
           </DndContext>
         </Suspense>
@@ -290,6 +296,7 @@ const WorkspaceContent = () => {
             <Media
               widgetInfo={widgetLayout.MediaWidget}
               activeWidget={activeWidget}
+              opacity={opacity}
               setDimensionsMedia={setDimensionsMedia}
               dimensionsMedia={dimensionsMedia}
               setActiveWidget={setActiveWidget}

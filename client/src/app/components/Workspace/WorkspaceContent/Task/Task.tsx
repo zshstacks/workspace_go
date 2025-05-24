@@ -37,6 +37,7 @@ const Task: React.FC<TodoProps> = ({
   dimensions,
   activeWidget,
   setActiveWidget,
+  opacity,
 }) => {
   const [openActionMenu, setOpenActionMenu, toggleOpenActionMenu] =
     useToggleStateOutside(false);
@@ -206,6 +207,7 @@ const Task: React.FC<TodoProps> = ({
       onMouseDown={() => setActiveWidget("todo")}
       className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-md shadow-white/5 dark:shadow-black/30 flex-1 flex flex-col "
       style={{
+        opacity: opacity,
         transform: `translate3d(${combinedPosition.xPos}px, ${combinedPosition.yPos}px, 0)`,
         position: "fixed",
         width: dimensions.width,

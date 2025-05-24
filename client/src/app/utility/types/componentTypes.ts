@@ -9,6 +9,8 @@ export interface HeaderProps {
   setIsPaintActive: () => void;
   setOpenUserStats: () => void;
   setOpenBackgroundSelect: () => void;
+  setOpacity: (value: number) => void;
+  opacity: number;
   isTimerActive: boolean;
   isMediaActive: boolean;
   isPaintActive: boolean;
@@ -70,6 +72,7 @@ export interface PomoTimerProps {
   widgetInfo?: WidgetInfo;
   activeWidget: string;
   setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+  opacity: number;
 }
 
 export interface TodoProps {
@@ -79,6 +82,7 @@ export interface TodoProps {
   setDimensions: (dimensions: { width: number; height: number }) => void;
   activeWidget: string;
   setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+  opacity: number;
 }
 
 export interface PaintProps {
@@ -88,6 +92,7 @@ export interface PaintProps {
   widgetInfo?: WidgetInfo;
   activeWidget: string;
   setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+  opacity: number;
 }
 
 export interface MediaProps {
@@ -97,6 +102,7 @@ export interface MediaProps {
   widgetInfo?: WidgetInfo;
   activeWidget: string;
   setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+  opacity: number;
 }
 
 export interface EmailModalProps {

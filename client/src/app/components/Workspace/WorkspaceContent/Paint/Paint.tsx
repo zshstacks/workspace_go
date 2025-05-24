@@ -12,6 +12,7 @@ const Paint: React.FC<PaintProps> = ({
   setActiveWidget,
   dimensionsPaint,
   setDimensionsPaint,
+  opacity,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -98,8 +99,9 @@ const Paint: React.FC<PaintProps> = ({
   return (
     <div
       onMouseDown={() => setActiveWidget("paint")}
-      className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-md shadow-white/5 dark:shadow-black/30 flex-1 flex flex-col"
+      className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-md shadow-white/5 dark:shadow-black/30 flex-1 flex flex-col "
       style={{
+        opacity: opacity,
         transform: `translate3d(${combinedPosition.xPos}px, ${combinedPosition.yPos}px, 0)`,
         position: "fixed",
         width: dimensionsPaint.width,
