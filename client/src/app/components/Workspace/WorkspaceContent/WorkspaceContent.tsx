@@ -24,6 +24,8 @@ import { restrictToPaintBoundingBox } from "@/app/hooks/restrictToPaintBoundingB
 import { restrictToMediaBoundingBox } from "@/app/hooks/restrictToMediaBoundingBox";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
+const widgetOpacity = process.env
+  .NEXT_PUBLIC_LOCAL_STORAGE_KEY_OPACITY as string;
 
 const UserStats = lazy(() => import("../../Header/UserStats/UserStats"));
 const Task = lazy(
@@ -148,6 +150,15 @@ const WorkspaceContent = () => {
     },
     [updateWidgetLayout, widgetLayout.MediaWidget]
   );
+
+  useEffect(() => {
+    const saved = localStorage.getItem(widgetOpacity);
+    if (saved) setOpacity(Number(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(widgetOpacity, opacity.toString());
+  }, [opacity]);
 
   if (!isClient) {
     return null;
