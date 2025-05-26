@@ -11,7 +11,7 @@ export const restrictToBoundingBox =
     const settingsHeight = openSettings ? 348 : 0;
 
     const boundingBox = {
-      top: 60, // top y cord
+      top: 50, // top y cord
       bottom: window.innerHeight - 127 - settingsHeight, // bott y cord
       left: 16, // left x cord
       right: window.innerWidth - 74, // right x cord

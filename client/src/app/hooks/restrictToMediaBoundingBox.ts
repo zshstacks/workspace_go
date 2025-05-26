@@ -9,7 +9,7 @@ export const restrictToMediaBoundingBox =
 
     //restrictions where we can move media
     const boundingBox = {
-      top: 68,
+      top: 58,
       bottom: window.innerHeight + 8,
       left: 53,
       right: window.innerWidth + 53,

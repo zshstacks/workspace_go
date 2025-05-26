@@ -194,6 +194,7 @@ const Header: React.FC<HeaderProps> = ({
       <div className="bg-main dark:bg-lightMain rounded-md  max-w-[24] h-[32px] flex justify-center items-center p-1">
         <div
           className="flex hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  py-[1px] px-[3px] cursor-pointer"
+          title="stats"
           onClick={setOpenUserStats}
         >
           <span className="text-white dark:text-lightText text-md mr-1">
@@ -295,7 +296,10 @@ const Header: React.FC<HeaderProps> = ({
       >
         {/* opacity */}
         <div className="relative inline-block group">
-          <div className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer">
+          <div
+            className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
+            title="opacity"
+          >
             <CgDropOpacity
               size={19}
               color={theme === "dark" ? "#4e4e4e" : "white"}
@@ -304,7 +308,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="absolute -right-2 bg-main dark:bg-lightMain rounded-md p-4 invisible group-hover:visible w-[122px]  ">
             <input
               type="range"
-              min="0"
+              min="0.2"
               max="1"
               step="0.1"
               value={opacity}
@@ -319,6 +323,7 @@ const Header: React.FC<HeaderProps> = ({
         {/* bg selection */}
         <div
           className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
+          title="backgrounds"
           onClick={setOpenBackgroundSelect}
         >
           <PiSelectionBackground
@@ -332,7 +337,8 @@ const Header: React.FC<HeaderProps> = ({
         {/*ambient  */}
         <div className="relative inline-block group">
           <div
-            className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer   "
+            className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
+            title="ambient"
             onClick={handleRainSound}
           >
             {isSoundEnabled ? (
@@ -365,6 +371,7 @@ const Header: React.FC<HeaderProps> = ({
         {/* enter/exit fullscreen */}
         <div
           className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
+          title="fullscreen"
           onClick={toggleFullscreenMode}
         >
           {isFullscreen ? (

@@ -220,13 +220,13 @@ const Task: React.FC<TodoProps> = ({
         <div className="text-sm font-semibold ">
           <div ref={filterContainerRef}>
             <button
-              className="bg-[#3d3e42] dark:bg-neutral-300 py-[1px] px-3 rounded-md flex gap-[1px] hover:bg-neutral-500/50 dark:hover:bg-neutral-400/60"
+              className="bg-[#3d3e42] dark:bg-neutral-300 py-[1px] px-3 rounded-md flex gap-[4px] hover:bg-neutral-500/50 dark:hover:bg-neutral-400/60"
               onClick={toggleOpenFilterMenu}
             >
               Filter{" "}
               <span>
                 {activeFilterCount > 0 && (
-                  <span className="ml-1 text-secondary rounded-full flex items-center justify-center text-xs">
+                  <span className=" absolute text-secondary rounded-full flex items-center justify-center text-xs">
                     {activeFilterCount}
                   </span>
                 )}

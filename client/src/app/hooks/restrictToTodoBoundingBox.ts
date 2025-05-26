@@ -9,10 +9,10 @@ export const restrictToTodoBoundingBox =
 
     //restrictions where we can move todo
     const boundingBox = {
-      top: 68,
+      top: 58,
       bottom: window.innerHeight + 8,
-      left: 83,
-      right: window.innerWidth + 84,
+      left: 90,
+      right: window.innerWidth + 89,
     };
 
     let newX = transform.x;

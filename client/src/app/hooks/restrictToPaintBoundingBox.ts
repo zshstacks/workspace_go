@@ -9,7 +9,7 @@ export const restrictToPaintBoundingBox =
 
     //restrictions where we can move paint
     const boundingBox = {
-      top: 68,
+      top: 58,
       bottom: window.innerHeight + 8,
       left: 199,
       right: window.innerWidth + 200,

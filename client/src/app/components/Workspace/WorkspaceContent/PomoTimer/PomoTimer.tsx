@@ -167,9 +167,9 @@ const PomoTimer: React.FC<PomoTimerProps> = ({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "F1" && !isRunning) {
+      if (e.key === "F2" && !isRunning) {
         handleStart();
-      } else if (e.key === "F1" && isRunning) {
+      } else if (e.key === "F2" && isRunning) {
         handleStop();
       }
     };
