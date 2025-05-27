@@ -40,6 +40,8 @@ import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
 import { RiYoutubeLine } from "react-icons/ri";
 import { CgDropOpacity } from "react-icons/cg";
+import { FaQuoteRight } from "react-icons/fa";
+import { LiaQuoteRightSolid } from "react-icons/lia";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
 
@@ -50,6 +52,7 @@ const Header: React.FC<HeaderProps> = ({
   setIsPaintActive,
   setIsTodoActive,
   setIsMediaActive,
+  setIsQuoteActive,
   setOpenUserStats,
   setOpenBackgroundSelect,
   setOpacity,
@@ -58,6 +61,7 @@ const Header: React.FC<HeaderProps> = ({
   isPaintActive,
   isTodoActive,
   isMediaActive,
+  isQuoteActive,
   hideElementsActive,
   hideAfterSeconds,
 }) => {
@@ -270,7 +274,7 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* media */}
         <div
-          className="flex my-auto mr-2 p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
+          className="flex my-auto  p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
           onClick={setIsMediaActive}
           title="media"
         >
@@ -278,6 +282,28 @@ const Header: React.FC<HeaderProps> = ({
             size={20}
             color={`${
               isMediaActive
+                ? " #e89688"
+                : theme === "dark"
+                ? "#4e4e4e"
+                : "white"
+            }
+              `}
+          />
+        </div>
+
+        {/* divider */}
+        <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder my-auto mx-2"></div>
+
+        {/* daily quote */}
+        <div
+          className="flex my-auto mr-2 p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
+          onClick={setIsQuoteActive}
+          title="quote"
+        >
+          <LiaQuoteRightSolid
+            size={20}
+            color={`${
+              isQuoteActive
                 ? " #e89688"
                 : theme === "dark"
                 ? "#4e4e4e"

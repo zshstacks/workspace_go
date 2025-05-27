@@ -7,11 +7,13 @@ export interface HeaderProps {
   setIsTodoActive: () => void;
   setIsMediaActive: () => void;
   setIsPaintActive: () => void;
+  setIsQuoteActive: () => void;
   setOpenUserStats: () => void;
   setOpenBackgroundSelect: () => void;
   setOpacity: (value: number) => void;
   opacity: number;
   isTimerActive: boolean;
+  isQuoteActive: boolean;
   isMediaActive: boolean;
   isPaintActive: boolean;
   isTodoActive: boolean;
@@ -50,6 +52,7 @@ export interface SavedWidgetLayoutInfo {
   TodoWidget?: WidgetInfo;
   PaintWidget?: WidgetInfo;
   MediaWidget?: WidgetInfo;
+  QuoteWidget?: WidgetInfo;
 }
 
 export interface PomoTimerSettingsProps {
@@ -71,7 +74,9 @@ export interface PomoTimerProps {
   setIsTimerActive: () => void;
   widgetInfo?: WidgetInfo;
   activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+  setActiveWidget: (
+    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+  ) => void;
   opacity: number;
 }
 
@@ -81,7 +86,9 @@ export interface TodoProps {
   dimensions: { width: number; height: number };
   setDimensions: (dimensions: { width: number; height: number }) => void;
   activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+  setActiveWidget: (
+    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+  ) => void;
   opacity: number;
 }
 
@@ -91,7 +98,9 @@ export interface PaintProps {
   setDimensionsPaint: (dimensions: { width: number; height: number }) => void;
   widgetInfo?: WidgetInfo;
   activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+  setActiveWidget: (
+    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+  ) => void;
   opacity: number;
 }
 
@@ -101,7 +110,19 @@ export interface MediaProps {
   setDimensionsMedia: (dimensions: { width: number; height: number }) => void;
   widgetInfo?: WidgetInfo;
   activeWidget: string;
-  setActiveWidget: (value: "pomodoro" | "todo" | "paint" | "media") => void;
+  setActiveWidget: (
+    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+  ) => void;
+  opacity: number;
+}
+
+export interface QuoteProps {
+  setIsQuoteActive: () => void;
+  widgetInfo?: WidgetInfo;
+  activeWidget: string;
+  setActiveWidget: (
+    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+  ) => void;
   opacity: number;
 }
 

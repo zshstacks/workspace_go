@@ -23,7 +23,7 @@ const MediaPlayer: React.FC<MediaProps> = ({
 
   if (!context) {
     throw new Error(
-      "The Task component should be used within MyContext.Provider."
+      "The Media component should be used within MyContext.Provider."
     );
   }
 

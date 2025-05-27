@@ -22,6 +22,7 @@ import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox
 import RenderModalComponent from "@/app/hooks/Modal/RenderModalComponent";
 import { restrictToPaintBoundingBox } from "@/app/hooks/restrictToPaintBoundingBox";
 import { restrictToMediaBoundingBox } from "@/app/hooks/restrictToMediaBoundingBox";
+import { restrictToQuoteBoundingBox } from "@/app/hooks/restrictToQuoteBoundingBox";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 const widgetOpacity = process.env
@@ -43,6 +44,7 @@ const BackgroundSelectVideo = lazy(
 const PomoTimer = lazy(() => import("./PomoTimer/PomoTimer"));
 const Paint = lazy(() => import("./Paint/Paint"));
 const Media = lazy(() => import("./MediaPlayer/MediaPlayer"));
+const Quote = lazy(() => import("./Quote/Quote"));
 
 const WorkspaceContent = () => {
   const [openUISettings, setOpenUISettings] = useToggleState(false);
@@ -53,6 +55,7 @@ const WorkspaceContent = () => {
   const [isPaintActive, setIsPaintActive] = useToggleState(false);
   const [openUserStats, setOpenUserStats] = useToggleState(false);
   const [isMediaActive, setIsMediaActive] = useToggleState(false);
+  const [isQuoteActive, setIsQuoteActive] = useToggleState(false);
   const [openBackgroundSelect, setOpenBackgroundSelect] = useToggleState(false);
 
   const [hideElementsActive, setHideElementsActive] = useState(false);
@@ -66,8 +69,12 @@ const WorkspaceContent = () => {
     width: 590,
     height: 478,
   });
+  const [dimensionsQuote] = useState({
+    width: 590,
+    height: 478,
+  });
   const [activeWidget, setActiveWidget] = useState<
-    "todo" | "pomodoro" | "paint" | "media"
+    "todo" | "pomodoro" | "paint" | "media" | "quote"
   >("pomodoro");
   const [isClient, setIsClient] = useState(false);
   const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
@@ -151,6 +158,19 @@ const WorkspaceContent = () => {
     [updateWidgetLayout, widgetLayout.MediaWidget]
   );
 
+  const handleQuoteDragEnd = useCallback(
+    (delta: { x: number; y: number }) => {
+      const currentQuote = widgetLayout.QuoteWidget || { xPos: 0, yPos: 0 };
+      const newQuoteInfo = {
+        ...currentQuote,
+        xPos: currentQuote.xPos + delta.x,
+        yPos: currentQuote.yPos + delta.y,
+      };
+      updateWidgetLayout("QuoteWidget", newQuoteInfo);
+    },
+    [updateWidgetLayout, widgetLayout.QuoteWidget]
+  );
+
   useEffect(() => {
     const saved = localStorage.getItem(widgetOpacity);
     if (saved) setOpacity(Number(saved));
@@ -176,10 +196,12 @@ const WorkspaceContent = () => {
           setIsTodoActive={setIsTodoActive}
           setOpenUserStats={setOpenUserStats}
           setIsMediaActive={setIsMediaActive}
+          setIsQuoteActive={setIsQuoteActive}
           setOpenBackgroundSelect={setOpenBackgroundSelect}
           setOpacity={setOpacity}
           opacity={opacity}
           isTimerActive={isTimerActive}
+          isQuoteActive={isQuoteActive}
           isPaintActive={isPaintActive}
           isTodoActive={isTodoActive}
           isMediaActive={isMediaActive}
@@ -312,6 +334,28 @@ const WorkspaceContent = () => {
               dimensionsMedia={dimensionsMedia}
               setActiveWidget={setActiveWidget}
               setIsMediaActive={setIsMediaActive}
+            />
+          </DndContext>
+        </Suspense>
+      )}
+
+      {/* quote */}
+      {isQuoteActive && (
+        <Suspense>
+          <DndContext
+            modifiers={[restrictToQuoteBoundingBox(dimensionsQuote)]}
+            onDragEnd={(event) => {
+              const { delta } = event;
+              handleQuoteDragEnd(delta);
+            }}
+            id={dndId}
+          >
+            <Quote
+              widgetInfo={widgetLayout.QuoteWidget}
+              activeWidget={activeWidget}
+              opacity={opacity}
+              setActiveWidget={setActiveWidget}
+              setIsQuoteActive={setIsQuoteActive}
             />
           </DndContext>
         </Suspense>
