@@ -40,7 +40,7 @@ import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
 import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
 import { RiYoutubeLine } from "react-icons/ri";
 import { CgDropOpacity } from "react-icons/cg";
-import { FaQuoteRight } from "react-icons/fa";
+
 import { LiaQuoteRightSolid } from "react-icons/lia";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));

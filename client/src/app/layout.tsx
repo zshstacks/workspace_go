@@ -1,8 +1,4 @@
-"use client";
-
-import { Provider } from "react-redux";
-import { store } from "./redux/store";
-import { ToastContainer } from "react-toastify";
+import Providers from "./Providers";
 
 export default function RootLayout({
   children,
@@ -12,10 +8,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="relative">
-        <Provider store={store}>
-          {children}
-          <ToastContainer toastStyle={{ zIndex: 100000 }} />
-        </Provider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,12 +1,12 @@
 import React from "react";
 import "@/app/styles/globals.css";
-import Workspace from "@/app/components/Workspace/Workspace";
+import WorkspaceClient from "./WorkspaceClient";
 
 const page = () => {
   return (
-    <div>
-      <Workspace />
-    </div>
+    <>
+      <WorkspaceClient />
+    </>
   );
 };
 

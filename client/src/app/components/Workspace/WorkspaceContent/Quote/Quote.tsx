@@ -94,7 +94,7 @@ const Quote: React.FC<QuoteProps> = ({
       <div className="w-full h-[1px] bg-white/25 dark:bg-lightBorder "></div>
 
       {/* content */}
-      <div className="flex-1 overflow-hidden">{quoteData?.quote}</div>
+      <div className="flex-1 overflow-hidden">ddd</div>
     </div>
   );
 };
