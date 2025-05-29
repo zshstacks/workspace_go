@@ -87,8 +87,30 @@ const WorkspaceContent = () => {
   }, []);
 
   useEffect(() => {
-    const savedPosition = localStorage.getItem(localStorageKey);
-    if (savedPosition) setWidgetLayout(JSON.parse(savedPosition));
+    setIsClient(true);
+
+    // Batch localStorage reads
+    const loadStoredData = () => {
+      const savedPosition = localStorage.getItem(localStorageKey);
+      // const savedOpacity = localStorage.getItem(widgetOpacity);
+
+      if (savedPosition) {
+        try {
+          setWidgetLayout(JSON.parse(savedPosition));
+        } catch (error) {
+          console.warn(
+            "Failed to parse widget layout from localStorage: ",
+            error
+          );
+        }
+      }
+
+      // if (savedOpacity) {
+      //   setOpacity(Number(savedOpacity));
+      // }
+    };
+
+    loadStoredData();
   }, []);
 
   const updateWidgetLayout = useCallback(

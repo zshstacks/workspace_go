@@ -2,10 +2,12 @@
 
 import React, {
   lazy,
+  memo,
   Suspense,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -26,6 +28,10 @@ import {
   MdOutlineKeyboardArrowUp,
   MdOutlineTimer,
 } from "react-icons/md";
+import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
+import { RiYoutubeLine } from "react-icons/ri";
+import { CgDropOpacity } from "react-icons/cg";
+import { LiaQuoteRightSolid } from "react-icons/lia";
 
 import "animate.css";
 
@@ -37,13 +43,59 @@ import {
   updateDailyStreak,
 } from "@/app/redux/slices/statsSlice/asyncActions";
 import { useToggleStateOutside } from "@/app/hooks/useToggleStateOutside";
-import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
-import { RiYoutubeLine } from "react-icons/ri";
-import { CgDropOpacity } from "react-icons/cg";
-
-import { LiaQuoteRightSolid } from "react-icons/lia";
 
 const UserMenu = lazy(() => import("./UserMenu/UserMenu"));
+
+// Memoized icon components
+const TimerIcon = memo(
+  ({ isActive, theme }: { isActive: boolean; theme: string }) => (
+    <MdOutlineTimer
+      size={19}
+      color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
+    />
+  )
+);
+TimerIcon.displayName = "TimerIcon";
+
+const TodoIcon = memo(
+  ({ isActive, theme }: { isActive: boolean; theme: string }) => (
+    <LuPencilLine
+      size={19}
+      color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
+    />
+  )
+);
+TodoIcon.displayName = "TodoIcon";
+
+const PaintIcon = memo(
+  ({ isActive, theme }: { isActive: boolean; theme: string }) => (
+    <PiPaintBucketBold
+      size={19}
+      color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
+    />
+  )
+);
+PaintIcon.displayName = "PaintIcon";
+
+const MediaIcon = memo(
+  ({ isActive, theme }: { isActive: boolean; theme: string }) => (
+    <RiYoutubeLine
+      size={20}
+      color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
+    />
+  )
+);
+MediaIcon.displayName = "MediaIcon";
+
+const QuoteIcon = memo(
+  ({ isActive, theme }: { isActive: boolean; theme: string }) => (
+    <LiaQuoteRightSolid
+      size={20}
+      color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
+    />
+  )
+);
+QuoteIcon.displayName = "QuoteIcon";
 
 const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,
@@ -188,6 +240,16 @@ const Header: React.FC<HeaderProps> = ({
     }
   }, [volume]);
 
+  const handlers = useMemo(
+    () => ({
+      opacity: (e: React.ChangeEvent<HTMLInputElement>) =>
+        setOpacity(parseFloat(e.target.value)),
+      volume: (e: React.ChangeEvent<HTMLInputElement>) =>
+        setVolume(parseFloat(e.target.value)),
+    }),
+    [setOpacity]
+  );
+
   if (!isVisible) return null;
 
   return (
@@ -216,17 +278,7 @@ const Header: React.FC<HeaderProps> = ({
           onClick={setIsTimerActive}
           title="pomodoro timer"
         >
-          <MdOutlineTimer
-            size={19}
-            color={`${
-              isTimerActive
-                ? " #e89688"
-                : theme === "dark"
-                ? "#4e4e4e"
-                : "white"
-            }
-              `}
-          />
+          <TimerIcon isActive={isTimerActive} theme={theme} />
         </div>
 
         {/* divider */}
@@ -238,13 +290,7 @@ const Header: React.FC<HeaderProps> = ({
           onClick={setIsTodoActive}
           title="todo"
         >
-          <LuPencilLine
-            size={19}
-            color={`${
-              isTodoActive ? " #e89688" : theme === "dark" ? "#4e4e4e" : "white"
-            }
-              `}
-          />
+          <TodoIcon isActive={isTodoActive} theme={theme} />
         </div>
 
         {/* divider */}
@@ -256,17 +302,7 @@ const Header: React.FC<HeaderProps> = ({
           onClick={setIsPaintActive}
           title="paint"
         >
-          <PiPaintBucketBold
-            size={19}
-            color={`${
-              isPaintActive
-                ? " #e89688"
-                : theme === "dark"
-                ? "#4e4e4e"
-                : "white"
-            }
-              `}
-          />
+          <PaintIcon isActive={isPaintActive} theme={theme} />
         </div>
 
         {/* divider */}
@@ -278,17 +314,7 @@ const Header: React.FC<HeaderProps> = ({
           onClick={setIsMediaActive}
           title="media"
         >
-          <RiYoutubeLine
-            size={20}
-            color={`${
-              isMediaActive
-                ? " #e89688"
-                : theme === "dark"
-                ? "#4e4e4e"
-                : "white"
-            }
-              `}
-          />
+          <MediaIcon isActive={isMediaActive} theme={theme} />
         </div>
 
         {/* divider */}
@@ -300,17 +326,7 @@ const Header: React.FC<HeaderProps> = ({
           onClick={setIsQuoteActive}
           title="quote"
         >
-          <LiaQuoteRightSolid
-            size={20}
-            color={`${
-              isQuoteActive
-                ? " #e89688"
-                : theme === "dark"
-                ? "#4e4e4e"
-                : "white"
-            }
-              `}
-          />
+          <QuoteIcon isActive={isQuoteActive} theme={theme} />
         </div>
       </div>
 
@@ -338,7 +354,7 @@ const Header: React.FC<HeaderProps> = ({
               max="1"
               step="0.1"
               value={opacity}
-              onChange={(e) => setOpacity(parseFloat(e.target.value))}
+              onChange={handlers.opacity}
               className="w-full flex h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300 dark:accent-gray-300 dark:hover:accent-gray-400"
             />
           </div>
@@ -386,7 +402,7 @@ const Header: React.FC<HeaderProps> = ({
               max="1"
               step="0.1"
               value={volume}
-              onChange={(e) => setVolume(parseFloat(e.target.value))}
+              onChange={handlers.volume}
               className="w-full flex h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300 dark:accent-gray-300 dark:hover:accent-gray-400"
             />
           </div>
