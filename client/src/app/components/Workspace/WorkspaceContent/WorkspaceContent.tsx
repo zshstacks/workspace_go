@@ -2,10 +2,12 @@
 
 import React, {
   lazy,
+  memo,
   Suspense,
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useState,
 } from "react";
 
@@ -23,6 +25,8 @@ import RenderModalComponent from "@/app/hooks/Modal/RenderModalComponent";
 import { restrictToPaintBoundingBox } from "@/app/hooks/restrictToPaintBoundingBox";
 import { restrictToMediaBoundingBox } from "@/app/hooks/restrictToMediaBoundingBox";
 import { restrictToQuoteBoundingBox } from "@/app/hooks/restrictToQuoteBoundingBox";
+
+import { CgSpinnerAlt } from "react-icons/cg";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 const widgetOpacity = process.env
@@ -45,6 +49,14 @@ const PomoTimer = lazy(() => import("./PomoTimer/PomoTimer"));
 const Paint = lazy(() => import("./Paint/Paint"));
 const Media = lazy(() => import("./MediaPlayer/MediaPlayer"));
 const Quote = lazy(() => import("./Quote/Quote"));
+
+const WidgetSkeleton = memo(() => (
+  <div className="animate-spin absolute">
+    <CgSpinnerAlt color="white" size={20} />
+  </div>
+));
+
+WidgetSkeleton.displayName = "WidgetSkeleton";
 
 const WorkspaceContent = () => {
   const [openUISettings, setOpenUISettings] = useToggleState(false);
@@ -87,30 +99,27 @@ const WorkspaceContent = () => {
   }, []);
 
   useEffect(() => {
-    setIsClient(true);
-
-    // Batch localStorage reads
     const loadStoredData = () => {
-      const savedPosition = localStorage.getItem(localStorageKey);
-      // const savedOpacity = localStorage.getItem(widgetOpacity);
+      try {
+        const [savedPosition, savedOpacity] = [
+          localStorage.getItem(localStorageKey),
+          localStorage.getItem(widgetOpacity),
+        ];
 
-      if (savedPosition) {
-        try {
+        if (savedPosition) {
           setWidgetLayout(JSON.parse(savedPosition));
-        } catch (error) {
-          console.warn(
-            "Failed to parse widget layout from localStorage: ",
-            error
-          );
         }
+        if (savedOpacity) {
+          setOpacity(Number(savedOpacity));
+        }
+      } catch (error) {
+        console.warn("Failed to load from localStorage:", error);
       }
-
-      // if (savedOpacity) {
-      //   setOpacity(Number(savedOpacity));
-      // }
     };
 
-    loadStoredData();
+    setIsClient(true);
+
+    requestAnimationFrame(loadStoredData);
   }, []);
 
   const updateWidgetLayout = useCallback(
@@ -194,13 +203,59 @@ const WorkspaceContent = () => {
   );
 
   useEffect(() => {
-    const saved = localStorage.getItem(widgetOpacity);
-    if (saved) setOpacity(Number(saved));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(widgetOpacity, opacity.toString());
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(widgetOpacity, opacity.toString());
+      } catch (error) {
+        console.warn("Failed to save opacity:", error);
+      }
+    }, 100);
+    return () => clearTimeout(timer);
   }, [opacity]);
+
+  // Memoized header props
+  const headerProps = useMemo(
+    () => ({
+      setOpenUISettings,
+      setOpenAccSettings,
+      setIsTimerActive,
+      setIsPaintActive,
+      setIsTodoActive,
+      setOpenUserStats,
+      setIsMediaActive,
+      setIsQuoteActive,
+      setOpenBackgroundSelect,
+      setOpacity,
+      opacity,
+      isTimerActive,
+      isQuoteActive,
+      isPaintActive,
+      isTodoActive,
+      isMediaActive,
+      hideElementsActive,
+      hideAfterSeconds,
+    }),
+    [
+      setOpenUISettings,
+      setOpenAccSettings,
+      setIsTimerActive,
+      setIsPaintActive,
+      setIsTodoActive,
+      setOpenUserStats,
+      setIsMediaActive,
+      setIsQuoteActive,
+      setOpenBackgroundSelect,
+      setOpacity,
+      opacity,
+      isTimerActive,
+      isQuoteActive,
+      isPaintActive,
+      isTodoActive,
+      isMediaActive,
+      hideElementsActive,
+      hideAfterSeconds,
+    ]
+  );
 
   if (!isClient) {
     return null;
@@ -210,26 +265,7 @@ const WorkspaceContent = () => {
     <>
       {/* header */}
       <div className="h-[50px]">
-        <Header
-          setOpenUISettings={setOpenUISettings}
-          setOpenAccSettings={setOpenAccSettings}
-          setIsTimerActive={setIsTimerActive}
-          setIsPaintActive={setIsPaintActive}
-          setIsTodoActive={setIsTodoActive}
-          setOpenUserStats={setOpenUserStats}
-          setIsMediaActive={setIsMediaActive}
-          setIsQuoteActive={setIsQuoteActive}
-          setOpenBackgroundSelect={setOpenBackgroundSelect}
-          setOpacity={setOpacity}
-          opacity={opacity}
-          isTimerActive={isTimerActive}
-          isQuoteActive={isQuoteActive}
-          isPaintActive={isPaintActive}
-          isTodoActive={isTodoActive}
-          isMediaActive={isMediaActive}
-          hideElementsActive={hideElementsActive}
-          hideAfterSeconds={hideAfterSeconds}
-        />
+        <Header {...headerProps} />
       </div>
 
       {/* user stats */}
@@ -291,7 +327,7 @@ const WorkspaceContent = () => {
 
       {/* todo */}
       {isTodoActive && (
-        <Suspense>
+        <Suspense fallback={<WidgetSkeleton />}>
           <DndContext
             modifiers={[restrictToTodoBoundingBox(dimensions)]}
             onDragEnd={(event) => {
@@ -315,7 +351,7 @@ const WorkspaceContent = () => {
 
       {/* paint */}
       {isPaintActive && (
-        <Suspense>
+        <Suspense fallback={<WidgetSkeleton />}>
           <DndContext
             modifiers={[restrictToPaintBoundingBox(dimensionsPaint)]}
             onDragEnd={(event) => {
@@ -339,7 +375,7 @@ const WorkspaceContent = () => {
 
       {/* media */}
       {isMediaActive && (
-        <Suspense>
+        <Suspense fallback={<WidgetSkeleton />}>
           <DndContext
             modifiers={[restrictToMediaBoundingBox(dimensionsMedia)]}
             onDragEnd={(event) => {
@@ -363,7 +399,7 @@ const WorkspaceContent = () => {
 
       {/* quote */}
       {isQuoteActive && (
-        <Suspense>
+        <Suspense fallback={<WidgetSkeleton />}>
           <DndContext
             modifiers={[restrictToQuoteBoundingBox(dimensionsQuote)]}
             onDragEnd={(event) => {
