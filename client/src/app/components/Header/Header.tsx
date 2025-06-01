@@ -97,6 +97,33 @@ const QuoteIcon = memo(
 );
 QuoteIcon.displayName = "QuoteIcon";
 
+const VolumeSlider = memo(
+  ({
+    value,
+    onChange,
+    min = "0",
+    max = "1",
+    step = "0.1",
+  }: {
+    value: number;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    min?: string;
+    max?: string;
+    step?: string;
+  }) => (
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      onChange={onChange}
+      className="w-full flex h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300 dark:accent-gray-300 dark:hover:accent-gray-400"
+    />
+  )
+);
+VolumeSlider.displayName = "VolumeSlider";
+
 const Header: React.FC<HeaderProps> = ({
   setOpenUISettings,
   setOpenAccSettings,
@@ -118,7 +145,7 @@ const Header: React.FC<HeaderProps> = ({
   hideAfterSeconds,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [animation, setAnimation] = useState("animate__slideInDown");
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const [volume, setVolume] = useState(0.2);
@@ -140,8 +167,12 @@ const Header: React.FC<HeaderProps> = ({
   const rainSoundRef = useRef<Howl | null>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const headerTimeoutRef = useRef<number | null>(null); //memory leaks fix
+  const mouseMoveTimeoutRef = useRef<number | null>(null);
 
+  // Optimized click outside handler
   useEffect(() => {
+    if (!openUserMenu) return;
+
     const handleClickOutside = (e: MouseEvent) => {
       if (
         userMenuRef.current &&
@@ -151,11 +182,15 @@ const Header: React.FC<HeaderProps> = ({
       }
     };
 
-    if (openUserMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    // Use requestIdleCallback for non-critical operations
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside, {
+        passive: true,
+      });
+    }, 0);
 
     return () => {
+      clearTimeout(timeoutId);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [openUserMenu, setOpenUserMenu]);
@@ -170,55 +205,6 @@ const Header: React.FC<HeaderProps> = ({
     }
     setIsSoundEnabled(!isSoundEnabled);
   };
-
-  const toggleFullscreenMode = () => {
-    const element = document.documentElement;
-
-    if (!document.fullscreenElement) {
-      element.requestFullscreen().then(() => setIsFullscreen(true));
-    } else {
-      document.exitFullscreen().then(() => setIsFullscreen(false));
-    }
-  };
-
-  //focus timer
-  const resetTimer = useCallback(() => {
-    setAnimation("animate__slideInDown");
-    setIsVisible(true);
-
-    if (hideElementsActive && headerTimeoutRef.current) {
-      clearTimeout(headerTimeoutRef.current);
-    }
-
-    if (hideElementsActive) {
-      headerTimeoutRef.current = window.setTimeout(() => {
-        setAnimation("animate__slideOutUp");
-        setTimeout(() => setIsVisible(false), 500);
-      }, hideAfterSeconds * 1000);
-    }
-  }, [hideElementsActive, hideAfterSeconds]);
-
-  useEffect(() => {
-    document.addEventListener("mousemove", resetTimer);
-    document.addEventListener("keydown", resetTimer);
-
-    return () => {
-      document.removeEventListener("mousemove", resetTimer);
-      document.removeEventListener("keydown", resetTimer);
-      if (headerTimeoutRef.current) {
-        clearTimeout(headerTimeoutRef.current);
-      }
-    };
-  }, [resetTimer]);
-
-  //stats
-  useEffect(() => {
-    dispatch(updateDailyStreak())
-      .unwrap()
-      .catch(() => {
-        dispatch(getAllStats());
-      });
-  }, [dispatch]);
 
   //rain sound only once
   useEffect(() => {
@@ -240,6 +226,74 @@ const Header: React.FC<HeaderProps> = ({
     }
   }, [volume]);
 
+  // Optimized fullscreen toggle
+  const toggleFullscreenMode = useCallback(() => {
+    const element = document.documentElement;
+
+    if (!document.fullscreenElement) {
+      element
+        .requestFullscreen()
+        .then(() => setIsFullscreen(true))
+        .catch(console.error);
+    } else {
+      document
+        .exitFullscreen()
+        .then(() => setIsFullscreen(false))
+        .catch(console.error);
+    }
+  }, []);
+
+  //focus timer
+  const debouncedResetTimer = useCallback(() => {
+    if (mouseMoveTimeoutRef.current) {
+      clearTimeout(mouseMoveTimeoutRef.current);
+    }
+
+    mouseMoveTimeoutRef.current = window.setTimeout(() => {
+      setAnimation("animate__slideInDown");
+      setIsVisible(true);
+
+      if (hideElementsActive && headerTimeoutRef.current) {
+        clearTimeout(headerTimeoutRef.current);
+      }
+
+      if (hideElementsActive) {
+        headerTimeoutRef.current = window.setTimeout(() => {
+          setAnimation("animate__slideOutUp");
+          setTimeout(() => setIsVisible(false), 500);
+        }, hideAfterSeconds * 1000);
+      }
+    }, 16); // ~60fps throttling
+  }, [hideElementsActive, hideAfterSeconds]);
+
+  useEffect(() => {
+    const handleMouseMove = () => debouncedResetTimer();
+    const handleKeyDown = () => debouncedResetTimer();
+
+    document.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("keydown", handleKeyDown, { passive: true });
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("keydown", handleKeyDown);
+      if (headerTimeoutRef.current) {
+        clearTimeout(headerTimeoutRef.current);
+      }
+      if (mouseMoveTimeoutRef.current) {
+        clearTimeout(mouseMoveTimeoutRef.current);
+      }
+    };
+  }, [debouncedResetTimer]);
+
+  //stats
+  useEffect(() => {
+    dispatch(updateDailyStreak())
+      .unwrap()
+      .catch(() => {
+        dispatch(getAllStats());
+      });
+  }, [dispatch]);
+
   const handlers = useMemo(
     () => ({
       opacity: (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -249,6 +303,13 @@ const Header: React.FC<HeaderProps> = ({
     }),
     [setOpacity]
   );
+
+  //clenup on unmount
+  useEffect(() => {
+    return () => {
+      rainSoundRef.current?.unload();
+    };
+  }, []);
 
   if (!isVisible) return null;
 
@@ -331,7 +392,6 @@ const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right Section */}
-
       <div
         ref={userMenuRef}
         className="flex items-center bg-main dark:bg-lightMain rounded-md text-white p-1 "
@@ -348,14 +408,12 @@ const Header: React.FC<HeaderProps> = ({
             />
           </div>
           <div className="absolute -right-2 bg-main dark:bg-lightMain rounded-md p-4 invisible group-hover:visible w-[122px]  ">
-            <input
-              type="range"
+            <VolumeSlider
+              value={opacity}
+              onChange={handlers.opacity}
               min="0.2"
               max="1"
               step="0.1"
-              value={opacity}
-              onChange={handlers.opacity}
-              className="w-full flex h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300 dark:accent-gray-300 dark:hover:accent-gray-400"
             />
           </div>
         </div>
@@ -381,6 +439,8 @@ const Header: React.FC<HeaderProps> = ({
           <div
             className="hover:bg-neutral-600 dark:hover:bg-neutral-300 p-1 hover:rounded-md cursor-pointer"
             title="ambient"
+            aria-label={`${isSoundEnabled ? "Mute" : "Play"} ambient sound`}
+            aria-pressed={isSoundEnabled}
             onClick={handleRainSound}
           >
             {isSoundEnabled ? (
@@ -396,15 +456,7 @@ const Header: React.FC<HeaderProps> = ({
             )}
           </div>
           <div className="absolute -right-2 bg-main dark:bg-lightMain rounded-md p-4 invisible group-hover:visible w-[122px]  ">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={volume}
-              onChange={handlers.volume}
-              className="w-full flex h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300 dark:accent-gray-300 dark:hover:accent-gray-400"
-            />
+            <VolumeSlider value={volume} onChange={handlers.volume} />
           </div>
         </div>
 

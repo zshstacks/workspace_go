@@ -12,7 +12,7 @@ const Workspace = dynamic(
 
 const WorkspaceClient = () => {
   return (
-    <div>
+    <div suppressHydrationWarning={true}>
       <Workspace />
     </div>
   );

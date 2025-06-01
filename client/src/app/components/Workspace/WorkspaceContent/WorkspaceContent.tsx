@@ -45,6 +45,7 @@ const Appearance = lazy(
 const BackgroundSelectVideo = lazy(
   () => import("../../Header/BackgroundSelect/BackgroundSelect")
 );
+
 const PomoTimer = lazy(() => import("./PomoTimer/PomoTimer"));
 const Paint = lazy(() => import("./Paint/Paint"));
 const Media = lazy(() => import("./MediaPlayer/MediaPlayer"));
@@ -62,7 +63,7 @@ const WorkspaceContent = () => {
   const [openUISettings, setOpenUISettings] = useToggleState(false);
   const [openAccSettings, setOpenAccSettings] = useToggleState(false);
   const [openSettings, setOpenSettings] = useToggleState(false);
-  const [isTimerActive, setIsTimerActive] = useToggleState(true);
+  const [isTimerActive, setIsTimerActive] = useToggleState(false);
   const [isTodoActive, setIsTodoActive] = useToggleState(false);
   const [isPaintActive, setIsPaintActive] = useToggleState(false);
   const [openUserStats, setOpenUserStats] = useToggleState(false);
@@ -305,24 +306,26 @@ const WorkspaceContent = () => {
 
       {/* timer */}
       {isTimerActive && (
-        <DndContext
-          modifiers={[restrictToBoundingBox(openSettings)]}
-          onDragEnd={(event) => {
-            const { delta } = event;
-            handleTimerDragEnd(delta);
-          }}
-          id={dndId}
-        >
-          <PomoTimer
-            setOpenSettings={setOpenSettings}
-            openSettings={openSettings}
-            setIsTimerActive={setIsTimerActive}
-            widgetInfo={widgetLayout.TimerWidget}
-            activeWidget={activeWidget}
-            setActiveWidget={setActiveWidget}
-            opacity={opacity}
-          />
-        </DndContext>
+        <Suspense fallback={<WidgetSkeleton />}>
+          <DndContext
+            modifiers={[restrictToBoundingBox(openSettings)]}
+            onDragEnd={(event) => {
+              const { delta } = event;
+              handleTimerDragEnd(delta);
+            }}
+            id={dndId}
+          >
+            <PomoTimer
+              setOpenSettings={setOpenSettings}
+              openSettings={openSettings}
+              setIsTimerActive={setIsTimerActive}
+              widgetInfo={widgetLayout.TimerWidget}
+              activeWidget={activeWidget}
+              setActiveWidget={setActiveWidget}
+              opacity={opacity}
+            />
+          </DndContext>
+        </Suspense>
       )}
 
       {/* todo */}
