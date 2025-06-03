@@ -179,24 +179,14 @@ const PomoTimer = React.memo<PomoTimerProps>(
       return () => window.removeEventListener("keydown", onKey);
     }, [isRunning, handleStart, handleStop]);
 
-    // timer isRunning then refresh time
+    // // timer isRunning then refresh time
     useEffect(() => {
       if (isRunning) {
-        let lastUpdateTime = Date.now();
-        let animationFrameId: number;
+        const intervalId = setInterval(() => {
+          dispatch(fetchTimerStatus());
+        }, 1000);
 
-        const updateTimer = () => {
-          const now = Date.now();
-          // Only fetch timer status every second instead of every frame
-          if (now - lastUpdateTime >= 1000) {
-            dispatch(fetchTimerStatus());
-            lastUpdateTime = now;
-          }
-          animationFrameId = requestAnimationFrame(updateTimer);
-        };
-
-        animationFrameId = requestAnimationFrame(updateTimer);
-        return () => cancelAnimationFrame(animationFrameId);
+        return () => clearInterval(intervalId);
       }
     }, [dispatch, isRunning]);
 
