@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useMemo, useState } from "react";
 import WorkspaceContent from "@/app/components/Workspace/WorkspaceContent/WorkspaceContent";
 import { ContextProps } from "@/app/utility/types/types";
 import VideoBackground from "./VideoBackground";
+import { useDebounceLocalStorage } from "@/app/hooks/useDebounceLocalStorage";
 
 export const MyContext = createContext<ContextProps | null>(null);
 const STORAGE_KEY_BG = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY_BG as string;
@@ -19,13 +20,21 @@ const Workspace = () => {
     return DEFAULT_BG;
   });
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_BG, videoId);
-  }, [videoId]);
+  useDebounceLocalStorage(STORAGE_KEY_BG, videoId, 1000);
+
+  const contextValue = useMemo(
+    () => ({
+      theme,
+      setTheme,
+      videoId,
+      setVideoId,
+    }),
+    [theme, videoId]
+  );
 
   return (
     <div className=" min-h-screen overflow-hidden ">
-      <MyContext.Provider value={{ theme, setTheme, videoId, setVideoId }}>
+      <MyContext.Provider value={contextValue}>
         <VideoBackground />
 
         <WorkspaceContent />
