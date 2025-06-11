@@ -4,7 +4,9 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("token");
 
   if (!token) {
-    return NextResponse.redirect(new URL("/signin", req.url));
+    const url = new URL("/signin", req.url);
+    url.searchParams.set("session", "expired");
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

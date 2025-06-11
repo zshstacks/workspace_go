@@ -1,8 +1,4 @@
 import axios from "axios";
-import { logoutUser } from "./slices/authSlice/asyncActions";
-import { AppDispatch } from "./store";
-import { useDispatch } from "react-redux";
-import { useRouter } from "next/router";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -61,15 +57,12 @@ api.interceptors.response.use(
         // Retry the original request
         return api(originalRequest);
       } catch (refreshError) {
-        const dispatch: AppDispatch = useDispatch();
-        const router = useRouter();
-        // If refresh fails, process queue with error and potentially logout
+        // If refresh fails, process queue with error and redirect with session expired flag
         isRefreshing = false;
         processQueue(refreshError);
 
-        //dispatch logout action & redirect to login
-        dispatch(logoutUser());
-        router.push("/signin");
+        // Redirect to signin with session expired parameter
+        window.location.href = "/signin?session=expired";
 
         return Promise.reject(refreshError);
       }

@@ -25,6 +25,7 @@ const Signin = () => {
 
   const searchParams = useSearchParams();
   const oauthError = searchParams.get("error");
+  const sessionExpired = searchParams.get("session");
 
   const dispatch: AppDispatch = useDispatch();
 
@@ -55,6 +56,19 @@ const Signin = () => {
       });
     }
   }, [oauthError]);
+
+  useEffect(() => {
+    if (sessionExpired === "expired") {
+      toast.warning("Your session is expired. Please login again.", {
+        theme: "dark",
+        autoClose: 5000,
+      });
+
+      const url = new URL(window.location.href);
+      url.searchParams.delete("session");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [sessionExpired]);
 
   //display errors and success messages
   useEffect(() => {
