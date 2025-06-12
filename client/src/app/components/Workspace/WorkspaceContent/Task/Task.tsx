@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -30,6 +31,33 @@ import {
   getAllTasks,
 } from "@/app/redux/slices/taskSlice/asyncActions";
 
+// Progress bar
+const ProgressBar: React.FC<{
+  completedCount: number;
+  totalCount: number;
+}> = React.memo(({ completedCount, totalCount }) => {
+  const progressPercentage = useMemo(
+    () => (totalCount > 0 ? (completedCount / totalCount) * 100 : 0),
+    [completedCount, totalCount]
+  );
+
+  return (
+    <div className="flex flex-row w-full gap-2">
+      <div className="rounded-2xl w-full h-[11px] my-auto bg-neutral-500/70 dark:bg-neutral-400/50">
+        <div
+          className="h-full rounded-2xl bg-neutral-400/75 dark:bg-neutral-500/75 transition-all duration-300"
+          style={{ width: `${progressPercentage}%` }}
+        />
+      </div>
+      <span className="text-sm font-semibold whitespace-nowrap ">
+        {completedCount}/{totalCount}
+      </span>
+    </div>
+  );
+});
+
+ProgressBar.displayName = "ProgressBar";
+
 const Task: React.FC<TodoProps> = ({
   setIsTodoActive,
   widgetInfo,
@@ -52,6 +80,13 @@ const Task: React.FC<TodoProps> = ({
   const { tasks } = useSelector((state: RootState) => state.tasks);
 
   const dispatch: AppDispatch = useDispatch();
+
+  // completed count bar
+  const taskStats = useMemo(() => {
+    const completedCount = tasks.filter((task) => task.Completed).length;
+    const totalCount = tasks.length;
+    return { completedCount, totalCount };
+  }, [tasks]);
 
   const handleDeleteAllTasks = () => {
     dispatch(deleteAllTasks());
@@ -82,12 +117,6 @@ const Task: React.FC<TodoProps> = ({
   const activeFilterCount = [hideCompleted, showTodayOnly].filter(
     Boolean
   ).length;
-
-  // completed count bar
-  const completedTaskCount = tasks.filter((task) => task.Completed).length;
-  const totalTasksCount = tasks.length;
-  const progressPercentage =
-    totalTasksCount > 0 ? (completedTaskCount / totalTasksCount) * 100 : 0;
 
   // menus
   const actionContainerRef = useRef<HTMLDivElement>(null);
@@ -195,12 +224,14 @@ const Task: React.FC<TodoProps> = ({
     [dimensions.width, dimensions.height, setDimensions]
   );
 
-  //fetch tasks with filters
+  //fetch tasks with filters with debounce
   useEffect(() => {
-    dispatch(getAllTasks({ hideCompleted, showTodayOnly }));
-  }, [hideCompleted, showTodayOnly, dispatch]);
+    const timeoutId = setTimeout(() => {
+      dispatch(getAllTasks({ hideCompleted, showTodayOnly }));
+    }, 100);
 
-  // #TODO: react-window for task list to optimize performance
+    return () => clearTimeout(timeoutId);
+  }, [hideCompleted, showTodayOnly, dispatch]);
 
   return (
     <div
@@ -382,17 +413,10 @@ const Task: React.FC<TodoProps> = ({
           </div>
 
           {/* completed count bar */}
-          <div className="flex flex-row w-full gap-2">
-            <div className="rounded-2xl w-full h-[11px] m-auto bg-neutral-500/70 dark:bg-neutral-400/50">
-              <div
-                className="h-full  rounded-2xl bg-neutral-400/75 dark:bg-neutral-500/75 transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
-            </div>
-            <span className="text-sm font-semibold ">
-              {completedTaskCount}/{totalTasksCount}
-            </span>
-          </div>
+          <ProgressBar
+            completedCount={taskStats.completedCount}
+            totalCount={taskStats.totalCount}
+          />
         </div>
 
         {/* resize  icon */}

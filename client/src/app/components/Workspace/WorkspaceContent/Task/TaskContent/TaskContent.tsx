@@ -7,7 +7,7 @@ import { reorderTasks } from "@/app/redux/slices/taskSlice/taskSlice";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import SortableTaskItem from "./SortableTaskItem/SortableTaskItem";
 
@@ -30,14 +30,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
+const CHARACTER_LIMIT = 800;
+
 const TaskContent = () => {
   const dispatch: AppDispatch = useDispatch();
   const { tasks } = useSelector((state: RootState) => state.tasks);
 
   const [activeId, setActiveId] = useState<number | null>(null);
   const [dropIndicator, setDropIndicator] = useState<number | null>(null);
-
-  const CHARACTER_LIMIT = 800;
 
   //complete task
   const handleCompleteTask = (taskId: number, isCompleted: boolean) => {
@@ -65,19 +65,15 @@ const TaskContent = () => {
   );
 
   // Handle drag start event
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id as number);
-  };
+  }, []);
 
   // Handle drag move event
-  const handleDragMove = (event: DragMoveEvent) => {
+  const handleDragMove = useCallback((event: DragMoveEvent) => {
     const { over } = event;
-    if (over) {
-      setDropIndicator(over.id as number);
-    } else {
-      setDropIndicator(null);
-    }
-  };
+    setDropIndicator(over ? (over.id as number) : null);
+  }, []);
 
   const handleDragEnd = useCallback(
     (e: DragEndEvent) => {
@@ -143,11 +139,13 @@ const TaskContent = () => {
     });
   }, [tasks]);
 
-  const activeTask = activeId
-    ? tasks.find((task) => task.LocalID === activeId)
-    : null;
+  const activeTask = useMemo(() => {
+    return activeId ? tasks.find((task) => task.LocalID === activeId) : null;
+  }, [activeId, tasks]);
 
-  const sortedTasks = tasks.slice().sort((a, b) => a.Order - b.Order);
+  const sortedTasks = useMemo(() => {
+    return tasks.slice().sort((a, b) => a.Order - b.Order);
+  }, [tasks]);
 
   return (
     <div className="flex flex-col absolute gap-2 p-6 w-full ">
