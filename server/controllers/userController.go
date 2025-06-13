@@ -16,7 +16,6 @@ import (
 	"server/initializers"
 	"server/models"
 	"server/utils"
-	"strconv"
 	"time"
 )
 
@@ -108,8 +107,22 @@ func invalidateUserCache(user models.User) {
 	initializers.RedisClient.Del(initializers.Ctx, userEmail)
 }
 
-func generateConfirmationCode() string {
-	return strconv.Itoa(rand.Intn(1000000))
+const optChars = "1234567890"
+
+func generateConfirmationCode(length int) (string, error) {
+	//return strconv.Itoa(rand.Intn(1000000))
+	buffer := make([]byte, length)
+	_, err := rand.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	optCharsLength := len(optChars)
+	for i := 0; i < length; i++ {
+		buffer[i] = optChars[int(buffer[i])%optCharsLength]
+	}
+
+	return string(buffer), nil
 }
 
 func sendEmailConfirmation(toEmail, code string) error {
@@ -199,7 +212,12 @@ func ResendConfirmationCode(c *gin.Context) {
 	}
 
 	// generate new code
-	confirmationCode := generateConfirmationCode()
+	confirmationCode, err := generateConfirmationCode(6)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate confirmation code"})
+		return
+	}
 	user.EmailConfirmationCode = confirmationCode
 
 	// save to db
@@ -277,7 +295,12 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	confirmationCode := generateConfirmationCode()
+	confirmationCode, err := generateConfirmationCode(6)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate confirmation code"})
+		return
+	}
 
 	//create a user
 	user := models.User{
