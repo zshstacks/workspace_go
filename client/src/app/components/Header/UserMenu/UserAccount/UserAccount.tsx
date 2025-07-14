@@ -110,6 +110,13 @@ const UserAccount: React.FC<UserAccountProps> = ({
                 My account
               </h2>
 
+              {/* Unique ID */}
+              <div className="mb-4">
+                <label className="text-gray-400 dark:text-lightText text-sm font-medium mb-1">
+                  ID: #{user ? user.uniqueID : "Failed to fetch"}
+                </label>
+              </div>
+
               {/* Email */}
               <div className="mb-4">
                 <label className="text-gray-400 dark:text-lightText text-sm font-medium mb-1 block">
