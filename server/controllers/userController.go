@@ -26,6 +26,23 @@ const (
 	StatsCacheTTL    = 15 * time.Minute
 )
 
+const optChars = "1234567890"
+
+func generateConfirmationCode(length int) (string, error) {
+	buffer := make([]byte, length)
+	_, err := rand.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	optCharsLength := len(optChars)
+	for i := 0; i < length; i++ {
+		buffer[i] = optChars[int(buffer[i])%optCharsLength]
+	}
+
+	return string(buffer), nil
+}
+
 // caching helper function
 func cacheUser(user models.User) error {
 	userJSON, err := json.Marshal(user)
@@ -105,24 +122,6 @@ func invalidateUserCache(user models.User) {
 
 	initializers.RedisClient.Del(initializers.Ctx, userKey)
 	initializers.RedisClient.Del(initializers.Ctx, userEmail)
-}
-
-const optChars = "1234567890"
-
-func generateConfirmationCode(length int) (string, error) {
-	//return strconv.Itoa(rand.Intn(1000000))
-	buffer := make([]byte, length)
-	_, err := rand.Read(buffer)
-	if err != nil {
-		return "", err
-	}
-
-	optCharsLength := len(optChars)
-	for i := 0; i < length; i++ {
-		buffer[i] = optChars[int(buffer[i])%optCharsLength]
-	}
-
-	return string(buffer), nil
 }
 
 func sendEmailConfirmation(toEmail, code string) error {
@@ -568,6 +567,7 @@ func Validate(c *gin.Context) {
 		"id":       userModel.ID,
 		"email":    userModel.Email,
 		"username": userModel.Username,
+		"uniqueID": userModel.UniqueID,
 	})
 }
 
