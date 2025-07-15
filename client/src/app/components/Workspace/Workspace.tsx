@@ -35,7 +35,9 @@ const Workspace = () => {
   return (
     <div className=" min-h-screen overflow-hidden ">
       <MyContext.Provider value={contextValue}>
-        <VideoBackground />
+        <div>
+          <VideoBackground />
+        </div>
 
         <WorkspaceContent />
       </MyContext.Provider>
