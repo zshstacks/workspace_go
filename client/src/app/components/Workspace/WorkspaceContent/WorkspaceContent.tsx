@@ -27,6 +27,7 @@ import { restrictToMediaBoundingBox } from "@/app/hooks/restrictToMediaBoundingB
 import { restrictToQuoteBoundingBox } from "@/app/hooks/restrictToQuoteBoundingBox";
 
 import { CgSpinnerAlt } from "react-icons/cg";
+import Footer from "../../Footer/Footer";
 
 const localStorageKey = process.env.NEXT_PUBLIC_LOCAL_STORAGE_KEY as string;
 const widgetOpacity = process.env
@@ -421,6 +422,9 @@ const WorkspaceContent = () => {
           </DndContext>
         </Suspense>
       )}
+      <div>
+        <Footer />
+      </div>
     </>
   );
 };
