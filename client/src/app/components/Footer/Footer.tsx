@@ -1,6 +1,7 @@
 import { useToggleState } from "@/app/hooks/useToggleState";
 import React from "react";
-import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import { IoIosSend } from "react-icons/io";
+import { IoChatbubbleEllipsesOutline, IoCloseOutline } from "react-icons/io5";
 
 const Footer = () => {
   const [isActive, setIsActive] = useToggleState(false);
@@ -9,7 +10,7 @@ const Footer = () => {
     <div className="w-full flex justify-between items-center fixed left-0 bottom-0 h-[50px]">
       <div className="justify-end flex w-full">
         <div
-          className="bg-main w-[45px] h-[45px] rounded-md mb-3 mr-2 flex justify-center items-center text-center text-white cursor-pointer hover:bg-neutral-700"
+          className="bg-main w-[45px] h-[45px] rounded-md mb-3 mr-2 flex justify-center items-center text-center text-white cursor-pointer hover:bg-secondary"
           onClick={setIsActive}
         >
           <IoChatbubbleEllipsesOutline size={19} />
@@ -17,27 +18,27 @@ const Footer = () => {
 
         {/* Chat block with slide animation */}
         <div
-          className={`fixed bottom-16 right-[60px] w-[350px] h-[700px] bg-main rounded-t-lg shadow-2xl border border-gray-700 flex flex-col overflow-hidden transition-transform duration-500 ease-in-out ${
+          className={`fixed bottom-16 right-[60px] w-[350px] h-[690px] bg-main rounded-t-lg shadow-md shadow-[0_0_20px_rgba(59,130,246,0.2)]" bg-gray-900/20 backdrop-blur-lg rounded-xl  flex flex-col overflow-hidden transition-transform duration-500 ease-in-out ${
             isActive ? "translate-x-[52px]" : "translate-x-[118%]"
           }`}
         >
           {/* Header */}
-          <div className="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700">
+          <div className="p-4 flex justify-between items-center ">
             <h3 className="text-white font-medium">Chat</h3>
             <button
               onClick={setIsActive}
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-white hover:scale-105 transition-all"
             >
-              ×
+              <IoCloseOutline />
             </button>
           </div>
 
           {/* Chat messages area */}
-          <div className="flex-1 p-4 overflow-y-auto bg-main">
-            {/* Regular messages */}
+          <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-900">
             <div className="space-y-4">
+              {/* Regular message */}
               <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center ring-2 ring-offset-2 ring-offset-gray-900 ring-orange-500/50">
                   <span className="text-white text-xs font-bold">Z</span>
                 </div>
                 <div className="flex-1">
@@ -53,8 +54,9 @@ const Footer = () => {
                 </div>
               </div>
 
+              {/* Host message */}
               <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center ring-2 ring-offset-2 ring-offset-gray-900 ring-blue-500/50">
                   <span className="text-white text-xs font-bold">T</span>
                 </div>
                 <div className="flex-1">
@@ -62,7 +64,7 @@ const Footer = () => {
                     <span className="text-blue-400 text-sm font-medium">
                       tragicpale
                     </span>
-                    <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                    <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-[0_0_5px_rgba(59,130,246,0.5)]">
                       Host
                     </span>
                     <span className="text-gray-400 text-xs">
@@ -76,15 +78,17 @@ const Footer = () => {
           </div>
 
           {/* Input area */}
-          <div className="p-4 border-t border-gray-700 bg-gray-800">
+          <div className="p-4 ">
             <div className="flex space-x-2">
-              <input
-                type="text"
+              <textarea
+                rows={1}
+                maxLength={85}
+                autoComplete="off"
                 placeholder="Say something"
-                className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                className="flex-1 bg-main text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-700/50 placeholder-gray-400 resize-none"
               />
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                Send
+              <button className="bg-main text-white px-4 py-2 rounded-lg hover:bg-secondary hover:shadow-[0_0_10px_rgba(232,150,136,0.5)] transition-all">
+                <IoIosSend />
               </button>
             </div>
           </div>
