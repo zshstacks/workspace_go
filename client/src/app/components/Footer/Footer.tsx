@@ -1,24 +1,36 @@
 import { useToggleState } from "@/app/hooks/useToggleState";
-import React from "react";
+import React, { useContext } from "react";
 import { IoIosSend } from "react-icons/io";
 import { IoChatbubbleEllipsesOutline, IoCloseOutline } from "react-icons/io5";
+import { MyContext } from "../Workspace/Workspace";
 
 const Footer = () => {
   const [isActive, setIsActive] = useToggleState(false);
 
+  const context = useContext(MyContext);
+  if (!context) {
+    throw new Error(
+      "The Footer component should be used within MyContext.Provider."
+    );
+  }
+  const { theme } = context;
+
   return (
-    <div className="w-full flex justify-between items-center fixed left-0 bottom-0 h-[50px]">
-      <div className="justify-end flex w-full">
+    <div className="w-full flex justify-between items-center fixed left-0 bottom-0 h-[50px] ">
+      <div className="justify-end flex w-full ">
         <div
-          className="bg-main w-[45px] h-[45px] rounded-md mb-3 mr-2 flex justify-center items-center text-center text-white cursor-pointer hover:bg-secondary"
+          className="bg-main dark:bg-lightMain w-[45px] h-[45px] rounded-md mb-3 mr-2 flex justify-center items-center text-center  cursor-pointer hover:bg-secondary dark:hover:bg-secondary"
           onClick={setIsActive}
         >
-          <IoChatbubbleEllipsesOutline size={19} />
+          <IoChatbubbleEllipsesOutline
+            size={19}
+            color={theme === "dark" ? "#4e4e4e" : "white"}
+          />
         </div>
 
         {/* Chat block with slide animation */}
         <div
-          className={`fixed bottom-16 right-[60px] w-[350px] h-[690px] bg-main rounded-t-lg shadow-md shadow-[0_0_20px_rgba(59,130,246,0.2)]" bg-gray-900/20 backdrop-blur-lg rounded-xl  flex flex-col overflow-hidden transition-transform duration-500 ease-in-out ${
+          className={`fixed bottom-16 right-[60px] w-[350px] h-[690px] bg-main bg-transparent rounded-t-lg shadow-md shadow-[0_0_20px_rgba(59,130,246,0.2)]" backdrop-blur-lg rounded-x flex flex-col overflow-y-auto custom-scrollbar transition-transform duration-500 ease-in-out ${
             isActive ? "translate-x-[52px]" : "translate-x-[118%]"
           }`}
         >
@@ -64,9 +76,7 @@ const Footer = () => {
                     <span className="text-blue-400 text-sm font-medium">
                       tragicpale
                     </span>
-                    <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-[0_0_5px_rgba(59,130,246,0.5)]">
-                      Host
-                    </span>
+
                     <span className="text-gray-400 text-xs">
                       May 26, 6:21pm
                     </span>
@@ -85,10 +95,10 @@ const Footer = () => {
                 maxLength={85}
                 autoComplete="off"
                 placeholder="Say something"
-                className="flex-1 bg-main text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-700/50 placeholder-gray-400 resize-none"
+                className="flex-1 bg-main dark:bg-lightMain dark:placeholder:text-lightText text-white dark:text-lightText rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-700/50 dark:focus:ring-lightBorder placeholder-gray-400 resize-none"
               />
-              <button className="bg-main text-white px-4 py-2 rounded-lg hover:bg-secondary hover:shadow-[0_0_10px_rgba(232,150,136,0.5)] transition-all">
-                <IoIosSend />
+              <button className="bg-main dark:bg-lightMain text-white px-4 py-2 rounded-lg dark:hover:bg-secondary hover:bg-secondary hover:shadow-[0_0_10px_rgba(232,150,136,0.5)] transition-all">
+                <IoIosSend color={theme === "dark" ? "#4e4e4e" : "white"} />
               </button>
             </div>
           </div>
