@@ -42,6 +42,7 @@ func main() {
 	routes.TasksRoutes(r)
 	routes.StatsRoutes(r)
 	routes.OAuthRoutes(r)
+	routes.ChatRoutes(r)
 
 	log.Fatal(r.Run())
 
