@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import { IoIosSend } from "react-icons/io";
 import { IoChatbubbleEllipsesOutline, IoCloseOutline } from "react-icons/io5";
 import { MyContext } from "../Workspace/Workspace";
+import { LuGitPullRequestCreate } from "react-icons/lu";
 
 const Footer = () => {
   const [isActive, setIsActive] = useToggleState(false);
@@ -16,7 +17,7 @@ const Footer = () => {
   const { theme } = context;
 
   return (
-    <div className="w-full flex justify-between items-center fixed left-0 bottom-0 h-[50px] ">
+    <div className="w-full flex justify-between items-center fixed left-0 bottom-0 h-[50px] z-[10000]">
       <div className="justify-end flex w-full ">
         <div
           className="bg-main dark:bg-lightMain w-[45px] h-[45px] rounded-md mb-3 mr-2 flex justify-center items-center text-center  cursor-pointer hover:bg-secondary dark:hover:bg-secondary"
@@ -29,6 +30,7 @@ const Footer = () => {
         </div>
 
         {/* Chat block with slide animation */}
+
         <div
           className={`fixed bottom-16 right-[60px] w-[350px] h-[690px] bg-main bg-transparent rounded-t-lg shadow-md shadow-[0_0_20px_rgba(59,130,246,0.2)]" backdrop-blur-lg rounded-x flex flex-col overflow-y-auto custom-scrollbar transition-transform duration-500 ease-in-out ${
             isActive ? "translate-x-[52px]" : "translate-x-[118%]"
@@ -46,7 +48,7 @@ const Footer = () => {
           </div>
 
           {/* Chat messages area */}
-          <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-900">
+          <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-900 ">
             <div className="space-y-4">
               {/* Regular message */}
               <div className="flex items-start space-x-3">
@@ -56,7 +58,7 @@ const Footer = () => {
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
                     <span className="text-white text-sm font-medium">
-                      zahstacks
+                      zshstacks
                     </span>
                     <span className="text-gray-400 text-xs">
                       May 26, 6:21pm
@@ -88,7 +90,7 @@ const Footer = () => {
           </div>
 
           {/* Input area */}
-          <div className="p-4 ">
+          <div className="p-4 gap-y-4 flex flex-col">
             <div className="flex space-x-2">
               <textarea
                 rows={1}
@@ -97,8 +99,28 @@ const Footer = () => {
                 placeholder="Say something"
                 className="flex-1 bg-main dark:bg-lightMain dark:placeholder:text-lightText text-white dark:text-lightText rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-700/50 dark:focus:ring-lightBorder placeholder-gray-400 resize-none"
               />
-              <button className="bg-main dark:bg-lightMain text-white px-4 py-2 rounded-lg dark:hover:bg-secondary hover:bg-secondary hover:shadow-[0_0_10px_rgba(232,150,136,0.5)] transition-all">
+              <button
+                className="bg-main dark:bg-lightMain text-white px-4 py-2 rounded-lg dark:hover:bg-secondary hover:bg-secondary hover:shadow-[0_0_10px_rgba(232,150,136,0.5)] transition-all"
+                title="Send"
+              >
                 <IoIosSend color={theme === "dark" ? "#4e4e4e" : "white"} />
+              </button>
+            </div>
+            {/* uniqueID input */}
+            <div className="flex space-x-2 justify-center">
+              <input
+                maxLength={12}
+                autoComplete="off"
+                placeholder="Enter user unique #ID"
+                className=" w-48 bg-main dark:bg-lightMain dark:placeholder:text-lightText text-white dark:text-lightText rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-700/50 dark:focus:ring-lightBorder placeholder-gray-400 "
+              />
+              <button
+                className="bg-main dark:bg-lightMain text-white px-4 py-2 rounded-lg dark:hover:bg-secondary hover:bg-secondary hover:shadow-[0_0_10px_rgba(232,150,136,0.5)] transition-all"
+                title="Create chat hub"
+              >
+                <LuGitPullRequestCreate
+                  color={theme === "dark" ? "#4e4e4e" : "white"}
+                />
               </button>
             </div>
           </div>
