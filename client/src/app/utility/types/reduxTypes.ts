@@ -102,3 +102,37 @@ export interface StatsState {
 export interface StatsErrorPayload {
   error?: string;
 }
+
+export interface ChatRoom {
+  id: string;
+  participantA: string;
+  participantB: string;
+  messages: Message[];
+  isConnected: boolean;
+}
+
+export interface Message {
+  senderID: string;
+  receiverID: string;
+  body: string;
+  timestamp?: string;
+}
+
+export interface ChatState {
+  activeRoom: ChatRoom | null;
+  ws: WebSocket | null;
+  isConnecting: boolean;
+  isConnected: boolean;
+  error: string | null;
+  targetUserID: string;
+  currentUserID: string | null;
+}
+
+export interface ChatErrorPayload {
+  error: string;
+}
+
+export interface ConnectToChatParams {
+  currentUserID: string;
+  targetUserID: string;
+}

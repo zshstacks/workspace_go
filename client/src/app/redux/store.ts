@@ -4,6 +4,7 @@ import userReducer from "./slices/userSlice/userSlice";
 import pomodoroReducer from "./slices/pomodoroSlice/pomodoroSlice";
 import taskReducer from "./slices/taskSlice/taskSlice";
 import statsReducer from "./slices/statsSlice/statsSlice";
+import chatReducer from "./slices/chatSlice/chatSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +13,16 @@ export const store = configureStore({
     pomodoro: pomodoroReducer,
     tasks: taskReducer,
     stats: statsReducer,
+    chat: chatReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore WebSocket instances in Redux state
+        ignoredActions: ["chat/connectToChat/fulfilled"],
+        ignoredPaths: ["chat.ws"],
+      },
+    }),
   devTools: process.env.NODE_ENV !== "production",
 });
 
