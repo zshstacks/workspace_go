@@ -5,8 +5,9 @@ import { IoIosSend } from "react-icons/io";
 import { IoChatbubbleEllipsesOutline, IoCloseOutline } from "react-icons/io5";
 import { LuGitPullRequestCreate } from "react-icons/lu";
 import { MyContext } from "../Workspace/Workspace";
-import { useSelector } from "react-redux";
-import { RootState } from "@/app/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import { validateUser } from "@/app/redux/slices/userSlice/asyncActions";
 
 const Footer = () => {
   const [isActive, setIsActive] = useToggleState(false);
@@ -24,6 +25,7 @@ const Footer = () => {
 
   // Get current user from user state
   const currentUser = useSelector((state: RootState) => state.user.user);
+  const dispatch: AppDispatch = useDispatch();
 
   // Use chat hook
   const {
@@ -37,6 +39,11 @@ const Footer = () => {
     updateTargetUserID,
     clearChatError,
   } = useChat();
+
+  //validate user
+  useEffect(() => {
+    dispatch(validateUser());
+  }, [dispatch]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -170,7 +177,7 @@ const Footer = () => {
           )}
 
           {/* Chat messages area */}
-          <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-900">
+          <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
             {!isConnected && !isConnecting ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-400 text-center">

@@ -9,7 +9,7 @@ export const connectToChat = createAsyncThunk(
   "chat/connectToChat",
   async ({ currentUserID, targetUserID }: ConnectToChatParams, thunkAPI) => {
     try {
-      const wsUrl = `ws://localhost:8000/chat?userID=${currentUserID}&chatWithID=${targetUserID}`;
+      const wsUrl = `ws://localhost:8000/chat?chatWithID=${targetUserID}`;
 
       return new Promise<{ ws: WebSocket; roomID: string }>(
         (resolve, reject) => {
@@ -28,8 +28,16 @@ export const connectToChat = createAsyncThunk(
             reject(new Error("Failed to connect to chat"));
           };
 
-          ws.onclose = () => {
-            console.log("WebSocket connection closed");
+          ws.onclose = (event) => {
+            console.log(
+              "WebSocket connection closed",
+              event.code,
+              event.reason
+            );
+            // check if closing was accidental
+            if (event.code !== 1000) {
+              reject(new Error("WebSocket connection failed"));
+            }
           };
         }
       );
@@ -53,12 +61,21 @@ export const sendMessage = createAsyncThunk(
         throw new Error("WebSocket connection is not open");
       }
 
+      // send only required fields
+      const messageToSend = {
+        senderID: message.senderID,
+        receiverID: message.receiverID,
+        body: message.body,
+      };
+
+      ws.send(JSON.stringify(messageToSend));
+
+      // return msg with timestamp
       const messageWithTimestamp: Message = {
         ...message,
         timestamp: new Date().toISOString(),
       };
 
-      ws.send(JSON.stringify(messageWithTimestamp));
       return messageWithTimestamp;
     } catch (error) {
       return thunkAPI.rejectWithValue({
@@ -76,8 +93,15 @@ export const disconnectFromChat = createAsyncThunk(
       const state = thunkAPI.getState() as { chat: ChatState };
       const { ws } = state.chat;
 
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close();
+      if (ws) {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close(1000, "User disconnected"); // normal close
+        } else if (ws.readyState === WebSocket.CONNECTING) {
+          // if connecting, wait and close
+          ws.addEventListener("open", () => {
+            ws.close(1000, "User disconnected");
+          });
+        }
       }
 
       return true;

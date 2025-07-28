@@ -16,10 +16,8 @@ import { ChatState, Message } from "../utility/types/reduxTypes";
 import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 
-// Pielāgots useDispatch ar thunk atbalstu
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 
-// Pielāgots useSelector ar RootState tipu
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export const useChat = () => {
