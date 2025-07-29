@@ -1,13 +1,13 @@
 import { Modifier } from "@dnd-kit/core";
 
-export const restrictToQuoteBoundingBox =
+export const restrictToCalculatorBoundingBox =
   (dimensionsMedia: { width: number; height: number }): Modifier =>
   ({ transform, activeNodeRect, containerNodeRect }) => {
     if (!activeNodeRect || !containerNodeRect) {
       return transform;
     }
 
-    //restrictions where we can move media
+    //restrictions where we can move
     const boundingBox = {
       top: 58,
       bottom: window.innerHeight + 8,

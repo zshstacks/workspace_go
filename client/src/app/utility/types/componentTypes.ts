@@ -7,13 +7,13 @@ export interface HeaderProps {
   setIsTodoActive: () => void;
   setIsMediaActive: () => void;
   setIsPaintActive: () => void;
-  setIsQuoteActive: () => void;
+  setIsCalculatorActive: () => void;
   setOpenUserStats: () => void;
   setOpenBackgroundSelect: () => void;
   setOpacity: (value: number) => void;
   opacity: number;
   isTimerActive: boolean;
-  isQuoteActive: boolean;
+  isCalculatorActive: boolean;
   isMediaActive: boolean;
   isPaintActive: boolean;
   isTodoActive: boolean;
@@ -52,7 +52,7 @@ export interface SavedWidgetLayoutInfo {
   TodoWidget?: WidgetInfo;
   PaintWidget?: WidgetInfo;
   MediaWidget?: WidgetInfo;
-  QuoteWidget?: WidgetInfo;
+  CalculatorWidget?: WidgetInfo;
 }
 
 export interface PomoTimerSettingsProps {
@@ -75,7 +75,7 @@ export interface PomoTimerProps {
   widgetInfo?: WidgetInfo;
   activeWidget: string;
   setActiveWidget: (
-    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+    value: "pomodoro" | "todo" | "paint" | "media" | "calculator"
   ) => void;
   opacity: number;
 }
@@ -87,7 +87,7 @@ export interface TodoProps {
   setDimensions: (dimensions: { width: number; height: number }) => void;
   activeWidget: string;
   setActiveWidget: (
-    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+    value: "pomodoro" | "todo" | "paint" | "media" | "calculator"
   ) => void;
   opacity: number;
 }
@@ -99,7 +99,7 @@ export interface PaintProps {
   widgetInfo?: WidgetInfo;
   activeWidget: string;
   setActiveWidget: (
-    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+    value: "pomodoro" | "todo" | "paint" | "media" | "calculator"
   ) => void;
   opacity: number;
 }
@@ -111,17 +111,17 @@ export interface MediaProps {
   widgetInfo?: WidgetInfo;
   activeWidget: string;
   setActiveWidget: (
-    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+    value: "pomodoro" | "todo" | "paint" | "media" | "calculator"
   ) => void;
   opacity: number;
 }
 
-export interface QuoteProps {
-  setIsQuoteActive: () => void;
+export interface CalculatorProps {
+  setIsCalculatorActive: () => void;
   widgetInfo?: WidgetInfo;
   activeWidget: string;
   setActiveWidget: (
-    value: "pomodoro" | "todo" | "paint" | "media" | "quote"
+    value: "pomodoro" | "todo" | "paint" | "media" | "calculator"
   ) => void;
   opacity: number;
 }

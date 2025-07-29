@@ -31,7 +31,7 @@ import {
 import { PiPaintBucketBold, PiSelectionBackground } from "react-icons/pi";
 import { RiYoutubeLine } from "react-icons/ri";
 import { CgDropOpacity } from "react-icons/cg";
-import { LiaQuoteRightSolid } from "react-icons/lia";
+import { IoIosCalculator } from "react-icons/io";
 
 import "animate.css";
 
@@ -87,15 +87,15 @@ const MediaIcon = memo(
 );
 MediaIcon.displayName = "MediaIcon";
 
-const QuoteIcon = memo(
+const CalculatorIcon = memo(
   ({ isActive, theme }: { isActive: boolean; theme: string }) => (
-    <LiaQuoteRightSolid
+    <IoIosCalculator
       size={20}
       color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
     />
   )
 );
-QuoteIcon.displayName = "QuoteIcon";
+CalculatorIcon.displayName = "CalculatorIcon";
 
 const VolumeSlider = memo(
   ({
@@ -131,7 +131,7 @@ const Header: React.FC<HeaderProps> = ({
   setIsPaintActive,
   setIsTodoActive,
   setIsMediaActive,
-  setIsQuoteActive,
+  setIsCalculatorActive,
   setOpenUserStats,
   setOpenBackgroundSelect,
   setOpacity,
@@ -140,7 +140,7 @@ const Header: React.FC<HeaderProps> = ({
   isPaintActive,
   isTodoActive,
   isMediaActive,
-  isQuoteActive,
+  isCalculatorActive,
   hideElementsActive,
   hideAfterSeconds,
 }) => {
@@ -381,13 +381,13 @@ const Header: React.FC<HeaderProps> = ({
         {/* divider */}
         <div className="h-5 w-[1px] bg-gray-500 dark:bg-lightBorder my-auto mx-2"></div>
 
-        {/* daily quote */}
+        {/* Calculator */}
         <div
           className="flex my-auto mr-2 p-1 hover:bg-neutral-600 dark:hover:bg-neutral-300 hover:rounded-md  cursor-pointer"
-          onClick={setIsQuoteActive}
-          title="quote"
+          onClick={setIsCalculatorActive}
+          title="Calculator"
         >
-          <QuoteIcon isActive={isQuoteActive} theme={theme} />
+          <CalculatorIcon isActive={isCalculatorActive} theme={theme} />
         </div>
       </div>
 

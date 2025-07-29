@@ -1,11 +1,11 @@
-import { QuoteProps } from "@/app/utility/types/componentTypes";
+import { CalculatorProps } from "@/app/utility/types/componentTypes";
 import { useDraggable } from "@dnd-kit/core";
 import React, { useContext, useEffect, useState } from "react";
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { MyContext } from "../../Workspace";
 
-const Quote: React.FC<QuoteProps> = ({
-  setIsQuoteActive,
+const Calculator: React.FC<CalculatorProps> = ({
+  setIsCalculatorActive,
   opacity,
   activeWidget,
   setActiveWidget,
@@ -17,7 +17,7 @@ const Quote: React.FC<QuoteProps> = ({
 
   if (!context) {
     throw new Error(
-      "The Quote component should be used within MyContext.Provider."
+      "The Calculator component should be used within MyContext.Provider."
     );
   }
 
@@ -36,7 +36,7 @@ const Quote: React.FC<QuoteProps> = ({
     transform,
     isDragging: dragging,
   } = useDraggable({
-    id: "quote-widget",
+    id: "calculator-widget",
   });
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const Quote: React.FC<QuoteProps> = ({
 
   return (
     <div
-      onMouseDown={() => setActiveWidget("quote")}
+      onMouseDown={() => setActiveWidget("calculator")}
       className="bg-main dark:bg-lightMain text-white dark:text-lightText rounded-lg shadow-md shadow-white/5 dark:shadow-black/30 flex-1 flex flex-col "
       style={{
         opacity: opacity,
@@ -66,7 +66,7 @@ const Quote: React.FC<QuoteProps> = ({
       {/* header */}
       <div className="flex justify-between w-96 p-2">
         <div className="">
-          <span className="w-21 flex font-semibold">Quote</span>
+          <span className="w-21 flex font-semibold">Calculator</span>
         </div>
 
         {/* div for dnd  */}
@@ -81,7 +81,7 @@ const Quote: React.FC<QuoteProps> = ({
         {/* minimize btn */}
         <button
           className="text-gray-400 dark:text-lightText mr-1 pb-2 pl-2"
-          onClick={setIsQuoteActive}
+          onClick={setIsCalculatorActive}
         >
           <FaRegWindowMinimize
             size={14}
@@ -99,4 +99,4 @@ const Quote: React.FC<QuoteProps> = ({
   );
 };
 
-export default Quote;
+export default Calculator;

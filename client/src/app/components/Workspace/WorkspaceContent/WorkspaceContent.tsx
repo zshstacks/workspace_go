@@ -24,7 +24,7 @@ import { restrictToTodoBoundingBox } from "@/app/hooks/restrictToTodoBoundingBox
 import RenderModalComponent from "@/app/hooks/Modal/RenderModalComponent";
 import { restrictToPaintBoundingBox } from "@/app/hooks/restrictToPaintBoundingBox";
 import { restrictToMediaBoundingBox } from "@/app/hooks/restrictToMediaBoundingBox";
-import { restrictToQuoteBoundingBox } from "@/app/hooks/restrictToQuoteBoundingBox";
+import { restrictToCalculatorBoundingBox } from "@/app/hooks/restrictToCalculatorBoundingBox";
 
 import { CgSpinnerAlt } from "react-icons/cg";
 import Footer from "../../Footer/Footer";
@@ -50,7 +50,7 @@ const BackgroundSelectVideo = lazy(
 const PomoTimer = lazy(() => import("./PomoTimer/PomoTimer"));
 const Paint = lazy(() => import("./Paint/Paint"));
 const Media = lazy(() => import("./MediaPlayer/MediaPlayer"));
-const Quote = lazy(() => import("./Quote/Quote"));
+const Calculator = lazy(() => import("./Calculator/Calculator"));
 
 const WidgetSkeleton = memo(() => (
   <div className="animate-spin absolute">
@@ -69,7 +69,7 @@ const WorkspaceContent = () => {
   const [isPaintActive, setIsPaintActive] = useToggleState(false);
   const [openUserStats, setOpenUserStats] = useToggleState(false);
   const [isMediaActive, setIsMediaActive] = useToggleState(false);
-  const [isQuoteActive, setIsQuoteActive] = useToggleState(false);
+  const [isCalculatorActive, setIsCalculatorActive] = useToggleState(false);
   const [openBackgroundSelect, setOpenBackgroundSelect] = useToggleState(false);
 
   const [hideElementsActive, setHideElementsActive] = useState(false);
@@ -83,12 +83,12 @@ const WorkspaceContent = () => {
     width: 590,
     height: 478,
   });
-  const [dimensionsQuote] = useState({
+  const [dimensionsCalculator] = useState({
     width: 590,
     height: 478,
   });
   const [activeWidget, setActiveWidget] = useState<
-    "todo" | "pomodoro" | "paint" | "media" | "quote"
+    "todo" | "pomodoro" | "paint" | "media" | "calculator"
   >("pomodoro");
   const [isClient, setIsClient] = useState(false);
   const [widgetLayout, setWidgetLayout] = useState<SavedWidgetLayoutInfo>({});
@@ -191,17 +191,20 @@ const WorkspaceContent = () => {
     [updateWidgetLayout, widgetLayout.MediaWidget]
   );
 
-  const handleQuoteDragEnd = useCallback(
+  const handleCalculatorDragEnd = useCallback(
     (delta: { x: number; y: number }) => {
-      const currentQuote = widgetLayout.QuoteWidget || { xPos: 0, yPos: 0 };
-      const newQuoteInfo = {
-        ...currentQuote,
-        xPos: currentQuote.xPos + delta.x,
-        yPos: currentQuote.yPos + delta.y,
+      const currentCalculator = widgetLayout.CalculatorWidget || {
+        xPos: 0,
+        yPos: 0,
       };
-      updateWidgetLayout("QuoteWidget", newQuoteInfo);
+      const newCalculatorInfo = {
+        ...currentCalculator,
+        xPos: currentCalculator.xPos + delta.x,
+        yPos: currentCalculator.yPos + delta.y,
+      };
+      updateWidgetLayout("CalculatorWidget", newCalculatorInfo);
     },
-    [updateWidgetLayout, widgetLayout.QuoteWidget]
+    [updateWidgetLayout, widgetLayout.CalculatorWidget]
   );
 
   useEffect(() => {
@@ -225,12 +228,12 @@ const WorkspaceContent = () => {
       setIsTodoActive,
       setOpenUserStats,
       setIsMediaActive,
-      setIsQuoteActive,
+      setIsCalculatorActive,
       setOpenBackgroundSelect,
       setOpacity,
       opacity,
       isTimerActive,
-      isQuoteActive,
+      isCalculatorActive,
       isPaintActive,
       isTodoActive,
       isMediaActive,
@@ -245,12 +248,12 @@ const WorkspaceContent = () => {
       setIsTodoActive,
       setOpenUserStats,
       setIsMediaActive,
-      setIsQuoteActive,
+      setIsCalculatorActive,
       setOpenBackgroundSelect,
       setOpacity,
       opacity,
       isTimerActive,
-      isQuoteActive,
+      isCalculatorActive,
       isPaintActive,
       isTodoActive,
       isMediaActive,
@@ -401,23 +404,23 @@ const WorkspaceContent = () => {
         </Suspense>
       )}
 
-      {/* quote */}
-      {isQuoteActive && (
+      {/* calculator */}
+      {isCalculatorActive && (
         <Suspense fallback={<WidgetSkeleton />}>
           <DndContext
-            modifiers={[restrictToQuoteBoundingBox(dimensionsQuote)]}
+            modifiers={[restrictToCalculatorBoundingBox(dimensionsCalculator)]}
             onDragEnd={(event) => {
               const { delta } = event;
-              handleQuoteDragEnd(delta);
+              handleCalculatorDragEnd(delta);
             }}
             id={dndId}
           >
-            <Quote
-              widgetInfo={widgetLayout.QuoteWidget}
+            <Calculator
+              widgetInfo={widgetLayout.CalculatorWidget}
               activeWidget={activeWidget}
               opacity={opacity}
               setActiveWidget={setActiveWidget}
-              setIsQuoteActive={setIsQuoteActive}
+              setIsCalculatorActive={setIsCalculatorActive}
             />
           </DndContext>
         </Suspense>

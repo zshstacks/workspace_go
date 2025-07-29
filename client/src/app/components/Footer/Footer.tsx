@@ -288,6 +288,7 @@ const Footer = () => {
               <div className="flex space-x-2 justify-center">
                 <input
                   maxLength={12}
+                  minLength={8}
                   autoComplete="off"
                   placeholder="Enter user unique #ID"
                   value={targetUserID}
