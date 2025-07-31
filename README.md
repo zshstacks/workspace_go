@@ -110,6 +110,8 @@ This application provides a convenient “workspace” environment where users c
 3. **Login Page**  
    ![Login screen](./screenshots/signin.png)
 
+   ![](./screenshots/main.gif)
+
 ---
 
 ## Requirements
