@@ -10,9 +10,9 @@ export const restrictToCalculatorBoundingBox =
     //restrictions where we can move
     const boundingBox = {
       top: 58,
-      bottom: window.innerHeight + 8,
-      left: 53,
-      right: window.innerWidth + 53,
+      bottom: window.innerHeight + 84,
+      left: 80,
+      right: window.innerWidth + 287,
     };
 
     let newX = transform.x;

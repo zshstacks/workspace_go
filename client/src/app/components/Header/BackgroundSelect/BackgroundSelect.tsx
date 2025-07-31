@@ -37,6 +37,16 @@ const BackgroundSelect: React.FC<BackgroundSelectProps> = ({
       label: "Space",
       preview: process.env.NEXT_PUBLIC_SPACE_PREVIEW as string,
     },
+    {
+      id: "L8ExkeuWzso",
+      label: "Tokyo Sky",
+      preview: process.env.NEXT_PUBLIC_TOKYO_SKY_PREVIEW as string,
+    },
+    {
+      id: "RzklsxGT438",
+      label: "Shibuya",
+      preview: process.env.NEXT_PUBLIC_SHIBUYA_PREVIEW as string,
+    },
   ];
 
   return (

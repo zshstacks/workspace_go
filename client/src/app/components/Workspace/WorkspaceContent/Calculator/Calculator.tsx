@@ -12,6 +12,9 @@ const Calculator: React.FC<CalculatorProps> = ({
   widgetInfo,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [display, setDisplay] = useState<string>("0");
+  const [overwrite, setOverwrite] = useState<boolean>(true);
+  const [lastWasOperator, setLastWasOperator] = useState<boolean>(false);
 
   const context = useContext(MyContext);
 
@@ -52,6 +55,121 @@ const Calculator: React.FC<CalculatorProps> = ({
     yPos: staticPosition.yPos + dynamicPosition.y,
   };
 
+  const handleClear = () => {
+    setDisplay("0");
+    setOverwrite(true);
+    setLastWasOperator(false);
+  };
+
+  const handleDelete = () => {
+    if (display.length === 1) {
+      setDisplay("0");
+      setOverwrite(true);
+      setLastWasOperator(false);
+    } else {
+      const newDisplay = display.slice(0, -1);
+      setDisplay(newDisplay);
+
+      const lastChar = newDisplay[newDisplay.length - 1];
+      setLastWasOperator(["+", "−", "×", "÷"].includes(lastChar));
+    }
+  };
+
+  const handleDigit = (digit: string) => {
+    if (overwrite) {
+      setDisplay(digit);
+      setOverwrite(false);
+    } else {
+      setDisplay((prev) => (prev === "0" ? digit : prev + digit));
+    }
+    setLastWasOperator(false);
+  };
+
+  const handleDot = () => {
+    if (overwrite) {
+      setDisplay("0.");
+      setOverwrite(false);
+      setLastWasOperator(false);
+      return;
+    }
+
+    const parts = display.split(/[+\−×÷]/);
+    const currentNumber = parts[parts.length - 1];
+
+    if (!currentNumber.includes(".")) {
+      setDisplay((prev) => prev + ".");
+      setLastWasOperator(false);
+    }
+  };
+
+  const handleOperation = (op: string) => {
+    if (lastWasOperator) {
+      setDisplay((prev) => prev.slice(0, -1) + op);
+    } else {
+      setDisplay((prev) => prev + op);
+    }
+    setLastWasOperator(true);
+    setOverwrite(false);
+  };
+
+  const handleEquals = () => {
+    try {
+      if (lastWasOperator) {
+        return;
+      }
+
+      const expression = display
+        .replace(/×/g, "*")
+        .replace(/÷/g, "/")
+        .replace(/−/g, "-");
+
+      if (!/^[0-9+\-*/.() ]+$/.test(expression)) {
+        setDisplay("Error");
+        setOverwrite(true);
+        setLastWasOperator(false);
+        return;
+      }
+
+      // eslint-disable-next-line no-eval
+      const result = eval(expression);
+
+      if (isNaN(result) || !isFinite(result)) {
+        setDisplay("Error");
+      } else {
+        setDisplay(String(result));
+      }
+    } catch {
+      setDisplay("Error");
+    }
+    setOverwrite(true);
+    setLastWasOperator(false);
+  };
+
+  const buttons = [
+    { label: "C", onClick: handleClear, className: "text-secondary" },
+    { label: "DEL", onClick: handleDelete },
+    { label: "÷", onClick: () => handleOperation("÷") },
+    { label: "×", onClick: () => handleOperation("×") },
+    { label: "7", onClick: () => handleDigit("7") },
+    { label: "8", onClick: () => handleDigit("8") },
+    { label: "9", onClick: () => handleDigit("9") },
+    { label: "−", onClick: () => handleOperation("−") },
+    { label: "4", onClick: () => handleDigit("4") },
+    { label: "5", onClick: () => handleDigit("5") },
+    { label: "6", onClick: () => handleDigit("6") },
+    { label: "+", onClick: () => handleOperation("+") },
+    { label: "1", onClick: () => handleDigit("1") },
+    { label: "2", onClick: () => handleDigit("2") },
+    { label: "3", onClick: () => handleDigit("3") },
+    {
+      label: "=",
+      onClick: handleEquals,
+      className: "row-span-2 bg-blue-600 text-white",
+    },
+    { label: "0", onClick: () => handleDigit("0"), className: "col-span-2" },
+    { label: ".", onClick: handleDot },
+  ];
+
   return (
     <div
       onMouseDown={() => setActiveWidget("calculator")}
@@ -60,7 +178,7 @@ const Calculator: React.FC<CalculatorProps> = ({
         opacity: opacity,
         transform: `translate3d(${combinedPosition.xPos}px, ${combinedPosition.yPos}px, 0)`,
         position: "fixed",
-        zIndex: activeWidget === "quote" ? 100 : 50,
+        zIndex: activeWidget === "calculator" ? 100 : 50,
       }}
     >
       {/* header */}
@@ -94,7 +212,30 @@ const Calculator: React.FC<CalculatorProps> = ({
       <div className="w-full h-[1px] bg-white/25 dark:bg-lightBorder "></div>
 
       {/* content */}
-      <div className="flex-1 overflow-hidden">ddd</div>
+      {/* Display */}
+      <div className=" text-right p-4">
+        <span className="text-right text-2xl font-mono break-all">
+          {display}
+        </span>
+      </div>
+
+      {/* Buttons Grid */}
+      <div className="grid grid-cols-4 grid-rows-5 gap-1 p-2">
+        {buttons.map((btn, idx) => (
+          <button
+            key={idx}
+            onClick={btn.onClick}
+            className={`
+              py-3 rounded-lg text-lg bg-white/10 hover:bg-white/20
+              ${btn.className ?? ""}
+              ${btn.label === "=" ? "row-span-2" : ""}
+              ${btn.label === "0" ? "col-span-2" : ""}
+            `}
+          >
+            {btn.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

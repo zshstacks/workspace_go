@@ -17,7 +17,7 @@ const VideoBackground = memo(() => {
     const aspectRatio = 16 / 9;
 
     const widthBaseHeight = viewportWidth / aspectRatio;
-    const heightBaseWidth = viewportHeight * aspectRatio;
+    // const heightBaseWidth = viewportHeight * aspectRatio;
 
     if (widthBaseHeight >= viewportHeight) {
       setVideoSize({ width: "100%", height: "86.25vw" });
