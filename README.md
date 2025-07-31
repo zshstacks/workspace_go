@@ -54,7 +54,7 @@ This application provides a convenient “workspace” environment where users c
      - Pomodoro timer with configurable durations
      - Calculator
      - Video player (YouTube)
-     - Paint tool (pen, width, shadow, shadow radius, fill pattern)
+     - Paint tool (pen, width, shadow, shadow radius, fill pattern, transform)
 
 2. **Chat Hub**
 
@@ -78,6 +78,7 @@ This application provides a convenient “workspace” environment where users c
 
    - Longest streak of consecutive days
    - Total visit days
+   - Current day streak
 
 6. **Account Management**
 
@@ -86,9 +87,15 @@ This application provides a convenient “workspace” environment where users c
    - View unique user ID
 
 7. **Authentication**
+
    - Email/password login
    - Social login (GitHub, Google)
    - Signup with email confirmation code
+
+8. **Drag&Drop / Resize**
+   - Drag&Drop widgets logic
+   - Resize widgets
+   - Screen restrictions towards DnD
 
 ---
 
@@ -97,11 +104,11 @@ This application provides a convenient “workspace” environment where users c
 1. **Main Workspace**  
    ![Workspace with widgets](./screenshots/workspace.png)
 
-2. **Statistics Modal**  
-   ![Statistics: longest streak & total days](./screenshots/stats.png)
+2. **Register page**  
+   ![Register page](./screenshots/signup.png)
 
 3. **Login Page**  
-   ![Login screen](./screenshots/login.png)
+   ![Login screen](./screenshots/signin.png)
 
 ---
 
