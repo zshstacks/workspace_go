@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"server/models"
 	"sort"
 	"sync"
 )
@@ -93,7 +94,13 @@ func generateRoomID(a, b string) string {
 
 // ws endpoint
 func ChatSocket(c *gin.Context) {
-	userA := c.Query("userID")     //connected side uniqueID
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+	currentUser := user.(models.User)
+	userA := currentUser.UniqueID  //connected side uniqueID
 	userB := c.Query("chatWithID") //target uniqueID
 
 	log.Printf("WebSocket connection attempt: userA=%s, userB=%s", userA, userB)
@@ -193,20 +200,17 @@ func (c *Connection) readPump() {
 
 		log.Printf("Parsed message from %s: %+v", c.id, msg)
 
-		// Automātiski izlabo senderID, ja tas ir tukšs vai nepareizs
 		if msg.SenderID == "" || msg.SenderID != c.id {
 			log.Printf("Auto-correcting senderID from '%s' to '%s'", msg.SenderID, c.id)
 			msg.SenderID = c.id
 		}
 
-		// Pārbaudi vai receiverID ir norādīts
 		if msg.ReceiverID == "" {
 			log.Printf("Missing receiverID in message from %s", c.id)
 			c.sendErrorMessage("ReceiverID is required")
 			continue
 		}
 
-		// Pārbaudi vai ziņojuma saturs nav tukšs
 		if msg.Body == "" {
 			log.Printf("Empty message body from user %s", c.id)
 			c.sendErrorMessage("Message body cannot be empty")
