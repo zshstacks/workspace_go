@@ -71,7 +71,7 @@ This application provides a convenient “workspace” environment where users c
 
 4. **Focus Mode**
 
-   - Header hides for a set duration
+   - Header hides after the set time
    - User-configurable focus time (in seconds)
 
 5. **Statistics**
@@ -126,7 +126,7 @@ This application provides a convenient “workspace” environment where users c
 1. **Backend**
 
    ```bash
-   cd backend
+   cd server
    go mod download
    go run main.go   //or CompileDaemon -command="./server"
 
