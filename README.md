@@ -2,6 +2,8 @@
 
 An interactive, fully web-based “workspace” application featuring productivity and communication tools.
 
+![](./screenshots/main.gif)
+
 ---
 
 ## Table of Contents
@@ -109,8 +111,6 @@ This application provides a convenient “workspace” environment where users c
 
 3. **Login Page**  
    ![Login screen](./screenshots/signin.png)
-
-   ![](./screenshots/main.gif)
 
 ---
 
