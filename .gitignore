@@ -16,7 +16,39 @@ dist-ssr
 server.exe
 server.exe~
 
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+coverage.txt
+vendor/
+
 uploads
+
+
+.env
+.env.local
+.env.dev
+.env.prod
+.env.production
+.env.development
+.env.staging
+*.env
+
+docker-compose.override.yml  
+.docker/   
+
+.next
+out
+
+tmp/
+temp/
+
+nginx/ssl/
+secrets/
+certs/
 
 # Editor directories and files
 .vscode/*
