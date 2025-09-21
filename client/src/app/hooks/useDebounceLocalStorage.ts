@@ -1,8 +1,17 @@
 import { useEffect } from "react";
 
+type SerializableValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | SerializableValue[]
+  | { [key: string]: SerializableValue };
+
 export const useDebounceLocalStorage = (
   key: string,
-  value: any,
+  value: SerializableValue,
   delay = 1000
 ) => {
   useEffect(() => {

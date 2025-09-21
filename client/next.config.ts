@@ -1,27 +1,38 @@
+// client/next.config.ts
 import type { NextConfig } from "next";
+import webpack from "webpack";
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
 const nextConfig: NextConfig = {
-  // Webpack optimization
-  webpack: (config, { dev, isServer }) => {
-    // Production optimization
-    if (!dev) {
+  webpack: (
+    config: webpack.Configuration,
+    { dev, isServer }: { dev: boolean; isServer: boolean }
+  ) => {
+    // config.plugins tipa nodrošināšana
+    config.plugins = config.plugins || [];
+
+    // Docker hot reload configuration for development
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+        ignored: /node_modules/,
+      };
+    }
+
+    if (!dev && !isServer) {
       config.optimization = {
         ...config.optimization,
         splitChunks: {
           chunks: "all",
           cacheGroups: {
-            default: {
-              minChunks: 2,
-              priority: -20,
-              reuseExistingChunk: true,
-            },
+            default: { minChunks: 2, priority: -20, reuseExistingChunk: true },
             vendor: {
               test: /[\\/]node_modules[\\/]/,
               name: "vendors",
               priority: -10,
               chunks: "all",
             },
-            // Seperates chunks for big libs
             react: {
               test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
               name: "react",
@@ -39,23 +50,17 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Bundle analyzer
     if (process.env.ANALYZE === "true") {
-      const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+      // BundleAnalyzerPlugin implementē WebpackPluginInstance
       config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: "server",
-          openAnalyzer: true,
-        })
+        new BundleAnalyzerPlugin() as unknown as webpack.WebpackPluginInstance
       );
     }
 
     return config;
   },
 
-  // Expremental func
   experimental: {
-    // Optimized JS bundling
     optimizePackageImports: [
       "@dnd-kit/core",
       "@dnd-kit/sortable",
@@ -63,13 +68,8 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Compiling optimization
-  compiler: {
-    // Dead code elimination
-    removeConsole: process.env.NODE_ENV === "production",
-  },
+  compiler: { removeConsole: process.env.NODE_ENV === "production" },
 
-  // Optimized images
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -83,24 +83,26 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Headers and caching
+  // Configure for containerized environment
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/:path*`,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
-          {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
-          },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-XSS-Protection", value: "1; mode=block" },
         ],
       },
       {
@@ -115,12 +117,18 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Poweredby header elimination
+  // Environment variables validation
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
+
+  // Disable telemetry
+  telemetry: {
+    enabled: false,
+  },
+
   poweredByHeader: false,
-
-  // Optimized tracing
   output: process.env.NODE_ENV === "production" ? "standalone" : undefined,
-
   reactStrictMode: true,
 };
 

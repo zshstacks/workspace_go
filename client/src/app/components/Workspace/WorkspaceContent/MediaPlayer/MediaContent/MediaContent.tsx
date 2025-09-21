@@ -1,5 +1,5 @@
 import { MediaContentProps } from "@/app/utility/types/componentTypes";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 
 const MediaContent: React.FC<MediaContentProps> = React.memo(
   ({ youtubeUrl }) => {
@@ -8,14 +8,14 @@ const MediaContent: React.FC<MediaContentProps> = React.memo(
 
     const getYoutubeId = useCallback((url: string): string | null => {
       const match = url.match(
-        /(?:https?:\/\/)?(?:www\.)?youtu(?:\.be\/|be\.com\/watch\?v=)([A-Za-z0-9_-]{11})/
+        /(?:https?:\/\/)?(?:www\.)?youtu(?:\.be\/|be\.com\/watch\?v=)([A-Za-z0-9_-]{11})/,
       );
       return match ? match[1] : null;
     }, []);
 
     const videoId = useMemo(
       () => getYoutubeId(youtubeUrl),
-      [youtubeUrl, getYoutubeId]
+      [youtubeUrl, getYoutubeId],
     );
 
     //prevent unnecessary iframe reloads
@@ -53,7 +53,7 @@ const MediaContent: React.FC<MediaContentProps> = React.memo(
       (e: React.SyntheticEvent<HTMLIFrameElement>) => {
         console.warn("YouTube iframe failed to load:", e);
       },
-      []
+      [],
     );
 
     // const handleIframeLoad = useCallback(() => {
@@ -123,7 +123,7 @@ const MediaContent: React.FC<MediaContentProps> = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 MediaContent.displayName = "MediaContent";

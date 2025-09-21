@@ -7,9 +7,10 @@ export interface ContextProps {
   setVideoId: React.Dispatch<React.SetStateAction<string>>;
 }
 
+type ReactComponent<P = Record<string, unknown>> = ComponentType<P>;
 //render modal component
-export interface RenderModalComponentProps<T extends Record<string, any>> {
+export interface RenderModalComponentProps<T extends Record<string, unknown>> {
   isOpen: boolean;
-  Component: ComponentType<T>;
+  Component: ReactComponent<T>;
   props: T;
 }

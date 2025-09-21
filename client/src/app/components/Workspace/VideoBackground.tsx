@@ -28,9 +28,10 @@ const VideoBackground = memo(() => {
 
   //cleanup iframe
   useEffect(() => {
+    const iframe = iframeRef.current;
     return () => {
-      if (iframeRef.current) {
-        iframeRef.current.src = "about:blank";
+      if (iframe) {
+        iframe.src = "about:blank";
       }
     };
   }, []);

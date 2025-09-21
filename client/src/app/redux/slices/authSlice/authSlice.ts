@@ -1,4 +1,4 @@
-import { AuthState, ErrorPayload } from "@/app/utility/types/reduxTypes";
+import { AuthState, ErrorPayload, User } from "@/app/utility/types/reduxTypes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   emailConfirmation,
@@ -96,13 +96,10 @@ const authSlice = createSlice({
         state.successLogout = action.payload.successLogout;
       })
 
-      .addCase(
-        oauthLogin.fulfilled,
-        (state, action: PayloadAction<AuthState>) => {
-          state.isLoading = false;
-          state.user = action.payload.user || action.payload;
-        }
-      )
+      .addCase(oauthLogin.fulfilled, (state, action: PayloadAction<User>) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
 
       .addMatcher(
         (action) => action.type.endsWith("/pending"),

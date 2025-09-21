@@ -1,4 +1,16 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+
+interface RefreshTokenResponse {
+  token: string;
+}
+
+interface RetryableRequest extends AxiosRequestConfig {
+  _retry?: boolean;
+}
+interface QueueItem {
+  resolve: (value: string | null) => void;
+  reject: (reason?: unknown) => void;
+}
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -6,12 +18,9 @@ const api = axios.create({
 });
 
 let isRefreshing = false;
-let failedQueue: {
-  resolve: (value: any) => void;
-  reject: (reason?: any) => void;
-}[] = [];
+let failedQueue: QueueItem[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null): void => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -23,46 +32,58 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  (response: AxiosResponse) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as RetryableRequest;
 
-    // Check if this is an authentication error and the request hasn't been retried
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      // If a refresh is already in progress, queue this request
+    // Check if there is an authentication error and the request is not retry
+    if (error.response?.status === 401 && !originalRequest?._retry) {
+      // If refresh is already in progress, add to request queue
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers["Authorization"] = "Bearer " + token;
-            return api(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
+        return new Promise<AxiosResponse>((resolve, reject) => {
+          failedQueue.push({
+            resolve: (token) => {
+              if (originalRequest) {
+                originalRequest.headers = originalRequest.headers || {};
+                originalRequest.headers["Authorization"] = "Bearer " + token;
+                resolve(api(originalRequest));
+              }
+            },
+            reject,
+          });
+        }).catch((err: unknown) => Promise.reject(err));
       }
 
-      originalRequest._retry = true;
+      if (originalRequest) {
+        originalRequest._retry = true;
+      }
       isRefreshing = true;
 
       try {
-        // Perform token refresh
-        const refreshResponse = await api.post("/refresh-token");
+        // token refresh
+        const refreshResponse = await api.post<RefreshTokenResponse>(
+          "/refresh-token"
+        );
 
-        // Reset the flag
+        // refresh flag
         isRefreshing = false;
 
-        // Process queued requests
+        // Processes the row
         processQueue(null, refreshResponse.data.token);
 
-        // Retry the original request
-        return api(originalRequest);
-      } catch (refreshError) {
-        // If refresh fails, process queue with error and redirect with session expired flag
+        // Retry origin request
+        if (originalRequest) {
+          return api(originalRequest);
+        }
+      } catch (refreshError: unknown) {
+        // If refresh unsuccessful, rocesses the row with error and redirect
         isRefreshing = false;
         processQueue(refreshError);
 
-        // Redirect to signin with session expired parameter
-        window.location.href = "/signin?session=expired";
+        // Redirect to signin with session expired param
+        if (typeof window !== "undefined") {
+          window.location.href = "/signin?session=expired";
+        }
 
         return Promise.reject(refreshError);
       }

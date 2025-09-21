@@ -58,7 +58,6 @@ export interface SavedWidgetLayoutInfo {
 export interface PomoTimerSettingsProps {
   setIsHideCount: () => void;
   ishideCount: boolean;
-
   setTimerSound: (newSound: string) => void;
   volume: number;
   setVolume: (volume: number) => void;
@@ -130,9 +129,20 @@ export interface EmailModalProps {
   email: string;
 }
 
+// Task objekta tips
+export interface Task {
+  LocalID: number;
+  Title: string;
+  Description: string;
+  Completed: boolean;
+  Order: number;
+  CreatedAt?: string;
+  UpdatedAt?: string;
+}
+
 // Sortable Task Item Component
 export interface SortableTaskItemProps {
-  task: any;
+  task: Task;
   handleCompleteTask: (taskId: number, isCompleted: boolean) => void;
   handleDeleteTask: (taskId: number) => void;
   autoResizeTextarea: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;

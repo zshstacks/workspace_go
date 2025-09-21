@@ -1,0 +1,11 @@
+echo "node_modules
+.git
+.env*
+README.md
+.dockerignore
+Dockerfile*
+.next
+.nuxt
+dist
+coverage
+.nyc_output" > client/.dockerignore

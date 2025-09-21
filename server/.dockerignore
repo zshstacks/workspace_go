@@ -1,0 +1,9 @@
+echo ".git
+.env*
+README.md
+.dockerignore
+Dockerfile*
+tmp/
+*.log
+coverage
+.nyc_output" > server/.dockerignore

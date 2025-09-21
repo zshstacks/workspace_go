@@ -53,7 +53,7 @@ const TimerIcon = memo(
       size={19}
       color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
     />
-  )
+  ),
 );
 TimerIcon.displayName = "TimerIcon";
 
@@ -63,7 +63,7 @@ const TodoIcon = memo(
       size={19}
       color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
     />
-  )
+  ),
 );
 TodoIcon.displayName = "TodoIcon";
 
@@ -73,7 +73,7 @@ const PaintIcon = memo(
       size={19}
       color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
     />
-  )
+  ),
 );
 PaintIcon.displayName = "PaintIcon";
 
@@ -83,7 +83,7 @@ const MediaIcon = memo(
       size={20}
       color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
     />
-  )
+  ),
 );
 MediaIcon.displayName = "MediaIcon";
 
@@ -93,7 +93,7 @@ const CalculatorIcon = memo(
       size={20}
       color={isActive ? "#e89688" : theme === "dark" ? "#4e4e4e" : "white"}
     />
-  )
+  ),
 );
 CalculatorIcon.displayName = "CalculatorIcon";
 
@@ -120,7 +120,7 @@ const VolumeSlider = memo(
       onChange={onChange}
       className="w-full flex h-[2px] m-auto bg-gray-300 rounded-lg appearance-none cursor-pointer accent-gray-400 hover:accent-gray-300 dark:accent-gray-300 dark:hover:accent-gray-400"
     />
-  )
+  ),
 );
 VolumeSlider.displayName = "VolumeSlider";
 
@@ -159,7 +159,7 @@ const Header: React.FC<HeaderProps> = ({
   const context = useContext(MyContext);
   if (!context) {
     throw new Error(
-      "The Header component should be used within MyContext.Provider."
+      "The Header component should be used within MyContext.Provider.",
     );
   }
   const { theme } = context;
@@ -168,6 +168,7 @@ const Header: React.FC<HeaderProps> = ({
   const userMenuRef = useRef<HTMLDivElement>(null);
   const headerTimeoutRef = useRef<number | null>(null); //memory leaks fix
   const mouseMoveTimeoutRef = useRef<number | null>(null);
+  const initialVolumeRef = useRef<number>(volume);
 
   // Optimized click outside handler
   useEffect(() => {
@@ -210,12 +211,13 @@ const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     rainSoundRef.current = new Howl({
       src: [`${process.env.NEXT_PUBLIC_RAIN_AUDIO}`],
-      volume: volume,
+      volume: initialVolumeRef.current,
       loop: true,
     });
 
     return () => {
       rainSoundRef.current?.unload();
+      rainSoundRef.current = null;
     };
   }, []);
 
@@ -301,13 +303,14 @@ const Header: React.FC<HeaderProps> = ({
       volume: (e: React.ChangeEvent<HTMLInputElement>) =>
         setVolume(parseFloat(e.target.value)),
     }),
-    [setOpacity]
+    [setOpacity],
   );
 
   //clenup on unmount
   useEffect(() => {
     return () => {
       rainSoundRef.current?.unload();
+      rainSoundRef.current = null;
     };
   }, []);
 

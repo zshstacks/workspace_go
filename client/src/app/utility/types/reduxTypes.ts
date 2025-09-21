@@ -1,3 +1,15 @@
+// User object types
+export interface User {
+  id: string;
+  email: string;
+  username: string;
+  uniqueID: string;
+  createdAt?: string;
+  updatedAt?: string;
+  isVerified?: boolean;
+  avatar?: string;
+}
+
 //redux auth slice
 export interface AuthState {
   emailError: string | null;
@@ -14,7 +26,7 @@ export interface AuthState {
   successLogin: string | null;
 
   isLoading: boolean;
-  user: any | null;
+  user: User | null;
 }
 
 //redux auth .rejected
@@ -29,7 +41,7 @@ export interface ErrorPayload {
 
 //redux user slice
 export interface UserState {
-  user: any | null;
+  user: User | null;
   isLoading: boolean;
   error: string | null;
   successDelete: string | null;

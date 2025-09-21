@@ -105,7 +105,7 @@ export const disconnectFromChat = createAsyncThunk(
       }
 
       return true;
-    } catch (error) {
+    } catch {
       return thunkAPI.rejectWithValue({
         error: "Failed to disconnect from chat",
       });

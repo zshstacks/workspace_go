@@ -4,13 +4,7 @@ import {
   updatePomodoroTime,
 } from "@/app/redux/slices/pomodoroSlice/asyncActions";
 import { AppDispatch, RootState } from "@/app/redux/store";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { PiSpeakerHigh } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { MyContext } from "../../../Workspace";
