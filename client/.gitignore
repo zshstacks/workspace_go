@@ -17,6 +17,12 @@
 /.next/
 /out/
 
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
 # production
 /build
 
@@ -32,7 +38,23 @@ yarn-debug.log*
 yarn-error.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+*.env
+.env
+.env.local
+.env.dev
+.env.prod
+.env.production
+.env.development
+.env.staging
+
+# Docker related files that should be ignored
+docker-compose.override.yml  
+.docker/         
+
+# SSL certificates and secrets (if you add them later)
+nginx/ssl/
+secrets/
+certs/
 
 # vercel
 .vercel
@@ -46,3 +68,7 @@ frontend.key
 frontend.crt
 frontend.key~
 frontend.crt~
+
+# Temporary folders
+tmp/
+temp/
