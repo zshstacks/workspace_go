@@ -11,7 +11,26 @@ node_modules
 dist
 dist-ssr
 *.local
+
+
+# Environment files (IMPORTANT - Contains sensitive data)
 .env
+.env.local
+.env.dev
+.env.prod
+.env.production
+.env.development
+.env.staging
+*.env
+
+# Docker related files that should be ignored
+docker-compose.override.yml
+.docker/
+
+# SSL certificates and secrets
+nginx/ssl/
+secrets/
+certs/
 
 certs
 server.crt
@@ -35,3 +54,16 @@ uploads
 *.exe
 *.exe~
 *.sw?
+
+# Temporary folders
+tmp/
+temp/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.backup
+*.bak
